@@ -175,7 +175,13 @@ export const AdminLoginView = () => {
                     </button>
                 </form>
 
-                <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+                <div className="mt-6 pt-6 border-t border-slate-100 text-center flex flex-col gap-4">
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider"
+                    >
+                        Return to User Portal
+                    </button>
                     <p className="text-[10px] text-slate-400 font-mono">
                         SYSTEM V2.4.0 • SECURE CONNECTION
                     </p>

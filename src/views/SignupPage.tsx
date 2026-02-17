@@ -170,15 +170,24 @@ export const SignupPage = () => {
                     </button>
                 </form>
 
-                <p className="mt-6 text-center text-sm text-gray-600">
-                    Already have an account?{' '}
+                <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-4">
+                    <p className="text-sm text-gray-600">
+                        Already have an account?{' '}
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="text-gray-900 font-bold hover:underline"
+                        >
+                            Login
+                        </button>
+                    </p>
                     <button
-                        onClick={() => navigate('/login')}
-                        className="text-gray-900 font-bold hover:underline"
+                        onClick={() => navigate('/admin/login')}
+                        className="text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors flex items-center gap-1.5 uppercase tracking-wider"
                     >
-                        Login
+                        <span className="h-1 w-1 rounded-full bg-gray-300" />
+                        Admin Console
                     </button>
-                </p>
+                </div>
             </div>
         </div>
     );
