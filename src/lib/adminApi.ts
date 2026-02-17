@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 
 const adminApi = axios.create({
-    baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5005').replace(/\/$/, '') + '/admin',
+    baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5005').replace(/\/+$/, '') + '/admin',
 });
 
 // Request interceptor to add token
