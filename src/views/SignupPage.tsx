@@ -60,6 +60,17 @@ export const SignupPage = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-lg p-8">
+                <div className="flex flex-col items-center gap-6 mb-8">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-gray-900 text-white rounded-2xl flex items-center justify-center font-bold tracking-tighter text-base shadow-xl shadow-gray-200">
+                            B
+                        </div>
+                        <span className="text-2xl font-bold tracking-tight text-gray-900">
+                            Best For <span className="text-gray-400 font-medium">Everyone</span>
+                        </span>
+                    </div>
+                </div>
+
                 <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
                     Create Account
                 </h1>
