@@ -1,18 +1,25 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { authApi } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useToastStore } from '@/store/useToastStore';
 
 export const SignupPage = () => {
+    const { referralCode: urlReferralCode } = useParams();
     const [formData, setFormData] = useState({
         fullname: '',
         username: '',
         phone: '',
         password: '',
         confirmPassword: '',
-        referralCode: '',
+        referralCode: urlReferralCode || '',
     });
+
+    useEffect(() => {
+        if (urlReferralCode) {
+            setFormData(prev => ({ ...prev, referralCode: urlReferralCode }));
+        }
+    }, [urlReferralCode]);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);

@@ -66,6 +66,10 @@ const App = () => {
               path="/signup"
               element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupPage />}
             />
+            <Route
+              path="/join/:referralCode"
+              element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupPage />}
+            />
 
             {/* Payment Verification (authenticated but not verified) */}
             <Route
