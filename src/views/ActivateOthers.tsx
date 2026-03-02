@@ -1,17 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { authApi } from '@/lib/api';
+import { authApi, epinApi } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/PageHeader';
 
 export const ActivateOthers = () => {
     const { user, updateUser } = useAuthStore();
+    const { fetchMatrixStatus } = useAppStore();
     const [targetUsername, setTargetUsername] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [pin, setPin] = useState('');
+    const [epins, setEpins] = useState([]);
+
+    const fetchMyEpins = async () => {
+        try {
+            const data = await epinApi.getMyEpins();
+            setEpins(data.epins);
+        } catch (error) {
+            console.error('Failed to fetch E-pins:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMyEpins();
+    }, []);
 
     const handleActivate = async () => {
         if (!targetUsername.trim()) {
@@ -24,19 +41,14 @@ export const ActivateOthers = () => {
         setSuccess(null);
 
         try {
-            const response = await authApi.activateOther(targetUsername.trim());
+            const response = await epinApi.use(pin.trim(), targetUsername.trim());
+
             setSuccess(response.message);
-            // Update local user balance
-            if (response.newBalance !== undefined) {
-                updateUser({
-                    wallet: {
-                        ...user?.wallet,
-                        balance: response.newBalance
-                    }
-                });
-            }
             setTargetUsername('');
+            setPin('');
             setShowConfirm(false);
+            fetchMyEpins(); // Refresh pins list
+            fetchMatrixStatus(); // Refresh matrix cycle if user themselves was the parent/referral target
         } catch (err: any) {
             setError(err.message || 'Activation failed');
             setShowConfirm(false);
@@ -45,7 +57,7 @@ export const ActivateOthers = () => {
         }
     };
 
-    const canAfford = (user?.wallet?.balance || 0) >= 1180;
+    // const canAfford = (user?.wallet?.balance || 0) >= 1180;
 
     return (
         <motion.div
@@ -55,22 +67,15 @@ export const ActivateOthers = () => {
         >
             <PageHeader title="Activate Others" subtitle="Use your balance to help others" />
 
-            {/* Wallet Info */}
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-lg overflow-hidden relative">
+            {/* Wallet Info - Removed balance check visual as only E-pin is used now */}
+            <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-3xl p-6 text-white shadow-lg overflow-hidden relative">
                 <div className="relative z-10">
-                    <p className="text-blue-100 text-xs font-bold uppercase tracking-wider mb-1">Available Balance</p>
-                    <h3 className="text-3xl font-bold">₹{user?.wallet?.balance?.toLocaleString()}</h3>
-                    <div className="mt-4 flex items-center gap-2 text-xs">
-                        <div className={`h-2 w-2 rounded-full ${canAfford ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                        <span className="font-medium">
-                            {canAfford
-                                ? 'You have enough balance to activate a user'
-                                : `You need ₹${(1180 - (user?.wallet?.balance || 0)).toLocaleString()} more for activation`}
-                        </span>
-                    </div>
+                    <p className="text-blue-100 text-xs font-bold uppercase tracking-wider mb-1">E-pin Activation</p>
+                    <h3 className="text-3xl font-bold text-white">Activate Accounts</h3>
+                    <p className="mt-2 text-sm text-blue-100 opacity-80">Enter a username and use an E-pin to activate their account.</p>
                 </div>
                 <Icon
-                    icon="solar:wallet-money-bold-duotone"
+                    icon="solar:ticket-bold-duotone"
                     className="absolute -right-4 -bottom-4 text-white/10"
                     width={140}
                 />
@@ -91,6 +96,24 @@ export const ActivateOthers = () => {
                             placeholder="Enter username (e.g. john_doe)"
                             className="block w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400"
                         />
+                    </div>
+                </div>
+
+                <div className="space-y-4 pt-2">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700 ml-1">E-pin Code</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                <Icon icon="solar:ticket-bold" width={20} />
+                            </div>
+                            <input
+                                type="text"
+                                value={pin}
+                                onChange={(e) => setPin(e.target.value.toUpperCase())}
+                                placeholder="Enter E-pin code"
+                                className="block w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400"
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -117,7 +140,7 @@ export const ActivateOthers = () => {
                 )}
 
                 <button
-                    disabled={!canAfford || !targetUsername.trim() || loading}
+                    disabled={!targetUsername.trim() || !pin.trim() || loading}
                     onClick={() => setShowConfirm(true)}
                     className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold shadow-lg hover:bg-gray-800 disabled:opacity-50 disabled:bg-gray-400 transition-all click-scale flex items-center justify-center gap-2"
                 >
@@ -125,11 +148,51 @@ export const ActivateOthers = () => {
                         <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                         <>
-                            <Icon icon="solar:user-plus-bold" width={20} />
-                            Activate Account (₹1,180)
+                            <Icon icon="solar:ticket-bold" width={20} />
+                            Activate Account with E-pin
                         </>
                     )}
                 </button>
+            </div>
+
+            {/* Available E-pins Section */}
+            <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-card space-y-4">
+                <div className="flex justify-between items-center px-1">
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">My Available E-pins</h3>
+                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                        {epins.filter((e: any) => e.status === 'active').length} Available
+                    </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                    {epins.filter((e: any) => e.status === 'active').length > 0 ? (
+                        epins.filter((e: any) => e.status === 'active').map((e: any) => (
+                            <button
+                                key={e._id}
+                                onClick={() => {
+                                    setPin(e.pin);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="group flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:border-blue-200 hover:bg-blue-50/50 transition-all text-left click-scale"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-gray-400 group-hover:text-blue-600 transition-colors shadow-sm">
+                                        <Icon icon="solar:ticket-bold" width={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{e.pin}</p>
+                                        <p className="text-[10px] text-gray-500 font-medium">Click to use</p>
+                                    </div>
+                                </div>
+                                <Icon icon="solar:round-alt-arrow-right-bold" className="text-gray-300 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" width={20} />
+                            </button>
+                        ))
+                    ) : (
+                        <div className="col-span-full py-8 text-center text-gray-400 text-sm italic">
+                            No unused E-pins available
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Confirmation Modal */}
@@ -154,7 +217,7 @@ export const ActivateOthers = () => {
                             </div>
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">Confirm Activation</h3>
                             <p className="text-gray-500 text-sm mb-6 px-2">
-                                You are about to deduct <span className="text-gray-900 font-bold">₹1,180</span> from your balance to activate <span className="text-blue-600 font-bold">@{targetUsername}</span>. This action cannot be undone.
+                                You are about to use E-pin <span className="text-blue-600 font-bold">{pin}</span> to activate <span className="text-blue-600 font-bold">@{targetUsername}</span>. This action cannot be undone.
                             </p>
                             <div className="flex gap-3">
                                 <button

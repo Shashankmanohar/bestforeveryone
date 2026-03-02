@@ -17,20 +17,16 @@ interface Transaction {
 
 export const WalletView = () => {
   const { user } = useAuthStore();
-  const { wallet, fetchWalletData } = useAppStore();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const { wallet, fetchWalletData, transactions, fetchTransactions } = useAppStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchWalletData();
-
-        // Fetch transactions locally
-        const txData = await walletApi.getTransactions();
-        if (txData?.transactions) {
-          setTransactions(txData.transactions);
-        }
+        await Promise.all([
+          fetchWalletData(),
+          fetchTransactions()
+        ]);
       } catch (error) {
         console.error('Failed to fetch wallet data:', error);
       } finally {
@@ -39,7 +35,7 @@ export const WalletView = () => {
     };
 
     fetchData();
-  }, [fetchWalletData]);
+  }, [fetchWalletData, fetchTransactions]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

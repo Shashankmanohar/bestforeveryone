@@ -1,5 +1,9 @@
 // API Configuration
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5005').replace(/\/+$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5005' : '')).replace(/\/+$/, '');
+
+if (!API_BASE_URL && import.meta.env.PROD) {
+    console.error('CRITICAL: VITE_API_URL is not defined in production environment!');
+}
 
 // Token management
 const getToken = () => localStorage.getItem('token');
@@ -13,10 +17,19 @@ const apiClient = async (endpoint: string, options: RequestInit = {}) => {
     const token = getToken();
 
     const headers: HeadersInit = {
-        'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
     };
+
+    // Only set Content-Type if it's not already set and the body is not FormData
+    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
+
+    // If it is FormData, the browser will automatically set the Content-Type with the boundary
+    if (options.body instanceof FormData) {
+        delete headers['Content-Type'];
+    }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
@@ -87,6 +100,34 @@ export const authApi = {
         method: 'POST',
         body: JSON.stringify({ targetUsername })
     }),
+
+    submitKyc: (formData: FormData) => apiClient('/user/kyc/submit', {
+        method: 'POST',
+        body: formData,
+    }),
+
+    changePassword: (data: any) => apiClient('/user/profile/change-password', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+};
+
+// Admin API
+export const adminApi = {
+    getDashboard: () => apiClient('/admin/metrics'),
+    getUsers: (params?: any) => {
+        const query = new URLSearchParams(params).toString();
+        return apiClient(`/admin/users?${query}`);
+    },
+    getPendingKyc: () => apiClient('/admin/kyc/pending'),
+    approveKyc: (userId: string) => apiClient(`/admin/kyc/approve/${userId}`, {
+        method: 'PUT'
+    }),
+    rejectKyc: (userId: string, reason: string) => apiClient(`/admin/kyc/reject/${userId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ reason })
+    }),
+    // ... other admin methods if needed
 };
 
 // Wallet API
@@ -131,6 +172,21 @@ export const leadershipApi = {
     getRoyalty: () => apiClient('/user/leadership'),
     getLogs: () => apiClient('/user/leadership/logs'),
     getDownlineCount: () => apiClient('/user/downline/count'),
+};
+
+// E-pin API
+export const epinApi = {
+    buy: (amount: number = 1357) =>
+        apiClient('/user/epin/buy', {
+            method: 'POST',
+            body: JSON.stringify({ amount }),
+        }),
+    getMyEpins: () => apiClient('/user/epin/my-pins'),
+    use: (pin: string, targetUsername: string) =>
+        apiClient('/user/epin/use', {
+            method: 'POST',
+            body: JSON.stringify({ pin, targetUsername }),
+        }),
 };
 
 export { getToken, setToken, removeToken };

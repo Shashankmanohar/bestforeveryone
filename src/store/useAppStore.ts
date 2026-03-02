@@ -1,13 +1,13 @@
 import { create } from 'zustand';
-import { walletApi, withdrawalApi, referralApi } from '@/lib/api';
+import { walletApi, withdrawalApi, referralApi, epinApi } from '@/lib/api';
 
 export interface Transaction {
-  id: number;
+  _id: string;
   type: string;
-  desc: string;
+  description: string;
   amount: number;
-  date: string;
   status: 'credit' | 'debit';
+  createdAt: string;
 }
 
 export interface BonanzaLog {
@@ -99,7 +99,10 @@ export interface AppState {
   closeSidebar: () => void;
   processWithdrawal: (amount: number, bankDetails: any, walletType?: 'current' | 'matrix') => Promise<void>;
   updateBalance: (amount: number) => void;
+  buyEpin: (amount?: number) => Promise<any>;
   fetchWalletData: () => Promise<void>;
+  fetchMatrixStatus: () => Promise<void>;
+  fetchTransactions: () => Promise<void>;
   setWallet: (walletData: any) => void;
   setWeekly: (weeklyData: any) => void;
 }
@@ -191,11 +194,11 @@ export const useAppStore = create<AppState>((set, get) => ({
           },
           transactions: [
             {
-              id: Date.now(),
+              _id: Date.now().toString(), // Changed from 'id' to '_id' and converted to string
               type: "Withdrawal",
-              desc: `Processing (${walletType})...`,
+              description: `Processing(${walletType})...`, // Changed from 'desc' to 'description'
               amount: amount,
-              date: "Just Now",
+              createdAt: new Date().toISOString(), // Changed from 'date' to 'createdAt' and formatted
               status: "debit"
             } as Transaction,
             ...state.transactions
@@ -213,6 +216,34 @@ export const useAppStore = create<AppState>((set, get) => ({
       balance: state.wallet.balance + amount
     }
   })),
+
+  buyEpin: async (amount: number = 1357) => {
+    try {
+      const response = await epinApi.buy(amount);
+      if (response.newBalance !== undefined) {
+        set((state) => ({
+          wallet: {
+            ...state.wallet,
+            balance: response.newBalance
+          },
+          transactions: [
+            {
+              _id: Date.now().toString(), // Changed from 'id' to '_id' and converted to string
+              type: "E-pin Purchase",
+              description: `Pin: ${response.epin.pin} `, // Changed from 'desc' to 'description'
+              amount: amount,
+              createdAt: new Date().toISOString(), // Changed from 'date' to 'createdAt' and formatted
+              status: "debit"
+            } as Transaction,
+            ...state.transactions
+          ]
+        }));
+      }
+      return response;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to purchase E-pin');
+    }
+  },
 
   fetchWalletData: async () => {
     try {
@@ -249,6 +280,29 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch wallet data:', error);
+    }
+  },
+
+  fetchMatrixStatus: async () => {
+    try {
+      const { matrixApi } = await import('@/lib/api');
+      const data = await matrixApi.getStatus();
+      if (data?.matrix) {
+        set({ matrix: data.matrix });
+      }
+    } catch (error) {
+      console.error('Failed to fetch matrix status:', error);
+    }
+  },
+
+  fetchTransactions: async () => {
+    try {
+      const response = await walletApi.getTransactions();
+      if (response?.transactions) {
+        set({ transactions: response.transactions });
+      }
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error);
     }
   },
 

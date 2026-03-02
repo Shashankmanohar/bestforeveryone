@@ -144,7 +144,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     fetchActivity: async () => {
         set({ loading: true, error: null });
         try {
-            const response = await adminApi.get('/activity?limit=10');
+            const response = await adminApi.get('/activity?limit=50');
             set({ activities: response.data.activities, loading: false });
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to fetch activity', loading: false });

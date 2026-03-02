@@ -20,6 +20,9 @@ import { AdminView } from "./views/AdminView";
 import { PaymentView } from "./views/PaymentView";
 import { PaymentVerificationView } from "./views/PaymentVerificationView";
 import { ActivateOthers } from "./views/ActivateOthers";
+import { SupportView } from "./views/SupportView";
+import { KycView } from "./views/KycView";
+import { AdminKycView } from "./views/AdminKycView";
 import { useAuthStore } from "./store/useAuthStore";
 
 const queryClient = new QueryClient();
@@ -79,6 +82,10 @@ const App = () => {
               path="/admin"
               element={<AdminProtectedRoute><AdminView /></AdminProtectedRoute>}
             />
+            <Route
+              path="/admin/kyc"
+              element={<AdminProtectedRoute><AdminKycView /></AdminProtectedRoute>}
+            />
 
             {/* Protected routes */}
             <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
@@ -92,9 +99,11 @@ const App = () => {
               <Route path="/bonanza" element={<BonanzaView />} />
               <Route path="/profile" element={<ProfileView />} />
               <Route path="/activate-others" element={<ActivateOthers />} />
+              <Route path="/support" element={<SupportView />} />
               <Route path="/terms" element={<TermsView />} />
               <Route path="/notifications" element={<DashboardView />} />
               <Route path="/payment" element={<PaymentView />} />
+              <Route path="/kyc" element={<KycView />} />
             </Route>
           </Routes>
         </BrowserRouter>

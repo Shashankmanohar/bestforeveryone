@@ -140,12 +140,27 @@ export const Sidebar = () => {
             onClick={() => handleNavigate('/bonanza')}
           />
 
+
           <div className="mt-8 mb-4 px-3">
+            <button
+              onClick={() => handleNavigate('/support')}
+              className="w-full text-left text-xs text-gray-400 hover:text-gray-600 font-medium transition-colors px-1 py-2 flex items-center gap-2"
+            >
+              <Icon icon="solar:help-bold" className="text-sm" />
+              Contact Support
+            </button>
             <button
               onClick={() => handleNavigate('/terms')}
               className="w-full text-left text-xs text-gray-400 hover:text-gray-600 font-medium transition-colors px-1 py-2"
             >
               Terms & Plan
+            </button>
+            <button
+              onClick={() => handleNavigate('/kyc')}
+              className="w-full text-left text-xs text-gray-400 hover:text-gray-600 font-medium transition-colors px-1 py-2 flex items-center gap-2"
+            >
+              <Icon icon="solar:verified-check-bold" className="text-sm" />
+              KYC Verification
             </button>
             <button
               onClick={() => handleNavigate('/profile')}

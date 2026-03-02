@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useToast } from '@/hooks/use-toast';
+import { Icon } from '@iconify/react';
 
 type PaymentMethod = 'card' | 'upi';
 
@@ -17,6 +18,9 @@ export const PaymentView = () => {
 
     // UPI details
     const [upiId, setUpiId] = useState('');
+    const [qrUrl, setQrUrl] = useState('');
+    const [qrData, setQrData] = useState('');
+    const [showQR, setShowQR] = useState(false);
 
     const navigate = useNavigate();
     const { user } = useAuthStore();
@@ -55,15 +59,41 @@ export const PaymentView = () => {
         e.preventDefault();
         setIsProcessing(true);
 
-        // Simulate UPI payment
+        const trId = `BFE-PAY-${user?.username}-${Date.now()}`;
+        const receiverUpi = 'paytm.s21tpy8@pty';
+        const data = `upi://pay?pa=${receiverUpi}&pn=BestForEveryone&am=1180&cu=INR&tr=${trId}`;
+        setQrData(data);
+        setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`);
+
         setTimeout(() => {
-            toast({
-                title: 'Payment Initiated',
-                description: 'Please complete the payment in your UPI app',
-            });
+            setShowQR(true);
             setIsProcessing(false);
-            navigate('/dashboard');
-        }, 2000);
+            toast({
+                title: 'QR Code Generated',
+                description: 'Scan the QR code to complete payment',
+            });
+        }, 1000);
+    };
+
+    const handleDownloadQR = async () => {
+        try {
+            const response = await fetch(qrUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `BFE-PAY-QR-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            toast({
+                title: "Download Failed",
+                description: "Failed to download QR Code",
+                variant: "destructive"
+            });
+        }
     };
 
     return (
@@ -95,8 +125,8 @@ export const PaymentView = () => {
                             <button
                                 onClick={() => setPaymentMethod('card')}
                                 className={`text-xs font-medium py-1.5 rounded-md transition-all ${paymentMethod === 'card'
-                                        ? 'bg-white shadow-sm text-black border border-neutral-200/50'
-                                        : 'text-neutral-500 hover:text-black'
+                                    ? 'bg-white shadow-sm text-black border border-neutral-200/50'
+                                    : 'text-neutral-500 hover:text-black'
                                     }`}
                             >
                                 Credit Card
@@ -104,8 +134,8 @@ export const PaymentView = () => {
                             <button
                                 onClick={() => setPaymentMethod('upi')}
                                 className={`text-xs font-medium py-1.5 rounded-md transition-all ${paymentMethod === 'upi'
-                                        ? 'bg-white shadow-sm text-black border border-neutral-200/50'
-                                        : 'text-neutral-500 hover:text-black'
+                                    ? 'bg-white shadow-sm text-black border border-neutral-200/50'
+                                    : 'text-neutral-500 hover:text-black'
                                     }`}
                             >
                                 UPI / QR
@@ -231,20 +261,52 @@ export const PaymentView = () => {
                                         </div>
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        disabled={isProcessing}
-                                        className="w-full inline-flex items-center justify-center rounded-md bg-neutral-950 h-10 text-sm font-medium text-white hover:bg-neutral-800 transition-all active:scale-[0.98] shadow-sm disabled:opacity-50"
-                                    >
-                                        {isProcessing ? (
-                                            <>
-                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                                                Generating...
-                                            </>
-                                        ) : (
-                                            'Generate QR & Pay'
-                                        )}
-                                    </button>
+                                    {showQR ? (
+                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                                            <div className="bg-neutral-50 border border-dashed border-neutral-200 rounded-xl p-6 text-center">
+                                                <div className="mb-3 flex justify-center">
+                                                    <div className="h-12 w-12 bg-white rounded-xl shadow-sm border border-neutral-100 flex items-center justify-center">
+                                                        <Icon icon="solar:qr-code-linear" className="text-2xl text-neutral-400" />
+                                                    </div>
+                                                </div>
+                                                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Payment UPI ID</p>
+                                                <p className="text-sm font-mono font-bold text-neutral-900">paytm.s21tpy8@pty</p>
+                                            </div>
+                                            <div className="flex flex-col items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleDownloadQR}
+                                                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 transition-colors"
+                                                >
+                                                    <Icon icon="solar:download-minimalistic-bold" />
+                                                    Download QR Code to Pay
+                                                </button>
+                                                <p className="text-[10px] text-neutral-400">Download and scan in any UPI app to pay ₹1180.00</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => navigate('/dashboard')}
+                                                className="w-full inline-flex items-center justify-center rounded-md bg-neutral-950 h-10 text-sm font-medium text-white hover:bg-neutral-800 transition-all active:scale-[0.98] shadow-sm"
+                                            >
+                                                Done, Go to Dashboard
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="submit"
+                                            disabled={isProcessing}
+                                            className="w-full inline-flex items-center justify-center rounded-md bg-neutral-950 h-10 text-sm font-medium text-white hover:bg-neutral-800 transition-all active:scale-[0.98] shadow-sm disabled:opacity-50"
+                                        >
+                                            {isProcessing ? (
+                                                <>
+                                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                                                    Generating...
+                                                </>
+                                            ) : (
+                                                'Generate QR & Pay'
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                             </form>
                         )}

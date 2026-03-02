@@ -1,15 +1,62 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
-import { authApi } from '@/lib/api';
+import { authApi, epinApi } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { Icon } from '@iconify/react';
 
 export const PaymentVerificationView = () => {
     const [submitting, setSubmitting] = useState(false);
     const { user, updateUser } = useAuthStore();
-    const { toast } = useToast();
     const navigate = useNavigate();
+    const { toast } = useToast();
+    const [qrUrl, setQrUrl] = useState('');
+    const [qrData, setQrData] = useState('');
+    const [pin, setPin] = useState('');
+    const [activating, setActivating] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            const trId = `BFE-${user.username}-${Date.now()}`;
+            const upiId = 'paytm.s21tpy8@pty';
+            const data = `upi://pay?pa=${upiId}&pn=BestForEveryone&am=1180&cu=INR&tr=${trId}`;
+            setQrData(data);
+            setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`);
+        }
+    }, [user]);
+
+    const handleDownloadQR = async () => {
+        try {
+            const response = await fetch(qrUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `BFE-QR-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast({
+                title: "Download Started",
+                description: "QR Code is being downloaded."
+            });
+        } catch (error) {
+            toast({
+                title: "Download Failed",
+                description: "Could not download the QR Code. Please try again.",
+                variant: "destructive"
+            });
+        }
+    };
+
+    // Immediate redirect if already verified
+    useEffect(() => {
+        if (user?.verified && user?.paymentStatus === 'approved') {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [user?.verified, user?.paymentStatus, navigate]);
 
     const handlePaymentSubmit = async () => {
         setSubmitting(true);
@@ -36,23 +83,51 @@ export const PaymentVerificationView = () => {
         }
     };
 
+    const handleEpinActivate = async () => {
+        if (!pin.trim()) {
+            toast({ title: "Error", description: "Please enter E-pin code", variant: "destructive" });
+            return;
+        }
+
+        setActivating(true);
+        try {
+            const response = await epinApi.use(pin.trim(), user?.username || '');
+            toast({ title: "Success", description: response.message });
+
+            // Refresh profile to get verified status
+            const profileRes = await authApi.getProfile();
+            updateUser(profileRes.user);
+            navigate('/dashboard', { replace: true });
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error.message || "Activation failed",
+                variant: "destructive"
+            });
+        } finally {
+            setActivating(false);
+        }
+    };
+
     // Poll for status updates
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
-        if (user?.paymentStatus === 'submitted') {
+        if (user && !user.verified) {
             interval = setInterval(async () => {
                 try {
                     const response = await authApi.getProfile();
-                    if (response.user.paymentStatus !== 'submitted') {
+                    // Update if status changed or verified
+                    if (response.user.paymentStatus !== user.paymentStatus || response.user.verified !== user.verified) {
                         updateUser(response.user);
-                        if (response.user.paymentStatus === 'approved') {
+
+                        if (response.user.paymentStatus === 'approved' && response.user.verified) {
                             toast({
-                                title: "Payment Approved",
+                                title: "Account Activated!",
                                 description: "Welcome to Best For Everyone!",
-                                variant: "default" // success
+                                variant: "default"
                             });
-                            navigate('/dashboard');
+                            navigate('/dashboard', { replace: true });
                         } else if (response.user.paymentStatus === 'rejected') {
                             toast({
                                 title: "Payment Rejected",
@@ -167,6 +242,19 @@ export const PaymentVerificationView = () => {
                             </div>
                         </div>
 
+                        {/* E-pin Information for Referred Users */}
+                        {user?.referredBy && (
+                            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex gap-3">
+                                <Icon icon="solar:ticket-bold" className="text-emerald-500 shrink-0 mt-0.5" width={20} />
+                                <div className="space-y-1">
+                                    <h3 className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">E-pin Activation</h3>
+                                    <p className="text-[11px] text-emerald-800 leading-relaxed font-medium">
+                                        Ask your friend who referring you, for activate your account by epin.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         {(!user?.paymentStatus || user?.paymentStatus === 'pending') && (
                             <>
                                 {/* Payment Details */}
@@ -194,18 +282,28 @@ export const PaymentVerificationView = () => {
 
                                 {/* QR Code */}
                                 <div className="text-center space-y-4">
-                                    <div className="bg-white border-2 border-slate-200 rounded-xl p-6 inline-block">
-                                        <div className="w-56 h-56 bg-white rounded-lg flex items-center justify-center p-2">
-                                            <img
-                                                src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=shashankmanohar1734@okaxis&pn=BestForEveryone&am=1180&cu=INR"
-                                                alt="Payment QR"
-                                                className="w-full h-full object-contain"
-                                            />
+                                    <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center gap-4">
+                                        <div className="h-16 w-16 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-slate-100">
+                                            <Icon icon="solar:qr-code-linear" className="text-3xl text-slate-400" />
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Company UPI ID</p>
+                                            <p className="text-sm font-mono font-bold text-slate-900">paytm.s21tpy8@pty</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-                                        <Icon icon="solar:shield-check-linear" className="text-emerald-600" />
-                                        <span>Secure payment via UPI</span>
+
+                                    <div className="flex flex-col items-center gap-3">
+                                        <button
+                                            onClick={handleDownloadQR}
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-all click-scale"
+                                        >
+                                            <Icon icon="solar:download-minimalistic-bold" />
+                                            Download QR Code
+                                        </button>
+                                        <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-medium">
+                                            <Icon icon="solar:shield-check-linear" className="text-emerald-600" />
+                                            <span>Secure payment via UPI • Unique Transaction ID</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -221,6 +319,45 @@ export const PaymentVerificationView = () => {
                                         <li>Click "Payment Done" button below</li>
                                         <li>Wait for admin approval</li>
                                     </ol>
+                                </div>
+
+                                {/* Support Section */}
+                                <div className="space-y-4 pt-2">
+                                    <div className="text-center">
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-3">Facing issues? Contact Support</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <a
+                                            href="https://wa.me/916299347375"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-all click-scale"
+                                        >
+                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                                <Icon icon="logos:whatsapp-icon" className="text-lg" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-[10px] font-bold text-emerald-900 leading-none mb-1">WhatsApp Support</p>
+                                                <p className="text-[10px] text-emerald-600 font-medium">+91 6299347375 / 9693794089</p>
+                                            </div>
+                                            <Icon icon="solar:round-alt-arrow-right-bold" className="ml-auto text-emerald-400" width={16} />
+                                        </a>
+
+                                        <a
+                                            href="mailto:ishuraj25122002@gmail.com"
+                                            className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-all click-scale"
+                                        >
+                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                                <Icon icon="solar:letter-bold-duotone" className="text-blue-600 text-lg" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-[10px] font-bold text-blue-900 leading-none mb-1">Email Support</p>
+                                                <p className="text-[10px] text-blue-600 font-medium">ishuraj25122002@gmail.com</p>
+                                            </div>
+                                            <Icon icon="solar:round-alt-arrow-right-bold" className="ml-auto text-blue-400" width={16} />
+                                        </a>
+                                    </div>
                                 </div>
 
                                 {/* Submit Button */}
@@ -249,10 +386,46 @@ export const PaymentVerificationView = () => {
                                 <div className="h-16 w-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Icon icon="solar:clock-circle-linear" className="text-3xl" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-slate-900 mb-2">Verification in Progress</h3>
-                                <p className="text-sm text-slate-500">
-                                    Our admin team is reviewing your payment. You'll be notified once approved.
-                                </p>
+                                <div className="text-center space-y-2">
+                                    <h3 className="text-xl font-bold text-slate-900">Verification in Progress</h3>
+                                    <p className="text-sm text-slate-500 max-w-[280px] mx-auto leading-relaxed">
+                                        Our admin team is reviewing your payment. You'll be notified once approved.
+                                    </p>
+                                </div>
+
+                                {/* Support Contacts during wait */}
+                                <div className="w-full max-w-[320px] mx-auto pt-4 border-t border-slate-100">
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center mb-3">Need help? Contact Support</p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <a
+                                            href="https://wa.me/916299347375"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-all click-scale"
+                                        >
+                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                                <Icon icon="logos:whatsapp-icon" className="text-lg" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-[10px] font-bold text-emerald-900 leading-none mb-1">WhatsApp Support</p>
+                                                <p className="text-[10px] text-emerald-600 font-medium">+91 6299347375 / 9693794089</p>
+                                            </div>
+                                        </a>
+
+                                        <a
+                                            href="mailto:ishuraj25122002@gmail.com"
+                                            className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-all click-scale"
+                                        >
+                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                                <Icon icon="solar:letter-bold-duotone" className="text-blue-600 text-lg" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="text-[10px] font-bold text-blue-900 leading-none mb-1">Email Support</p>
+                                                <p className="text-[10px] text-blue-600 font-medium">ishuraj25122002@gmail.com</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         )}
 

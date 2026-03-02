@@ -12,6 +12,8 @@ interface AuthState {
     admin: any | null;
     adminToken: string | null;
 
+    hasSeenKycPrompt: boolean;
+
     // User methods
     login: (userData: any, token: string) => void;
     logout: () => void;
@@ -20,6 +22,8 @@ interface AuthState {
     // Admin methods
     loginAsAdmin: (adminData: any, token: string) => void;
     logoutAdmin: () => void;
+
+    setHasSeenKycPrompt: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -35,6 +39,8 @@ export const useAuthStore = create<AuthState>()(
             admin: null,
             adminToken: null,
 
+            hasSeenKycPrompt: false,
+
             // User methods
             login: (userData, token) =>
                 set({
@@ -42,17 +48,24 @@ export const useAuthStore = create<AuthState>()(
                     user: userData,
                     token,
                 }),
-
             logout: () =>
                 set({
                     isAuthenticated: false,
                     user: null,
                     token: null,
+                    hasSeenKycPrompt: false,
                 }),
+
 
             updateUser: (userData) =>
                 set((state) => ({
-                    user: { ...state.user, ...userData },
+                    user: {
+                        ...state.user,
+                        ...userData,
+                        kyc: userData.kyc
+                            ? { ...state.user?.kyc, ...userData.kyc }
+                            : state.user?.kyc
+                    },
                 })),
 
             // Admin methods
@@ -71,6 +84,8 @@ export const useAuthStore = create<AuthState>()(
                     adminToken: null,
                 });
             },
+
+            setHasSeenKycPrompt: (value) => set({ hasSeenKycPrompt: value }),
         }),
         {
             name: 'auth-storage',
