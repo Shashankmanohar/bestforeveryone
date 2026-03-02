@@ -140,7 +140,7 @@ export const DashboardView = () => {
                   <code className="text-lg font-bold tracking-wide">{user?.referralCode}</code>
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://bestforever.com/join/${user?.referralCode}`);
+                      navigator.clipboard.writeText(`https://bestforeveryone.in/join/${user?.referralCode}`);
                       // You can add a toast notification here
                     }}
                     className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center transition-colors click-scale"

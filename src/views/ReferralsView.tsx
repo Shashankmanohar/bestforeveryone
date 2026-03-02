@@ -59,7 +59,7 @@ export const ReferralsView = () => {
   }, [user]);
 
   const copyLink = () => {
-    const link = `https://bestforever.com/join/${referralCode}`;
+    const link = `https://bestforeveryone.in/join/${referralCode}`;
     navigator.clipboard.writeText(link);
     showToast('Link Copied', 'Referral link copied to clipboard.');
   };
