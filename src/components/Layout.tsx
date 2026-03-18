@@ -6,7 +6,7 @@ import { Toast } from './Toast';
 
 export const Layout = () => {
   return (
-    <div className="flex h-screen overflow-hidden selection:bg-gray-900 selection:text-white bg-background">
+    <div className="flex h-screen overflow-hidden selection:bg-gray-900 selection:text-white dark:selection:bg-white dark:selection:text-gray-900 bg-background">
       <Sidebar />
       
       <main className="flex-1 relative h-full overflow-y-auto overflow-x-hidden bg-background scroll-smooth">

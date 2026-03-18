@@ -48,14 +48,14 @@ export const BonanzaView = () => {
       <PageHeader title="Weekly Bonanza" subtitle="Rewards" />
 
       {/* Info Card */}
-      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-3xl p-6 md:p-8">
+      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-100 dark:border-blue-800 rounded-3xl p-6 md:p-8">
         <div className="flex items-start gap-4">
-          <div className="h-12 w-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+          <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center shrink-0">
             <Icon icon="solar:gift-bold" width={24} />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">How Bonanza Works</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">How Bonanza Works</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
               Earn ₹400 total per person when you refer 2 or more people in a week! You get ₹200 instantly, plus an extra ₹200 bonus for every referral once the threshold is met.
             </p>
           </div>
@@ -63,41 +63,41 @@ export const BonanzaView = () => {
       </div>
 
       {/* This Week Stats */}
-      <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-card">
+      <div className="bg-white/5 dark:bg-white/5 p-6 rounded-3xl border border-white/10 shadow-card">
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-bold mb-2">This Week's Bonanza</p>
-            <h3 className="text-4xl font-bold text-blue-600 amount-value">₹{weeklyBonanza.toLocaleString()}</h3>
+            <p className="text-xs text-white/50 uppercase tracking-wide font-bold mb-2">This Week's Bonanza</p>
+            <h3 className="text-4xl font-bold text-blue-400 amount-value">₹{weeklyBonanza.toLocaleString()}</h3>
           </div>
-          <div className="h-16 w-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+          <div className="h-16 w-16 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center">
             <Icon icon="solar:gift-bold" width={32} />
           </div>
         </div>
       </div>
 
       {/* Bonanza Logs */}
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-card">
-        <div className="p-5 border-b border-gray-100 bg-gray-50/50">
-          <h3 className="text-sm font-bold text-gray-900">Bonanza History</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Bonanza History</h3>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {logs.length > 0 ? (
             logs.map((log: any) => (
-              <div key={log.id} className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
+              <div key={log.id} className="flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                  <div className="h-10 w-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
                     <Icon icon="solar:user-plus-rounded-linear" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-gray-900">Referral: {log.referral}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{log.date}</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">Referral: {log.referral}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{log.date}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-blue-600 amount-value">+₹{log.amount}</span>
+                <span className="text-sm font-bold text-blue-600 dark:text-blue-400 amount-value">+₹{log.amount}</span>
               </div>
             ))
           ) : (
-            <div className="p-8 text-center text-gray-400 text-sm">
+            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">
               No bonanza credits yet this week. Start referring to earn!
             </div>
           )}

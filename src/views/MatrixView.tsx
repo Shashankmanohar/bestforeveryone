@@ -23,7 +23,6 @@ export const MatrixView = () => {
         }
       } catch (error) {
         console.error('Failed to fetch matrix data:', error);
-        // Fallback to user data if available
         if (user?.matrix) {
           setMatrix(user.matrix);
         }
@@ -42,7 +41,7 @@ export const MatrixView = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-sm text-gray-500">Loading matrix data...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading matrix data...</p>
         </div>
       </div>
     );
@@ -59,18 +58,18 @@ export const MatrixView = () => {
 
       {/* Cycle Badge */}
       <div className="flex justify-end">
-        <div className="text-xs font-bold text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-xl shadow-sm">
+        <div className="text-xs font-bold text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-2 rounded-xl shadow-sm">
           Cycle #{matrix.cycle}
         </div>
       </div>
 
       {/* Live Status Banner */}
-      <div className="bg-blue-50/50 border border-blue-100 p-4 sm:p-5 rounded-2xl flex gap-3 items-center">
+      <div className="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 sm:p-5 rounded-2xl flex gap-3 items-center">
         <div className="relative flex h-3 w-3 shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
         </div>
-        <p className="text-xs sm:text-sm text-blue-800 font-medium">
+        <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-300 font-medium">
           Matrix is filling automatically from global spillover activity.
         </p>
       </div>
@@ -78,25 +77,25 @@ export const MatrixView = () => {
       {/* Level Status Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Level 1 Card */}
-        <div className="bg-white p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 shadow-card">
+        <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide mb-1">
                 LEVEL 1 STATUS
               </p>
-              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tighter">
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tighter">
                 {matrix.level1.filled}
-                <span className="text-gray-300 text-xl sm:text-2xl">/6</span>
+                <span className="text-gray-300 dark:text-gray-600 text-xl sm:text-2xl">/6</span>
               </h3>
             </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
               <Icon icon="solar:users-group-two-rounded-bold" width={20} className="sm:hidden" />
               <Icon icon="solar:users-group-two-rounded-bold" width={24} className="hidden sm:block" />
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full bg-gray-100 rounded-full h-2.5 sm:h-3 mb-3 overflow-hidden">
+          <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 sm:h-3 mb-3 overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${l1Pct}%` }}
@@ -107,16 +106,16 @@ export const MatrixView = () => {
 
           {/* Income Info */}
           <div className="flex items-center justify-between">
-            <p className="text-xs sm:text-sm text-gray-500 font-medium">
-              Potential Income: <span className="font-bold text-gray-900">₹3,600</span>
-              <span className="text-[10px] text-gray-400 ml-1">(₹600 × 6)</span>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">
+              Potential Income: <span className="font-bold text-gray-900 dark:text-white">₹2,400</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-1">(₹400 × 6)</span>
             </p>
             {matrix.level1.filled === matrix.level1.total ? (
-              <span className="text-[10px] sm:text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
+              <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800">
                 Completed
               </span>
             ) : (
-              <span className="text-[10px] sm:text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-100">
+              <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-1 rounded-lg border border-amber-100 dark:border-amber-800">
                 In Progress
               </span>
             )}

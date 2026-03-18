@@ -190,13 +190,13 @@ export const PaymentVerificationView = () => {
     const status = getStatusMessage();
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-950 dark:to-gray-900 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="h-10 w-10 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                            <div className="h-10 w-10 bg-white dark:bg-gray-900/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
                                 <Icon icon="solar:shield-check-linear" className="text-2xl" />
                             </div>
                             <div>
@@ -209,8 +209,8 @@ export const PaymentVerificationView = () => {
                     {/* Content */}
                     <div className="p-6 space-y-6">
                         {/* Status Alert */}
-                        <div className={`p-4 rounded-lg border ${status.color === 'amber' ? 'bg-amber-50 border-amber-200' :
-                            status.color === 'blue' ? 'bg-blue-50 border-blue-200' :
+                        <div className={`p-4 rounded-lg border ${status.color === 'amber' ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700' :
+                            status.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200' :
                                 'bg-rose-50 border-rose-200'
                             }`}>
                             <div className="flex items-start gap-3">
@@ -220,19 +220,19 @@ export const PaymentVerificationView = () => {
                                             status.color === 'blue' ? 'solar:clock-circle-linear' :
                                                 'solar:close-circle-linear'
                                     }
-                                    className={`text-xl ${status.color === 'amber' ? 'text-amber-600' :
-                                        status.color === 'blue' ? 'text-blue-600' :
+                                    className={`text-xl ${status.color === 'amber' ? 'text-amber-600 dark:text-amber-400' :
+                                        status.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
                                             'text-rose-600'
                                         }`}
                                 />
                                 <div>
-                                    <h3 className={`text-sm font-semibold ${status.color === 'amber' ? 'text-amber-900' :
+                                    <h3 className={`text-sm font-semibold ${status.color === 'amber' ? 'text-amber-900 dark:text-amber-200' :
                                         status.color === 'blue' ? 'text-blue-900' :
                                             'text-rose-900'
                                         }`}>
                                         {status.title}
                                     </h3>
-                                    <p className={`text-xs mt-1 ${status.color === 'amber' ? 'text-amber-700' :
+                                    <p className={`text-xs mt-1 ${status.color === 'amber' ? 'text-amber-700 dark:text-amber-400' :
                                         status.color === 'blue' ? 'text-blue-700' :
                                             'text-rose-700'
                                         }`}>
@@ -244,7 +244,7 @@ export const PaymentVerificationView = () => {
 
                         {/* E-pin Information for Referred Users */}
                         {user?.referredBy && (
-                            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex gap-3">
+                            <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-xl p-4 flex gap-3">
                                 <Icon icon="solar:ticket-bold" className="text-emerald-500 shrink-0 mt-0.5" width={20} />
                                 <div className="space-y-1">
                                     <h3 className="text-[11px] font-bold text-emerald-900 uppercase tracking-wider">E-pin Activation</h3>
@@ -283,7 +283,7 @@ export const PaymentVerificationView = () => {
                                 {/* QR Code */}
                                 <div className="text-center space-y-4">
                                     <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 flex flex-col items-center justify-center gap-4">
-                                        <div className="h-16 w-16 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-slate-100">
+                                        <div className="h-16 w-16 bg-white dark:bg-gray-900 rounded-2xl shadow-sm flex items-center justify-center border border-slate-100">
                                             <Icon icon="solar:qr-code-linear" className="text-3xl text-slate-400" />
                                         </div>
                                         <div className="text-center">
@@ -301,14 +301,14 @@ export const PaymentVerificationView = () => {
                                             Download QR Code
                                         </button>
                                         <div className="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-medium">
-                                            <Icon icon="solar:shield-check-linear" className="text-emerald-600" />
+                                            <Icon icon="solar:shield-check-linear" className="text-emerald-600 dark:text-emerald-400" />
                                             <span>Secure payment via UPI • Unique Transaction ID</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Instructions */}
-                                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg p-4">
                                     <h4 className="text-xs font-semibold text-blue-900 mb-2 flex items-center gap-2">
                                         <Icon icon="solar:info-circle-linear" />
                                         Payment Instructions
@@ -332,28 +332,28 @@ export const PaymentVerificationView = () => {
                                             href="https://wa.me/916299347375"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-all click-scale"
+                                            className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 transition-all click-scale"
                                         >
-                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                            <div className="h-8 w-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
                                                 <Icon icon="logos:whatsapp-icon" className="text-lg" />
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-emerald-900 leading-none mb-1">WhatsApp Support</p>
-                                                <p className="text-[10px] text-emerald-600 font-medium">+91 6299347375 / 9693794089</p>
+                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+91 6299347375 / 9693794089</p>
                                             </div>
                                             <Icon icon="solar:round-alt-arrow-right-bold" className="ml-auto text-emerald-400" width={16} />
                                         </a>
 
                                         <a
                                             href="mailto:ishuraj25122002@gmail.com"
-                                            className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-all click-scale"
+                                            className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl hover:bg-blue-100 transition-all click-scale"
                                         >
-                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                                                <Icon icon="solar:letter-bold-duotone" className="text-blue-600 text-lg" />
+                                            <div className="h-8 w-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
+                                                <Icon icon="solar:letter-bold-duotone" className="text-blue-600 dark:text-blue-400 text-lg" />
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-blue-900 leading-none mb-1">Email Support</p>
-                                                <p className="text-[10px] text-blue-600 font-medium">ishuraj25122002@gmail.com</p>
+                                                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">ishuraj25122002@gmail.com</p>
                                             </div>
                                             <Icon icon="solar:round-alt-arrow-right-bold" className="ml-auto text-blue-400" width={16} />
                                         </a>
@@ -383,7 +383,7 @@ export const PaymentVerificationView = () => {
 
                         {user?.paymentStatus === 'submitted' && (
                             <div className="text-center py-8">
-                                <div className="h-16 w-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <div className="h-16 w-16 bg-blue-100 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Icon icon="solar:clock-circle-linear" className="text-3xl" />
                                 </div>
                                 <div className="text-center space-y-2">
@@ -401,27 +401,27 @@ export const PaymentVerificationView = () => {
                                             href="https://wa.me/916299347375"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-all click-scale"
+                                            className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 transition-all click-scale"
                                         >
-                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                                            <div className="h-8 w-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
                                                 <Icon icon="logos:whatsapp-icon" className="text-lg" />
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-emerald-900 leading-none mb-1">WhatsApp Support</p>
-                                                <p className="text-[10px] text-emerald-600 font-medium">+91 6299347375 / 9693794089</p>
+                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+91 6299347375 / 9693794089</p>
                                             </div>
                                         </a>
 
                                         <a
                                             href="mailto:ishuraj25122002@gmail.com"
-                                            className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-xl hover:bg-blue-100 transition-all click-scale"
+                                            className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl hover:bg-blue-100 transition-all click-scale"
                                         >
-                                            <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm">
-                                                <Icon icon="solar:letter-bold-duotone" className="text-blue-600 text-lg" />
+                                            <div className="h-8 w-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
+                                                <Icon icon="solar:letter-bold-duotone" className="text-blue-600 dark:text-blue-400 text-lg" />
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-blue-900 leading-none mb-1">Email Support</p>
-                                                <p className="text-[10px] text-blue-600 font-medium">ishuraj25122002@gmail.com</p>
+                                                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">ishuraj25122002@gmail.com</p>
                                             </div>
                                         </a>
                                     </div>

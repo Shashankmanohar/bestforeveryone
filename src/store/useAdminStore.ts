@@ -21,7 +21,7 @@ interface User {
     _id: string;
     fullname: string;
     username: string;
-    phone: string;
+    email: string;
     wallet: {
         balance: number;
         totalEarnings: number;
@@ -36,7 +36,7 @@ interface Withdrawal {
     user: {
         _id: string;
         fullname: string;
-        phone: string;
+        email: string;
     };
     amount: number;
     adminFee: number;
@@ -56,7 +56,7 @@ interface Transaction {
         _id: string;
         fullname: string;
         username: string;
-        phone: string;
+        email: string;
     };
     type: string;
     description: string;
@@ -87,6 +87,7 @@ interface AdminState {
     updateUserStatus: (userId: string, status: string) => Promise<void>;
     approvePayment: (userId: string) => Promise<void>;
     rejectPayment: (userId: string, reason?: string) => Promise<void>;
+    distributeRoyalty: () => Promise<any>;
 }
 
 export const useAdminStore = create<AdminState>((set, get) => ({
@@ -222,6 +223,18 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             await get().fetchPendingPayments();
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to reject payment' });
+            throw error;
+        }
+    },
+
+    distributeRoyalty: async () => {
+        try {
+            const response = await adminApi.post('/distribute-royalty');
+            // Refresh ledger to show new payouts
+            await get().fetchLedger();
+            return response.data;
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to distribute royalty' });
             throw error;
         }
     },

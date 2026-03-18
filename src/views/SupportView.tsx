@@ -8,9 +8,9 @@ export const SupportView = () => {
             description: 'Chat with us on WhatsApp: +91 6299347375 or +91 9693794089',
             icon: 'logos:whatsapp-icon',
             link: 'https://wa.me/916299347375',
-            color: 'bg-emerald-50',
-            textColor: 'text-emerald-600',
-            borderColor: 'border-emerald-100',
+            color: 'bg-emerald-50 dark:bg-emerald-900/30',
+            textColor: 'text-emerald-600 dark:text-emerald-400',
+            borderColor: 'border-emerald-100 dark:border-emerald-800',
             label: 'Open WhatsApp'
         },
         {
@@ -18,19 +18,19 @@ export const SupportView = () => {
             description: 'Send us an email for detailed inquiries or issues.',
             icon: 'solar:letter-bold-duotone',
             link: 'mailto:ishuraj25122002@gmail.com',
-            color: 'bg-blue-50',
-            textColor: 'text-blue-600',
-            borderColor: 'border-blue-100',
+            color: 'bg-blue-50 dark:bg-blue-900/30',
+            textColor: 'text-blue-600 dark:text-blue-400',
+            borderColor: 'border-blue-100 dark:border-blue-800',
             label: 'Send Email'
         },
         {
             title: 'Technical Support',
             description: 'Report technical bugs or platform issues.',
             icon: 'solar:settings-bold-duotone',
-            link: 'https://t.me/bestforeveryone_support', // Placeholder for Telegram or similar
-            color: 'bg-purple-50',
-            textColor: 'text-purple-600',
-            borderColor: 'border-purple-100',
+            link: 'https://t.me/bestforeveryone_support',
+            color: 'bg-purple-50 dark:bg-purple-900/30',
+            textColor: 'text-purple-600 dark:text-purple-400',
+            borderColor: 'border-purple-100 dark:border-purple-800',
             label: 'Contact Tech'
         }
     ];
@@ -57,8 +57,8 @@ export const SupportView = () => {
         <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
             {/* Header Section */}
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Contact Support</h1>
-                <p className="text-gray-500 max-w-lg">
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Contact Support</h1>
+                <p className="text-gray-500 dark:text-gray-400 max-w-lg">
                     Need help? Our dedicated support team is here to assist you with any questions or issues you may have.
                 </p>
             </div>
@@ -73,15 +73,15 @@ export const SupportView = () => {
                     <motion.div
                         key={index}
                         variants={itemVariants}
-                        className={`group relative overflow-hidden bg-white rounded-3xl p-8 border-2 ${option.borderColor} transition-all duration-300 hover:shadow-2xl hover:shadow-gray-200/50 hover:-translate-y-1`}
+                        className={`group relative overflow-hidden bg-white dark:bg-gray-900 rounded-3xl p-8 border-2 ${option.borderColor} transition-all duration-300 hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-black/30 hover:-translate-y-1`}
                     >
                         <div className={`h-16 w-16 ${option.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
                             <Icon icon={option.icon} className="text-3xl" />
                         </div>
 
                         <div className="space-y-2 mb-8">
-                            <h3 className="text-xl font-bold text-gray-900">{option.title}</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">{option.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                                 {option.description}
                             </p>
                         </div>
@@ -102,8 +102,8 @@ export const SupportView = () => {
                 ))}
             </motion.div>
 
-            {/* Help Center / FAQ Placeholder */}
-            <div className="bg-gray-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-gray-200">
+            {/* Help Center / FAQ */}
+            <div className="bg-gray-900 dark:bg-white/5 dark:border dark:border-white/10 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-gray-200 dark:shadow-none">
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
                     <div className="max-w-md">
                         <h2 className="text-3xl font-bold mb-4">Check our Plan & FAQs</h2>
@@ -126,7 +126,7 @@ export const SupportView = () => {
             </div>
 
             {/* Support Message */}
-            <div className="flex items-center justify-center p-6 bg-gray-50 rounded-3xl border border-gray-100 italic text-sm text-gray-500 text-center">
+            <div className="flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 italic text-sm text-gray-500 dark:text-gray-400 text-center">
                 Our average response time is less than 2 hours during business hours (9 AM - 6 PM IST).
             </div>
         </div>

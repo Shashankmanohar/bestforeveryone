@@ -68,7 +68,7 @@ export const WalletView = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin h-8 w-8 border-4 border-emerald-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-sm text-gray-500">Loading wallet data...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading wallet data...</p>
         </div>
       </div>
     );
@@ -85,25 +85,25 @@ export const WalletView = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-6 rounded-3xl border border-gray-200 flex justify-between items-center shadow-card card-hover">
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 flex justify-between items-center shadow-card card-hover">
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-bold">Current Balance</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-2 amount-value">₹{wallet.balance.toLocaleString()}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-bold">Current Balance</p>
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2 amount-value">₹{wallet.balance.toLocaleString()}</h3>
           </div>
-          <div className="h-14 w-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+          <div className="h-14 w-14 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center">
             <Icon icon="solar:wallet-money-bold" width={28} />
           </div>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-gray-200 flex justify-between items-center shadow-card card-hover">
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 flex justify-between items-center shadow-card card-hover">
           <div>
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-bold">Total Withdrawn</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-2 amount-value">₹{wallet.withdrawn.toLocaleString()}</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-bold">Total Withdrawn</p>
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2 amount-value">₹{wallet.withdrawn.toLocaleString()}</h3>
           </div>
-          <div className="h-14 w-14 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center">
+          <div className="h-14 w-14 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full flex items-center justify-center">
             <Icon icon="solar:bill-check-bold" width={28} />
           </div>
         </div>
-        <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 flex justify-between items-center shadow-card card-hover col-md-span-2">
+        <div className="bg-gray-900 dark:bg-white/5 dark:border dark:border-white/10 p-6 rounded-3xl border border-gray-800 flex justify-between items-center shadow-card card-hover col-md-span-2">
           <div>
             <p className="text-xs text-emerald-400 uppercase tracking-wide font-bold">Matrix Wallet (0% Fee)</p>
             <h3 className="text-3xl font-bold text-white mt-2 amount-value">₹{wallet.matrixWallet.toLocaleString()}</h3>
@@ -115,32 +115,32 @@ export const WalletView = () => {
       </div>
 
       {/* Transaction List */}
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-card overflow-hidden">
-        <div className="p-5 border-b border-gray-100 bg-gray-50/50">
-          <h3 className="text-sm font-bold text-gray-900">All Transactions</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card overflow-hidden">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">All Transactions</h3>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {transactions.length === 0 ? (
             <div className="p-10 text-center">
-              <Icon icon="solar:wallet-bold" className="mx-auto text-gray-300 mb-3" width={48} />
-              <p className="text-sm text-gray-500">No transactions yet</p>
+              <Icon icon="solar:wallet-bold" className="mx-auto text-gray-300 dark:text-gray-600 mb-3" width={48} />
+              <p className="text-sm text-gray-500 dark:text-gray-400">No transactions yet</p>
             </div>
           ) : (
             transactions.map((tx) => (
-              <div key={tx._id} className="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
+              <div key={tx._id} className="flex items-center justify-between p-5 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center border ${tx.status === 'credit'
-                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                    : 'bg-gray-50 text-gray-500 border-gray-200'
+                    ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700'
                     }`}>
                     <Icon icon={tx.status === 'credit' ? 'solar:arrow-left-down-linear' : 'solar:arrow-right-up-linear'} />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-gray-900">{tx.type}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{formatDate(tx.createdAt)}</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">{tx.type}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{formatDate(tx.createdAt)}</p>
                   </div>
                 </div>
-                <span className={`text-sm font-bold amount-value ${tx.status === 'credit' ? 'text-emerald-700' : 'text-gray-900'}`}>
+                <span className={`text-sm font-bold amount-value ${tx.status === 'credit' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
                   {tx.status === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
                 </span>
               </div>

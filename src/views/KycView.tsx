@@ -70,11 +70,11 @@ export const KycView = () => {
     if (kycStatus === 'approved') {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+                <div className="h-20 w-20 bg-emerald-100 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6">
                     <Icon icon="solar:verified-check-bold" width={40} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">KYC Verified</h2>
-                <p className="text-gray-500 max-w-md">Your KYC has been approved. You can now withdraw your funds.</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">KYC Verified</h2>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 max-w-md">Your KYC has been approved. You can now withdraw your funds.</p>
             </div>
         );
     }
@@ -82,11 +82,11 @@ export const KycView = () => {
     if (kycStatus === 'pending') {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="h-20 w-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-6">
+                <div className="h-20 w-20 bg-amber-100 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-6">
                     <Icon icon="solar:clock-circle-bold" width={40} />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">KYC Pending</h2>
-                <p className="text-gray-500 max-w-md">Your KYC application is under review. We'll notify you once it's processed.</p>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">KYC Pending</h2>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 max-w-md">Your KYC application is under review. We'll notify you once it's processed.</p>
             </div>
         );
     }
@@ -101,7 +101,7 @@ export const KycView = () => {
             <PageHeader title="KYC Verification" subtitle="Upload documents to enable withdrawals" />
 
             {kycStatus === 'rejected' && (
-                <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3 text-red-800">
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3 text-red-800">
                     <Icon icon="solar:danger-bold" className="text-xl shrink-0" />
                     <div>
                         <p className="text-xs font-bold uppercase tracking-wide">KYC Rejected</p>
@@ -113,15 +113,15 @@ export const KycView = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Document Uploads */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-card">
-                        <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Icon icon="solar:user-id-bold" className="text-blue-600" /> Aadhar Card
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-card">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Icon icon="solar:user-id-bold" className="text-blue-600 dark:text-blue-400" /> Aadhar Card
                         </h3>
-                        <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${files.aadharCard ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300 bg-gray-50'}`}>
+                        <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${files.aadharCard ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 bg-gray-50'}`}>
                             <Icon icon={files.aadharCard ? "solar:check-circle-bold" : "solar:upload-bold"} className={files.aadharCard ? "text-emerald-500" : "text-gray-400"} width={32} />
                             <div className="text-center">
-                                <p className="text-sm font-bold text-gray-900">{files.aadharCard ? files.aadharCard.name : 'Click to Upload Aadhar'}</p>
-                                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1">Front and Back (PDF/JPG)</p>
+                                <p className="text-sm font-bold text-gray-900 dark:text-white">{files.aadharCard ? files.aadharCard.name : 'Click to Upload Aadhar'}</p>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-widest mt-1">Front and Back (PDF/JPG)</p>
                             </div>
                             <input
                                 type="file"
@@ -132,15 +132,15 @@ export const KycView = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-card">
-                        <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <Icon icon="solar:bank-card-bold" className="text-amber-600" /> PAN Card
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-card">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Icon icon="solar:bank-card-bold" className="text-amber-600 dark:text-amber-400" /> PAN Card
                         </h3>
-                        <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${files.panCard ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300 bg-gray-50'}`}>
+                        <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${files.panCard ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 bg-gray-50'}`}>
                             <Icon icon={files.panCard ? "solar:check-circle-bold" : "solar:upload-bold"} className={files.panCard ? "text-emerald-500" : "text-gray-400"} width={32} />
                             <div className="text-center">
-                                <p className="text-sm font-bold text-gray-900">{files.panCard ? files.panCard.name : 'Click to Upload PAN'}</p>
-                                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mt-1">Clear Photo ID (PDF/JPG)</p>
+                                <p className="text-sm font-bold text-gray-900 dark:text-white">{files.panCard ? files.panCard.name : 'Click to Upload PAN'}</p>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-widest mt-1">Clear Photo ID (PDF/JPG)</p>
                             </div>
                             <input
                                 type="file"
@@ -153,52 +153,52 @@ export const KycView = () => {
                 </div>
 
                 {/* Bank Details */}
-                <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-card">
-                    <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <Icon icon="solar:bank-bold" className="text-blue-600" /> Bank Account Information
+                <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 md:p-8 shadow-card">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                        <Icon icon="solar:bank-bold" className="text-blue-600 dark:text-blue-400" /> Bank Account Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Account Holder Name</label>
+                            <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Account Holder Name</label>
                             <input
                                 type="text"
                                 value={bankDetails.accountHolderName}
                                 onChange={(e) => setBankDetails({ ...bankDetails, accountHolderName: e.target.value })}
                                 placeholder="Full name as per bank"
-                                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
                                 required
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Bank Name</label>
+                            <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Bank Name</label>
                             <input
                                 type="text"
                                 value={bankDetails.bankName}
                                 onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
                                 placeholder="e.g. State Bank of India"
-                                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
                                 required
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Account Number</label>
+                            <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Account Number</label>
                             <input
                                 type="text"
                                 value={bankDetails.accountNumber}
                                 onChange={(e) => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
                                 placeholder="Enter account number"
-                                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
                                 required
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">IFSC Code</label>
+                            <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">IFSC Code</label>
                             <input
                                 type="text"
                                 value={bankDetails.ifscCode}
                                 onChange={(e) => setBankDetails({ ...bankDetails, ifscCode: e.target.value.toUpperCase() })}
                                 placeholder="SBIN00XXXXX"
-                                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
                                 required
                             />
                         </div>
@@ -208,7 +208,7 @@ export const KycView = () => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {loading ? (
                         <>

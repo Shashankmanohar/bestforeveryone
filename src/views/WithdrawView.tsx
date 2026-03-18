@@ -136,8 +136,8 @@ export const WithdrawView = () => {
     >
       {/* Header */}
       <div>
-        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Finance</p>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Withdraw Funds</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mb-1">Finance</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Withdraw Funds</h2>
       </div>
 
       <AnimatePresence mode="wait">
@@ -149,15 +149,15 @@ export const WithdrawView = () => {
             exit={{ opacity: 0, scale: 1.05 }}
             className="space-y-6"
           >
-            <div className={`border rounded-3xl p-6 flex flex-col items-center text-center gap-4 ${kycStatus === 'pending' ? 'bg-blue-50 border-blue-200' : kycStatus === 'rejected' ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200'}`}>
-              <div className={`h-16 w-16 rounded-full flex items-center justify-center ${kycStatus === 'pending' ? 'bg-blue-100 text-blue-600' : kycStatus === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
+            <div className={`border rounded-3xl p-6 flex flex-col items-center text-center gap-4 ${kycStatus === 'pending' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200' : kycStatus === 'rejected' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700'}`}>
+              <div className={`h-16 w-16 rounded-full flex items-center justify-center ${kycStatus === 'pending' ? 'bg-blue-100 text-blue-600 dark:text-blue-400' : kycStatus === 'rejected' ? 'bg-red-100 text-red-600 dark:text-red-400' : 'bg-amber-100 text-amber-600 dark:text-amber-400'}`}>
                 <Icon icon={kycStatus === 'pending' ? "solar:clock-circle-bold" : kycStatus === 'rejected' ? "solar:danger-bold" : "solar:shield-warning-bold"} width={32} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {kycStatus === 'pending' ? 'KYC Pending Review' : kycStatus === 'rejected' ? 'KYC Rejected' : 'KYC Required'}
                 </h3>
-                <p className="text-sm text-gray-600 max-w-sm mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500 max-w-sm mt-1">
                   {kycStatus === 'pending'
                     ? "Your KYC application is currently under review by our team. You'll be able to withdraw funds once it's approved."
                     : kycStatus === 'rejected'
@@ -170,14 +170,14 @@ export const WithdrawView = () => {
             {(kycStatus === 'not_submitted' || kycStatus === 'rejected') && (
               <form onSubmit={handleKycSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-card">
-                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <Icon icon="solar:user-id-bold" className="text-blue-600" /> Aadhar Card
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-card">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <Icon icon="solar:user-id-bold" className="text-blue-600 dark:text-blue-400" /> Aadhar Card
                     </h3>
-                    <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${kycFiles.aadharCard ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300 bg-gray-50'}`}>
+                    <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${kycFiles.aadharCard ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 bg-gray-50'}`}>
                       <Icon icon={kycFiles.aadharCard ? "solar:check-circle-bold" : "solar:upload-bold"} className={kycFiles.aadharCard ? "text-emerald-500" : "text-gray-400"} width={32} />
                       <div className="text-center">
-                        <p className="text-sm font-bold text-gray-900">{kycFiles.aadharCard ? kycFiles.aadharCard.name : 'Click to Upload Aadhar'}</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">{kycFiles.aadharCard ? kycFiles.aadharCard.name : 'Click to Upload Aadhar'}</p>
                       </div>
                       <input
                         type="file"
@@ -188,14 +188,14 @@ export const WithdrawView = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-card">
-                    <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <Icon icon="solar:bank-card-bold" className="text-amber-600" /> PAN Card
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-card">
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <Icon icon="solar:bank-card-bold" className="text-amber-600 dark:text-amber-400" /> PAN Card
                     </h3>
-                    <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${kycFiles.panCard ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 hover:border-gray-300 bg-gray-50'}`}>
+                    <div className={`relative border-2 border-dashed rounded-2xl p-8 transition-all flex flex-col items-center justify-center gap-3 ${kycFiles.panCard ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30' : 'border-gray-200 dark:border-gray-800 hover:border-gray-300 bg-gray-50'}`}>
                       <Icon icon={kycFiles.panCard ? "solar:check-circle-bold" : "solar:upload-bold"} className={kycFiles.panCard ? "text-emerald-500" : "text-gray-400"} width={32} />
                       <div className="text-center">
-                        <p className="text-sm font-bold text-gray-900">{kycFiles.panCard ? kycFiles.panCard.name : 'Click to Upload PAN'}</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">{kycFiles.panCard ? kycFiles.panCard.name : 'Click to Upload PAN'}</p>
                       </div>
                       <input
                         type="file"
@@ -207,52 +207,52 @@ export const WithdrawView = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-card">
-                  <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <Icon icon="solar:bank-bold" className="text-blue-600" /> Bank Details
+                <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 md:p-8 shadow-card">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                    <Icon icon="solar:bank-bold" className="text-blue-600 dark:text-blue-400" /> Bank Details
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Account Holder Name</label>
+                      <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Account Holder Name</label>
                       <input
                         type="text"
                         value={kycForm.accountHolderName}
                         onChange={(e) => setKycForm({ ...kycForm, accountHolderName: e.target.value })}
                         placeholder="Full name as per bank"
-                        className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 outline-none"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
                         required
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Bank Name</label>
+                      <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Bank Name</label>
                       <input
                         type="text"
                         value={kycForm.bankName}
                         onChange={(e) => setKycForm({ ...kycForm, bankName: e.target.value })}
                         placeholder="e.g. State Bank of India"
-                        className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 outline-none"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
                         required
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Account Number</label>
+                      <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Account Number</label>
                       <input
                         type="text"
                         value={kycForm.accountNumber}
                         onChange={(e) => setKycForm({ ...kycForm, accountNumber: e.target.value })}
                         placeholder="Enter account number"
-                        className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 outline-none"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
                         required
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">IFSC Code</label>
+                      <label className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">IFSC Code</label>
                       <input
                         type="text"
                         value={kycForm.ifscCode}
                         onChange={(e) => setKycForm({ ...kycForm, ifscCode: e.target.value.toUpperCase() })}
                         placeholder="SBIN00XXXXX"
-                        className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 outline-none"
+                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
                         required
                       />
                     </div>
@@ -262,7 +262,7 @@ export const WithdrawView = () => {
                 <button
                   type="submit"
                   disabled={kycLoading}
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2"
                 >
                   {kycLoading ? (
                     <Icon icon="eos-icons:loading" className="animate-spin text-xl" />
@@ -285,69 +285,69 @@ export const WithdrawView = () => {
               <button
                 onClick={() => setSelectedWallet('current')}
                 className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 ${selectedWallet === 'current'
-                  ? 'border-gray-900 bg-gray-50 ring-2 ring-gray-900/5'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+                  ? 'border-gray-900 bg-gray-50 dark:bg-gray-800 ring-2 ring-gray-900/5'
+                  : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300'
                   }`}
               >
                 <div className="flex items-center justify-between">
-                  <Icon icon="solar:wallet-bold" className={selectedWallet === 'current' ? 'text-gray-900' : 'text-gray-400'} width={24} />
-                  {selectedWallet === 'current' && <Icon icon="solar:check-circle-bold" className="text-gray-900" width={20} />}
+                  <Icon icon="solar:wallet-bold" className={selectedWallet === 'current' ? 'text-gray-900 dark:text-white' : 'text-gray-400'} width={24} />
+                  {selectedWallet === 'current' && <Icon icon="solar:check-circle-bold" className="text-gray-900 dark:text-white" width={20} />}
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Current Wallet</p>
-                  <p className="text-lg font-bold text-gray-900">₹{wallet.balance.toLocaleString()}</p>
-                  <p className="text-[10px] text-red-500 font-bold mt-1">20% Admin Fee Applies</p>
+                  <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Current Wallet</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">₹{wallet.balance.toLocaleString()}</p>
+                  <p className="text-[10px] text-red-500 dark:text-red-400 font-bold mt-1">20% Admin Fee Applies</p>
                 </div>
               </button>
 
               <button
                 onClick={() => setSelectedWallet('matrix')}
                 className={`p-4 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 ${selectedWallet === 'matrix'
-                  ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/5'
-                  : 'border-gray-200 bg-white hover:border-gray-300'
+                  ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 ring-2 ring-emerald-500/5'
+                  : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300'
                   }`}
               >
                 <div className="flex items-center justify-between">
-                  <Icon icon="solar:crown-bold" className={selectedWallet === 'matrix' ? 'text-emerald-600' : 'text-gray-400'} width={24} />
-                  {selectedWallet === 'matrix' && <Icon icon="solar:check-circle-bold" className="text-emerald-600" width={20} />}
+                  <Icon icon="solar:crown-bold" className={selectedWallet === 'matrix' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'} width={24} />
+                  {selectedWallet === 'matrix' && <Icon icon="solar:check-circle-bold" className="text-emerald-600 dark:text-emerald-400" width={20} />}
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Matrix Wallet</p>
-                  <p className="text-lg font-bold text-gray-900">₹{wallet.matrixWallet.toLocaleString()}</p>
-                  <p className="text-[10px] text-emerald-600 font-bold mt-1">0% Admin Fee (Tax Free)</p>
+                  <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Matrix Wallet</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">₹{wallet.matrixWallet.toLocaleString()}</p>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">0% Admin Fee (Tax Free)</p>
                 </div>
               </button>
             </div>
 
             {/* Status Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 flex items-center gap-4 shadow-card card-hover">
-                <div className="h-12 w-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center gap-4 shadow-card card-hover">
+                <div className="h-12 w-12 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                   <Icon icon="solar:wallet-money-bold" width={24} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wide">Available</p>
-                  <p className="text-xl font-bold text-gray-900 amount-value">₹{wallet.balance.toLocaleString()}</p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wide">Available</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white amount-value">₹{wallet.balance.toLocaleString()}</p>
                 </div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 flex items-center gap-4 shadow-card card-hover">
-                <div className="h-12 w-12 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
+              <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center gap-4 shadow-card card-hover">
+                <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0">
                   <Icon icon="solar:calendar-bold" width={24} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wide">Weekly Used</p>
-                  <p className="text-xl font-bold text-gray-900 amount-value">
-                    ₹{weekly.withdrawalUsed.toLocaleString()}<span className="text-gray-400 text-sm font-medium">/{weekly.withdrawalLimit.toLocaleString()}</span>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wide">Weekly Used</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white amount-value">
+                    ₹{weekly.withdrawalUsed.toLocaleString()}<span className="text-gray-400 dark:text-gray-500 text-sm font-medium">/{weekly.withdrawalLimit.toLocaleString()}</span>
                   </p>
                 </div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 flex items-center gap-4 shadow-card card-hover">
-                <div className="h-12 w-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center gap-4 shadow-card card-hover">
+                <div className="h-12 w-12 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                   <Icon icon="solar:bill-list-bold" width={24} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wide">Charge</p>
-                  <p className={`text-xl font-bold amount-value ${isMatrix ? 'text-emerald-600' : 'text-amber-600'}`}>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wide">Charge</p>
+                  <p className={`text-xl font-bold amount-value ${isMatrix ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                     {isMatrix ? '0%' : '20%'}
                   </p>
                 </div>
@@ -355,21 +355,21 @@ export const WithdrawView = () => {
             </div>
 
             {!isSaturday && (
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3 text-amber-800">
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 flex items-center gap-3 text-amber-800">
                 <Icon icon="solar:info-circle-bold" className="text-xl shrink-0" />
                 <p className="text-xs font-bold uppercase tracking-wide">
-                  Notice: Withdrawals are only active on <span className="text-amber-900 underline underline-offset-2">Saturdays</span>.
+                  Notice: Withdrawals are only active on <span className="text-amber-900 dark:text-amber-200 underline underline-offset-2">Saturdays</span>.
                 </p>
               </div>
             )}
 
             {/* Withdraw Form */}
-            <div className="bg-white rounded-3xl border border-gray-200 p-6 md:p-8 shadow-card">
-              <h3 className="text-sm font-bold text-gray-900 mb-5 flex items-center gap-2">
-                <Icon icon="solar:money-bag-bold" className="text-emerald-600" /> Enter Withdrawal Amount
+            <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 md:p-8 shadow-card">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+                <Icon icon="solar:money-bag-bold" className="text-emerald-600 dark:text-emerald-400" /> Enter Withdrawal Amount
               </h3>
               <div className="relative group">
-                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-900 font-bold text-2xl group-focus-within:text-gray-900 transition-colors">
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-900 dark:text-white font-bold text-2xl group-focus-within:text-gray-900 dark:text-white transition-colors">
                   ₹
                 </span>
                 <input
@@ -377,61 +377,61 @@ export const WithdrawView = () => {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="₹200 - ₹50,000"
-                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-2xl font-bold rounded-2xl py-4 pl-10 pr-4 focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all placeholder:text-gray-300 focus:bg-white"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-2xl font-bold rounded-2xl py-4 pl-10 pr-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all placeholder:text-gray-300 dark:text-gray-600 focus:bg-white dark:bg-gray-900"
                 />
               </div>
 
               {/* Bank Summary (Read-only since it's from KYC) */}
-              <div className="mt-8 bg-blue-50 border border-blue-100 rounded-2xl p-5">
+              <div className="mt-8 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xs font-bold text-blue-900 flex items-center gap-2 uppercase tracking-wider">
-                    <Icon icon="solar:bank-bold" className="text-blue-600" /> Disbursement Bank
+                    <Icon icon="solar:bank-bold" className="text-blue-600 dark:text-blue-400" /> Disbursement Bank
                   </h3>
-                  <Icon icon="solar:verified-check-bold" className="text-blue-600" width={18} />
+                  <Icon icon="solar:verified-check-bold" className="text-blue-600 dark:text-blue-400" width={18} />
                 </div>
                 <div className="grid grid-cols-2 gap-y-3">
                   <div>
-                    <p className="text-[10px] text-blue-600/70 uppercase font-bold">Holder</p>
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400/70 uppercase font-bold">Holder</p>
                     <p className="text-sm font-bold text-blue-900">{user?.kyc?.bankDetails?.accountHolderName}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-blue-600/70 uppercase font-bold">Account</p>
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400/70 uppercase font-bold">Account</p>
                     <p className="text-sm font-bold text-blue-900">•••• {user?.kyc?.bankDetails?.accountNumber?.slice(-4)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-blue-600/70 uppercase font-bold">IFSC</p>
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400/70 uppercase font-bold">IFSC</p>
                     <p className="text-sm font-bold text-blue-900">{user?.kyc?.bankDetails?.ifscCode}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-blue-600/70 uppercase font-bold">Bank</p>
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400/70 uppercase font-bold">Bank</p>
                     <p className="text-sm font-bold text-blue-900">{user?.kyc?.bankDetails?.bankName}</p>
                   </div>
                 </div>
               </div>
 
               {/* Calculation Preview */}
-              <div className="mt-6 p-5 bg-gray-50 rounded-2xl space-y-3 border border-dashed border-gray-200">
+              <div className="mt-6 p-5 bg-gray-50 dark:bg-gray-800 rounded-2xl space-y-3 border border-dashed border-gray-200 dark:border-gray-800">
                 <div className="flex justify-between text-xs md:text-sm">
-                  <span className="text-gray-500 font-medium">Requested Amount</span>
-                  <span className="font-bold text-gray-900">₹{numAmount.toLocaleString()}</span>
+                  <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Requested Amount</span>
+                  <span className="font-bold text-gray-900 dark:text-white">₹{numAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-xs md:text-sm">
-                  <span className="text-gray-500 font-medium">Admin Fee ({isMatrix ? '0%' : '20%'})</span>
-                  <span className={`font-bold ${fee > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                  <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Admin Fee ({isMatrix ? '0%' : '20%'})</span>
+                  <span className={`font-bold ${fee > 0 ? 'text-red-500 dark:text-red-400' : 'text-emerald-500'}`}>
                     {fee > 0 ? `-₹${fee.toLocaleString()}` : '₹0'}
                   </span>
                 </div>
                 <div className="h-px bg-gray-200 my-2" />
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-gray-700 text-sm">Net Payable</span>
-                  <span className="font-bold text-emerald-600 text-xl md:text-2xl">₹{net.toLocaleString()}</span>
+                  <span className="font-bold text-gray-700 dark:text-gray-300 dark:text-gray-600 text-sm">Net Payable</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400 text-xl md:text-2xl">₹{net.toLocaleString()}</span>
                 </div>
               </div>
 
               <button
                 onClick={handleWithdraw}
                 disabled={loading || !isSaturday}
-                className={`w-full mt-8 ${!isSaturday ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-gray-900 hover:bg-gray-800 shadow-lg'} text-white font-bold py-4 rounded-xl click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full mt-8 ${!isSaturday ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg'} text-white font-bold py-4 rounded-xl click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? (
                   <>

@@ -4,13 +4,12 @@ import { PageHeader } from '@/components/PageHeader';
 
 export const TermsView = () => {
   const planDetails = [
-    { label: 'Joining Fee', value: '₹499' },
-    { label: 'Matrix Type', value: '5x5 Forced' },
-    { label: 'Level 1 Income', value: '₹3,600' },
-    { label: 'Level 2 Income', value: '₹50,000' },
-    { label: 'Direct Referral', value: '₹200' },
-    { label: 'Leadership Royalty', value: '₹10/re-topup' },
-    { label: 'Weekly Bonanza', value: '₹400/referral (Mon-Fri, if 2+)' },
+    { label: 'Joining Fee', value: '₹1,000' },
+    { label: 'Matrix Type', value: '6x Matrix Auto Growth' },
+    { label: 'Level 1 Matrix Income', value: '₹2,400 (One-Time)' },
+    { label: 'Direct Referral', value: '₹200 (20%)' },
+    { label: 'Weekly Bonanza', value: '₹200 (20%)' },
+    { label: 'Weekly Royalty Bonus', value: '₹200 (20% Pool)' },
   ];
 
   return (
@@ -23,7 +22,7 @@ export const TermsView = () => {
       <PageHeader title="Terms & Plan" subtitle="Information" />
 
       {/* Plan Overview */}
-      <div className="bg-gray-900 text-white rounded-3xl p-6 md:p-8 relative overflow-hidden">
+      <div className="bg-gray-900 dark:bg-white/5 dark:border dark:border-white/10 text-white rounded-3xl p-6 md:p-8 relative overflow-hidden">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-10 w-10 bg-white/10 rounded-xl flex items-center justify-center">
@@ -41,24 +40,24 @@ export const TermsView = () => {
       </div>
 
       {/* Plan Details */}
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-card overflow-hidden">
-        <div className="p-5 border-b border-gray-100 bg-gray-50/50">
-          <h3 className="text-sm font-bold text-gray-900">Income Structure</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card overflow-hidden">
+        <div className="p-5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">Income Structure</h3>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
           {planDetails.map((item, i) => (
             <div key={i} className="flex items-center justify-between p-5">
-              <span className="text-sm text-gray-600">{item.label}</span>
-              <span className="text-sm font-bold text-gray-900">{item.value}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{item.label}</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white">{item.value}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Terms */}
-      <div className="bg-white rounded-3xl border border-gray-200 p-6 shadow-card">
-        <h3 className="text-sm font-bold text-gray-900 mb-4">Terms & Conditions</h3>
-        <ul className="space-y-3 text-sm text-gray-600">
+      <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-card">
+        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Terms & Conditions</h3>
+        <ul className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
           <li className="flex gap-2">
             <Icon icon="solar:check-circle-bold" className="text-emerald-500 shrink-0 mt-0.5" />
             <span>All withdrawals are subject to 20% admin fee.</span>
@@ -79,7 +78,7 @@ export const TermsView = () => {
             <Icon icon="solar:check-circle-bold" className="text-emerald-500 shrink-0 mt-0.5" />
             <span>Leadership royalty is credited instantly on every re-topup.</span>
           </li>
-          <li className="flex gap-2 text-emerald-600 font-bold">
+          <li className="flex gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
             <Icon icon="solar:info-circle-bold" className="text-emerald-500 shrink-0 mt-0.5" />
             <span>System works on community based auto growth (Top to Bottom, Left to Right).</span>
           </li>

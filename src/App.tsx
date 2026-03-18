@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +17,8 @@ import { TermsView } from "./views/TermsView";
 import { LoginPage } from "./views/LoginPage";
 import { SignupPage } from "./views/SignupPage";
 import { AdminLoginView } from "./views/AdminLoginView";
+import { ForgotPasswordView } from "./views/ForgotPasswordView";
+import { AdminForgotPasswordView } from "./views/AdminForgotPasswordView";
 import { AdminView } from "./views/AdminView";
 import { PaymentView } from "./views/PaymentView";
 import { PaymentVerificationView } from "./views/PaymentVerificationView";
@@ -23,7 +26,9 @@ import { ActivateOthers } from "./views/ActivateOthers";
 import { SupportView } from "./views/SupportView";
 import { KycView } from "./views/KycView";
 import { AdminKycView } from "./views/AdminKycView";
+import { BusinessPlanView } from "./views/BusinessPlanView";
 import { useAuthStore } from "./store/useAuthStore";
+import { useThemeStore, resolveTheme } from "./store/useThemeStore";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +54,22 @@ const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   const { isAuthenticated, isAdminAuthenticated } = useAuthStore();
+  const { theme } = useThemeStore();
+
+  useEffect(() => {
+    const apply = () => {
+      const resolved = resolveTheme(theme);
+      document.documentElement.classList.toggle('dark', resolved === 'dark');
+    };
+    apply();
+
+    if (theme === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const handler = () => apply();
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    }
+  }, [theme]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -70,6 +91,10 @@ const App = () => {
               path="/join/:referralCode"
               element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <SignupPage />}
             />
+            <Route
+              path="/forgot-password"
+              element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ForgotPasswordView />}
+            />
 
             {/* Payment Verification (authenticated but not verified) */}
             <Route
@@ -81,6 +106,10 @@ const App = () => {
             <Route
               path="/admin/login"
               element={isAdminAuthenticated ? <Navigate to="/admin" replace /> : <AdminLoginView />}
+            />
+            <Route
+              path="/admin/forgot-password"
+              element={isAdminAuthenticated ? <Navigate to="/admin" replace /> : <AdminForgotPasswordView />}
             />
             <Route
               path="/admin"
@@ -105,6 +134,7 @@ const App = () => {
               <Route path="/activate-others" element={<ActivateOthers />} />
               <Route path="/support" element={<SupportView />} />
               <Route path="/terms" element={<TermsView />} />
+              <Route path="/business-plan" element={<BusinessPlanView />} />
               <Route path="/notifications" element={<DashboardView />} />
               <Route path="/payment" element={<PaymentView />} />
               <Route path="/kyc" element={<KycView />} />

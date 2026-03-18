@@ -53,7 +53,7 @@ export const AdminLoginView = () => {
                 <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-blue-100/50 blur-3xl opacity-60 mix-blend-multiply"></div>
             </div>
 
-            <div className="relative w-full max-w-sm bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
+            <div className="relative w-full max-w-sm bg-white dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
                 <div className="flex flex-col items-center mb-8">
                     <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-white text-lg font-semibold shadow-lg mb-4">
                         B
@@ -149,9 +149,13 @@ export const AdminLoginView = () => {
                             />
                             <span className="text-xs text-slate-500">Remember session</span>
                         </label>
-                        <a href="#" className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/admin/forgot-password')}
+                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                        >
                             Forgot access?
-                        </a>
+                        </button>
                     </div>
 
                     <button

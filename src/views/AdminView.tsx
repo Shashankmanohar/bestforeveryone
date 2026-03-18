@@ -71,7 +71,7 @@ export const AdminView = () => {
         <div className="flex h-screen bg-slate-50">
             {/* Sidebar */}
             <aside
-                className={`w-64 bg-white border-r border-slate-200 flex flex-col z-30 transition-all duration-300 absolute md:relative ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`w-64 bg-white dark:bg-gray-900 border-r border-slate-200 flex flex-col z-30 transition-all duration-300 absolute md:relative ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
                     } md:translate-x-0 h-full`}
             >
                 {/* Brand */}
@@ -169,7 +169,7 @@ export const AdminView = () => {
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 relative h-full">
                 {/* Header */}
-                <header className="h-14 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-20 flex items-center justify-between px-4 md:px-6">
+                <header className="h-14 bg-white dark:bg-gray-900/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-20 flex items-center justify-between px-4 md:px-6">
                     <div className="flex items-center gap-3 md:hidden">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -184,7 +184,7 @@ export const AdminView = () => {
                         <div className="w-full flex items-center gap-2 px-3 py-1.5 bg-slate-50/50 border border-slate-200 rounded-md text-slate-400">
                             <Icon icon="solar:magnifer-linear" />
                             <span className="text-xs font-medium">Search users, transactions, logs...</span>
-                            <span className="ml-auto text-[10px] bg-white border border-slate-200 px-1.5 rounded text-slate-400">
+                            <span className="ml-auto text-[10px] bg-white dark:bg-gray-900 border border-slate-200 px-1.5 rounded text-slate-400">
                                 ⌘K
                             </span>
                         </div>
@@ -309,7 +309,7 @@ const DashboardContent = ({
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wide">
                     Recent Activity
@@ -319,7 +319,7 @@ const DashboardContent = ({
                 {activities && activities.length > 0 ? (
                     activities.map((activity: any) => (
                         <div key={activity._id} className="flex items-center gap-4 px-5 py-3 border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                            <div className={`h-8 w-8 rounded-full ${activity.status === 'credit' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'} flex items-center justify-center text-sm border border-white shadow-sm`}>
+                            <div className={`h-8 w-8 rounded-full ${activity.status === 'credit' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 text-rose-600'} flex items-center justify-center text-sm border border-white shadow-sm`}>
                                 <Icon icon={activity.status === 'credit' ? 'solar:arrow-left-down-linear' : 'solar:arrow-right-up-linear'} />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -327,7 +327,7 @@ const DashboardContent = ({
                                 <p className="text-[10px] text-slate-400 font-mono">{activity.user?.username || activity.user?.fullname || 'N/A'}</p>
                             </div>
                             <div className="text-right">
-                                <p className={`text-sm font-semibold font-mono ${activity.status === 'credit' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <p className={`text-sm font-semibold font-mono ${activity.status === 'credit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
                                     {activity.status === 'credit' ? '+' : '-'}₹{activity.amount}
                                 </p>
                                 <p className="text-[10px] text-slate-400">Just now</p>
@@ -361,16 +361,16 @@ const KPICard = ({
     onClick?: () => void;
 }) => {
     const colorClasses = {
-        emerald: 'bg-emerald-50 text-emerald-600',
+        emerald: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
         indigo: 'bg-indigo-50 text-indigo-600',
-        amber: 'bg-amber-50 text-amber-600',
-        purple: 'bg-purple-50 text-purple-600',
+        amber: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400',
+        purple: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
     }[color as 'emerald' | 'indigo' | 'amber' | 'purple'];
 
     return (
         <div
             onClick={onClick}
-            className={`bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition-all ${onClick ? 'cursor-pointer hover:shadow-md hover:border-slate-300 active:scale-[0.98]' : ''
+            className={`bg-white dark:bg-gray-900 p-5 rounded-xl border border-slate-200 shadow-sm transition-all ${onClick ? 'cursor-pointer hover:shadow-md hover:border-slate-300 active:scale-[0.98]' : ''
                 }`}
         >
             <div className="flex justify-between items-start">
@@ -423,7 +423,7 @@ const UsersContent = ({ users }: { users: any[] }) => {
                 </h2>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-auto">
                     <table className="w-full text-left text-sm whitespace-nowrap">
                         <thead className="bg-slate-50 sticky top-0">
@@ -447,7 +447,7 @@ const UsersContent = ({ users }: { users: any[] }) => {
                                                 <div>
                                                     <div className="font-medium text-slate-900">{user.fullname}</div>
                                                     <div className="text-xs text-slate-500 font-semibold">{user.username}</div>
-                                                    <div className="text-[10px] text-slate-400 font-mono">{user.phone}</div>
+                                                    <div className="text-[10px] text-slate-400 font-mono">{user.email}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -456,15 +456,15 @@ const UsersContent = ({ users }: { users: any[] }) => {
                                             <div className="text-xs text-slate-600">Total: <span className="font-semibold">₹{user.wallet?.totalEarnings?.toLocaleString() || 0}</span></div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
-                                                <span className={`w-1 h-1 rounded-full ${user.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${user.status === 'active' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
+                                                <span className={`w-1 h-1 rounded-full ${user.status === 'active' ? 'bg-emerald-50 dark:bg-emerald-900/300' : 'bg-rose-500'}`}></span>
                                                 {user.status}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-right">
                                             <button
                                                 onClick={() => handleBlockUser(user._id, user.status)}
-                                                className="text-slate-400 hover:text-indigo-600 font-medium text-xs border border-slate-200 hover:border-indigo-200 px-2 py-1 rounded bg-white transition-all"
+                                                className="text-slate-400 hover:text-indigo-600 font-medium text-xs border border-slate-200 hover:border-indigo-200 px-2 py-1 rounded bg-white dark:bg-gray-900 transition-all"
                                             >
                                                 {user.status === 'active' ? 'Block' : 'Unblock'}
                                             </button>
@@ -518,8 +518,8 @@ const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
             </div>
 
             {!hasPending ? (
-                <div className="bg-white border border-slate-200 rounded-xl p-12 text-center flex flex-col items-center justify-center">
-                    <div className="h-16 w-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-3xl mb-4">
+                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl p-12 text-center flex flex-col items-center justify-center">
+                    <div className="h-16 w-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-3xl mb-4">
                         <Icon icon="solar:check-circle-bold-duotone" />
                     </div>
                     <h3 className="text-slate-900 font-semibold">All Caught Up!</h3>
@@ -528,7 +528,7 @@ const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
                     </p>
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <div className="divide-y divide-slate-100">
                         {withdrawals.map((w: any) => (
                             <div key={w._id} className="p-4 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
@@ -541,7 +541,7 @@ const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
                                             <span className="text-lg font-semibold text-slate-900 font-mono">₹{w.amount}</span>
                                             <span className="text-xs text-slate-400">Fee: ₹{w.adminFee}</span>
                                         </div>
-                                        <div className="text-xs text-emerald-600 font-semibold">Net Payable: ₹{w.netPayable}</div>
+                                        <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Net Payable: ₹{w.netPayable}</div>
                                     </div>
                                 </div>
 
@@ -589,53 +589,92 @@ const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
 };
 
 // Ledger Content
-const LedgerContent = ({ transactions }: { transactions: any[] }) => (
-    <div className="animate-in fade-in duration-400">
-        <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
-                Financial Ledger
-            </h2>
-        </div>
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-50 sticky top-0">
-                    <tr className="text-xs font-semibold text-slate-500 uppercase">
-                        <th className="px-4 py-3 border-b border-slate-200">Transaction ID</th>
-                        <th className="px-4 py-3 border-b border-slate-200">Type</th>
-                        <th className="px-4 py-3 border-b border-slate-200">Category</th>
-                        <th className="px-4 py-3 border-b border-slate-200">User</th>
-                        <th className="px-4 py-3 border-b border-slate-200 text-right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                    {transactions && transactions.length > 0 ? (
-                        transactions.map((tx: any) => (
-                            <tr key={tx._id} className="hover:bg-slate-50">
-                                <td className="px-4 py-3 font-mono text-xs text-slate-500">{tx._id.slice(-8)}</td>
-                                <td className="px-4 py-3">
-                                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${tx.status === 'credit' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'} uppercase`}>
-                                        {tx.status}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3 text-slate-900 font-medium">{tx.type}</td>
-                                <td className="px-4 py-3 text-slate-600 text-xs">{tx.user?.fullname || 'N/A'}</td>
-                                <td className={`px-4 py-3 text-right font-mono font-semibold ${tx.status === 'credit' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                    {tx.status === 'credit' ? '+' : '-'}₹{tx.amount}
+const LedgerContent = ({ transactions }: { transactions: any[] }) => {
+    const { distributeRoyalty } = useAdminStore();
+    const { toast } = useToast();
+    const [isDistributing, setIsDistributing] = useState(false);
+
+    const handleDistributeRoyalty = async () => {
+        if (!confirm("Are you sure you want to distribute the Weekly Royalty Bonus? This action cannot be undone.")) return;
+
+        setIsDistributing(true);
+        try {
+            const res = await distributeRoyalty();
+            toast({
+                title: "Royalty Distributed!",
+                description: res.message || "Successfully distributed weekly royalty."
+            });
+        } catch (error: any) {
+            toast({
+                title: "Distribution Failed",
+                description: error.response?.data?.message || "An error occurred.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsDistributing(false);
+        }
+    };
+
+    return (
+        <div className="animate-in fade-in duration-400">
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
+                    Financial Ledger
+                </h2>
+                <button
+                    onClick={handleDistributeRoyalty}
+                    disabled={isDistributing}
+                    className="px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 text-xs font-semibold rounded-md shadow-sm transition-all flex items-center gap-2"
+                >
+                    {isDistributing ? (
+                        <Icon icon="solar:spinner-linear" className="animate-spin text-lg" />
+                    ) : (
+                        <Icon icon="solar:star-fall-line-duotone" className="text-lg text-amber-400" />
+                    )}
+                    Distribute Weekly Royalty
+                </button>
+            </div>
+            <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                    <thead className="bg-slate-50 sticky top-0">
+                        <tr className="text-xs font-semibold text-slate-500 uppercase">
+                            <th className="px-4 py-3 border-b border-slate-200">Transaction ID</th>
+                            <th className="px-4 py-3 border-b border-slate-200">Type</th>
+                            <th className="px-4 py-3 border-b border-slate-200">Category</th>
+                            <th className="px-4 py-3 border-b border-slate-200">User</th>
+                            <th className="px-4 py-3 border-b border-slate-200 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {transactions && transactions.length > 0 ? (
+                            transactions.map((tx: any) => (
+                                <tr key={tx._id} className="hover:bg-slate-50">
+                                    <td className="px-4 py-3 font-mono text-xs text-slate-500">{tx._id.slice(-8)}</td>
+                                    <td className="px-4 py-3">
+                                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${tx.status === 'credit' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 border-rose-100'} uppercase`}>
+                                            {tx.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-900 font-medium">{tx.type}</td>
+                                    <td className="px-4 py-3 text-slate-600 text-xs">{tx.user?.fullname || 'N/A'}</td>
+                                    <td className={`px-4 py-3 text-right font-mono font-semibold ${tx.status === 'credit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
+                                        {tx.status === 'credit' ? '+' : '-'}₹{tx.amount}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                                    No transactions found
                                 </td>
                             </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                                No transactions found
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // Payments Content
 const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
@@ -684,26 +723,26 @@ const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
                     <p className="text-sm text-slate-500">Review and approve user payment submissions</p>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Icon icon="solar:shield-check-linear" className="text-emerald-600" />
+                    <Icon icon="solar:shield-check-linear" className="text-emerald-600 dark:text-emerald-400" />
                     <span>{pendingPayments.length} pending</span>
                 </div>
             </div>
 
             {pendingPayments.length === 0 ? (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-12 text-center">
-                    <div className="h-16 w-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm p-12 text-center">
+                    <div className="h-16 w-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Icon icon="solar:check-circle-linear" className="text-3xl" />
                     </div>
                     <h3 className="text-base font-semibold text-slate-900 mb-2">All Caught Up!</h3>
                     <p className="text-sm text-slate-500">No pending payment approvals at the moment</p>
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
                     <table className="w-full">
                         <thead className="bg-slate-50/50 border-b border-slate-100">
                             <tr>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">User</th>
-                                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Phone</th>
+                                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Submitted</th>
                                 <th className="px-5 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
                             </tr>
@@ -724,7 +763,7 @@ const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
                                         </div>
                                     </td>
                                     <td className="px-5 py-4">
-                                        <span className="text-sm font-mono text-slate-600">{payment.phone}</span>
+                                        <span className="text-sm font-mono text-slate-600">{payment.email}</span>
                                     </td>
                                     <td className="px-5 py-4">
                                         <span className="text-xs text-slate-500">
@@ -743,7 +782,7 @@ const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
                                         <div className="flex items-center justify-end gap-2">
                                             <button
                                                 onClick={() => handleApprove(payment._id, payment.fullname)}
-                                                className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-md hover:bg-emerald-100 transition-colors border border-emerald-200 flex items-center gap-1.5"
+                                                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-md hover:bg-emerald-100 transition-colors border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5"
                                             >
                                                 <Icon icon="solar:check-circle-linear" className="text-sm" />
                                                 Approve
@@ -773,7 +812,7 @@ const MatrixContent = () => (
         <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-4">
             Matrix Engine Logic
         </h2>
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8 text-center">
+        <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm p-8 text-center">
             <p className="text-slate-500">Matrix control interface will be implemented here</p>
         </div>
     </div>
@@ -785,7 +824,7 @@ const SettingsContent = () => (
         <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-4">
             System Configuration
         </h2>
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-8 text-center">
+        <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm p-8 text-center">
             <p className="text-slate-500">Settings interface will be implemented here</p>
         </div>
     </div>

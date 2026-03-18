@@ -9,8 +9,8 @@ interface MatrixTreeProps {
 
 export const MatrixTree = ({ matrix }: MatrixTreeProps) => {
   return (
-    <div className="bg-white rounded-2xl sm:rounded-3xl border border-gray-200 p-6 sm:p-8 lg:p-10 shadow-card">
-      <p className="text-[10px] sm:text-xs font-bold text-gray-400 mb-6 sm:mb-8 uppercase tracking-widest text-center">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 p-6 sm:p-8 lg:p-10 shadow-card">
+      <p className="text-[10px] sm:text-xs font-bold text-gray-400 dark:text-gray-500 mb-6 sm:mb-8 uppercase tracking-widest text-center">
         LIVE TREE VISUALIZATION
       </p>
 
@@ -23,17 +23,17 @@ export const MatrixTree = ({ matrix }: MatrixTreeProps) => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="relative z-10 mb-8"
           >
-            <div className="h-14 w-14 sm:h-16 sm:w-16 bg-gray-900 text-white rounded-full flex items-center justify-center border-4 border-white shadow-xl relative">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-800 shadow-xl relative">
               <span className="text-xs sm:text-sm font-bold">YOU</span>
             </div>
             {/* Connecting line to Level 1 */}
-            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-8 sm:h-10 bg-gray-200" />
+            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-8 sm:h-10 bg-gray-200 dark:bg-gray-700" />
           </motion.div>
 
           {/* Level 1 Nodes */}
           <div className="relative pt-6">
             {/* Horizontal connector line */}
-            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gray-200" style={{ width: 'calc(100% - 44px)', left: '22px' }} />
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gray-200 dark:bg-gray-700" style={{ width: 'calc(100% - 44px)', left: '22px' }} />
 
             <div className="flex gap-3 sm:gap-6 md:gap-8">
               {Array(6).fill(0).map((_, i) => (
@@ -45,14 +45,14 @@ export const MatrixTree = ({ matrix }: MatrixTreeProps) => {
                   className="flex flex-col items-center relative"
                 >
                   {/* Vertical connector to horizontal line */}
-                  <div className="absolute -top-6 w-0.5 h-6 bg-gray-200" />
+                  <div className="absolute -top-6 w-0.5 h-6 bg-gray-200 dark:bg-gray-700" />
 
 
                   {/* Node */}
                   <div
                     className={`h-11 w-11 sm:h-12 sm:w-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${i < matrix.level1.filled
-                      ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-300 shadow-md scale-100'
-                      : 'bg-gray-50 border-2 border-dashed border-gray-200 text-gray-300 scale-95'
+                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 border-2 border-emerald-300 dark:border-emerald-600 shadow-md scale-100'
+                      : 'bg-gray-50 dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-600 text-gray-300 dark:text-gray-500 scale-95'
                       }`}
                   >
                     {i < matrix.level1.filled ? (
@@ -63,7 +63,7 @@ export const MatrixTree = ({ matrix }: MatrixTreeProps) => {
                   </div>
 
                   {/* Position label */}
-                  <span className="text-[9px] sm:text-[10px] text-gray-400 mt-1.5 font-medium">
+                  <span className="text-[9px] sm:text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 font-medium">
                     {i < matrix.level1.filled ? '●' : '○'}
                   </span>
                 </motion.div>

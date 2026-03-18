@@ -61,7 +61,7 @@ export const PaymentView = () => {
 
         const trId = `BFE-PAY-${user?.username}-${Date.now()}`;
         const receiverUpi = 'paytm.s21tpy8@pty';
-        const data = `upi://pay?pa=${receiverUpi}&pn=BestForEveryone&am=1180&cu=INR&tr=${trId}`;
+        const data = `upi://pay?pa=${receiverUpi}&pn=BestForEveryone&am=1000&cu=INR&tr=${trId}`;
         setQrData(data);
         setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`);
 
@@ -97,9 +97,9 @@ export const PaymentView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <div className="border border-neutral-200 rounded-xl bg-white shadow-sm">
+                <div className="border border-neutral-200 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
                     {/* Header */}
                     <div className="p-4 border-b border-neutral-100 flex items-center gap-3 bg-neutral-50/30">
                         <button
@@ -125,7 +125,7 @@ export const PaymentView = () => {
                             <button
                                 onClick={() => setPaymentMethod('card')}
                                 className={`text-xs font-medium py-1.5 rounded-md transition-all ${paymentMethod === 'card'
-                                    ? 'bg-white shadow-sm text-black border border-neutral-200/50'
+                                    ? 'bg-white dark:bg-gray-900 shadow-sm text-black border border-neutral-200/50'
                                     : 'text-neutral-500 hover:text-black'
                                     }`}
                             >
@@ -134,7 +134,7 @@ export const PaymentView = () => {
                             <button
                                 onClick={() => setPaymentMethod('upi')}
                                 className={`text-xs font-medium py-1.5 rounded-md transition-all ${paymentMethod === 'upi'
-                                    ? 'bg-white shadow-sm text-black border border-neutral-200/50'
+                                    ? 'bg-white dark:bg-gray-900 shadow-sm text-black border border-neutral-200/50'
                                     : 'text-neutral-500 hover:text-black'
                                     }`}
                             >
@@ -170,7 +170,7 @@ export const PaymentView = () => {
                                         placeholder="Card Number"
                                         maxLength={19}
                                         required
-                                        className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all font-mono"
+                                        className="flex h-10 w-full rounded-md border border-neutral-200 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all font-mono"
                                     />
                                     <input
                                         type="text"
@@ -178,7 +178,7 @@ export const PaymentView = () => {
                                         onChange={(e) => setCardName(e.target.value.toUpperCase())}
                                         placeholder="Name on Card"
                                         required
-                                        className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all uppercase"
+                                        className="flex h-10 w-full rounded-md border border-neutral-200 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all uppercase"
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                         <input
@@ -188,7 +188,7 @@ export const PaymentView = () => {
                                             placeholder="MM/YY"
                                             maxLength={5}
                                             required
-                                            className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all font-mono"
+                                            className="flex h-10 w-full rounded-md border border-neutral-200 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all font-mono"
                                         />
                                         <input
                                             type="password"
@@ -197,7 +197,7 @@ export const PaymentView = () => {
                                             placeholder="CVC"
                                             maxLength={3}
                                             required
-                                            className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all font-mono"
+                                            className="flex h-10 w-full rounded-md border border-neutral-200 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all font-mono"
                                         />
                                     </div>
                                     <button
@@ -211,7 +211,7 @@ export const PaymentView = () => {
                                                 Processing...
                                             </>
                                         ) : (
-                                            'Pay ₹1180.00'
+                                            'Pay ₹1000.00'
                                         )}
                                     </button>
                                 </div>
@@ -223,13 +223,13 @@ export const PaymentView = () => {
                             <form onSubmit={handleUPIPayment} className="space-y-6">
                                 <div className="text-center py-2 space-y-4">
                                     <div className="flex justify-center -space-x-3">
-                                        <div className="w-9 h-9 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center z-10">
+                                        <div className="w-9 h-9 rounded-full bg-white dark:bg-gray-900 border border-neutral-200 shadow-sm flex items-center justify-center z-10">
                                             <span className="text-sm">G</span>
                                         </div>
-                                        <div className="w-9 h-9 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center z-20">
+                                        <div className="w-9 h-9 rounded-full bg-white dark:bg-gray-900 border border-neutral-200 shadow-sm flex items-center justify-center z-20">
                                             <span className="text-sm">P</span>
                                         </div>
-                                        <div className="w-9 h-9 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center z-10">
+                                        <div className="w-9 h-9 rounded-full bg-white dark:bg-gray-900 border border-neutral-200 shadow-sm flex items-center justify-center z-10">
                                             <span className="text-sm">₹</span>
                                         </div>
                                     </div>
@@ -248,7 +248,7 @@ export const PaymentView = () => {
                                                 onChange={(e) => setUpiId(e.target.value)}
                                                 placeholder="username@bank"
                                                 required
-                                                className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all pl-9"
+                                                className="flex h-10 w-full rounded-md border border-neutral-200 bg-white dark:bg-gray-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-950 transition-all pl-9"
                                             />
                                             <svg
                                                 className="absolute left-3 top-2.5 text-neutral-400 w-4 h-4"
@@ -265,7 +265,7 @@ export const PaymentView = () => {
                                         <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
                                             <div className="bg-neutral-50 border border-dashed border-neutral-200 rounded-xl p-6 text-center">
                                                 <div className="mb-3 flex justify-center">
-                                                    <div className="h-12 w-12 bg-white rounded-xl shadow-sm border border-neutral-100 flex items-center justify-center">
+                                                    <div className="h-12 w-12 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-neutral-100 flex items-center justify-center">
                                                         <Icon icon="solar:qr-code-linear" className="text-2xl text-neutral-400" />
                                                     </div>
                                                 </div>
@@ -276,12 +276,12 @@ export const PaymentView = () => {
                                                 <button
                                                     type="button"
                                                     onClick={handleDownloadQR}
-                                                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 transition-colors"
+                                                    className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 flex items-center gap-1.5 transition-colors"
                                                 >
                                                     <Icon icon="solar:download-minimalistic-bold" />
                                                     Download QR Code to Pay
                                                 </button>
-                                                <p className="text-[10px] text-neutral-400">Download and scan in any UPI app to pay ₹1180.00</p>
+                                                <p className="text-[10px] text-neutral-400">Download and scan in any UPI app to pay ₹1000.00</p>
                                             </div>
                                             <button
                                                 type="button"

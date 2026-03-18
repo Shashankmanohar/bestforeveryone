@@ -88,16 +88,20 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Skeleton shimmer */
+    --skeleton-base: #f0f0f0;
+    --skeleton-shine: #f8f8f8;
   }
 
   .dark {
-    --background: 222 84% 5%;
+    --background: 222 47% 6%;
     --foreground: 210 40% 98%;
 
-    --card: 222 84% 5%;
+    --card: 220 40% 8%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 84% 5%;
+    --popover: 220 40% 8%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 40% 98%;
@@ -115,11 +119,69 @@
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
+    --border: 217 20% 18%;
+    --input: 217 20% 18%;
     --ring: 213 27% 84%;
 
-    --sidebar-background: 240 5.9% 10%;
+    /* Custom Matrix Dashboard Colors – Dark */
+    /* Semantic gray scale (flips in dark mode) */
+  --gray-50: #0f172a;    /* Deep Slate/Dark */
+  --gray-100: #1e293b;
+  --gray-200: #334155;
+  --gray-300: #475569;
+  --gray-400: #94a3b8;
+  --gray-500: #cbd5e1;
+  --gray-600: #e2e8f0;
+  --gray-700: #f1f5f9;
+  --gray-800: #f8fafc;
+  --gray-900: #ffffff;   /* Pure White/Bright */
+
+  --app-bg: #030712;
+  --app-border: #1f2937;
+
+  --skeleton-shimmer: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.03) 20%,
+    rgba(255, 255, 255, 0.06) 60%,
+    rgba(255, 255, 255, 0)
+  );
+
+  --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+
+    --emerald-50: 160 40% 12%;
+    --emerald-100: 158 45% 18%;
+    --emerald-200: 156 50% 28%;
+    --emerald-400: 158 64% 45%;
+    --emerald-500: 160 84% 39%;
+    --emerald-600: 161 94% 35%;
+    --emerald-700: 163 94% 28%;
+
+    --blue-50: 220 50% 12%;
+    --blue-100: 218 50% 18%;
+    --blue-400: 213 90% 60%;
+    --blue-500: 217 88% 55%;
+    --blue-600: 221 80% 55%;
+    --blue-800: 224 70% 45%;
+
+    --purple-50: 270 40% 14%;
+    --purple-600: 271 85% 65%;
+
+    --orange-50: 30 40% 14%;
+    --orange-600: 25 90% 55%;
+
+    --red-50: 0 40% 14%;
+    --red-100: 0 45% 18%;
+    --red-200: 0 50% 24%;
+    --red-400: 0 85% 60%;
+    --red-500: 0 80% 55%;
+    --red-600: 0 70% 50%;
+
+    /* App-specific colors */
+    --app-bg: 222 47% 6%;
+    --app-border: 217 20% 18%;
+
+    --sidebar-background: 220 40% 8%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -127,6 +189,10 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Skeleton shimmer */
+    --skeleton-base: hsl(220, 30%, 12%);
+    --skeleton-shine: hsl(220, 25%, 16%);
   }
 }
 
@@ -200,6 +266,10 @@
     border-color: hsl(var(--gray-200));
   }
 
+  .dark .card-hover:hover {
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+  }
+
   /* Safe Area Padding */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom, 20px);
@@ -233,7 +303,7 @@
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
@@ -289,4 +359,9 @@
 
 .toast-exit {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Dark mode transition */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }

@@ -65,7 +65,7 @@ export const authApi = {
     signup: async (data: {
         fullname: string;
         username: string;
-        phone: string;
+        email: string;
         password: string;
         referralCode?: string;
     }) => {
@@ -127,6 +127,7 @@ export const adminApi = {
         method: 'PUT',
         body: JSON.stringify({ reason })
     }),
+    distributeRoyalty: () => apiClient('/admin/distribute-royalty', { method: 'POST' }),
     // ... other admin methods if needed
 };
 
