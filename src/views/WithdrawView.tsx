@@ -49,10 +49,7 @@ export const WithdrawView = () => {
 
   const handleKycSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!kycFiles.aadharCard || !kycFiles.panCard) {
-      showToast('Error', 'Please upload both Aadhar and PAN cards', 'error');
-      return;
-    }
+    // KYC docs are optional
     if (!kycForm.accountNumber || !kycForm.ifscCode || !kycForm.accountHolderName || !kycForm.bankName) {
       showToast('Error', 'Please fill in all bank details', 'error');
       return;
@@ -61,8 +58,8 @@ export const WithdrawView = () => {
     setKycLoading(true);
     try {
       const formData = new FormData();
-      formData.append('aadharCard', kycFiles.aadharCard);
-      formData.append('panCard', kycFiles.panCard);
+      if (kycFiles.aadharCard) formData.append('aadharCard', kycFiles.aadharCard);
+      if (kycFiles.panCard) formData.append('panCard', kycFiles.panCard);
       formData.append('accountNumber', kycForm.accountNumber);
       formData.append('ifscCode', kycForm.ifscCode);
       formData.append('accountHolderName', kycForm.accountHolderName);

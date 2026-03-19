@@ -31,10 +31,7 @@ export const KycView = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!files.aadharCard || !files.panCard) {
-            showToast('Error', 'Please upload both Aadhar and PAN cards', 'error');
-            return;
-        }
+        // KYC docs are optional
         if (!bankDetails.accountNumber || !bankDetails.ifscCode || !bankDetails.accountHolderName || !bankDetails.bankName) {
             showToast('Error', 'Please fill in all bank details', 'error');
             return;
@@ -43,8 +40,8 @@ export const KycView = () => {
         setLoading(true);
         try {
             const formData = new FormData();
-            formData.append('aadharCard', files.aadharCard);
-            formData.append('panCard', files.panCard);
+            if (files.aadharCard) formData.append('aadharCard', files.aadharCard);
+            if (files.panCard) formData.append('panCard', files.panCard);
             formData.append('accountNumber', bankDetails.accountNumber);
             formData.append('ifscCode', bankDetails.ifscCode);
             formData.append('accountHolderName', bankDetails.accountHolderName);

@@ -100,9 +100,11 @@ export const ReferralsView = () => {
 
           {/* Bonus Status Indicator */}
           <div className="mb-4 sm:mb-6">
-            <div className="inline-flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/300/20 border border-emerald-500/30 px-3 sm:px-4 py-2 rounded-xl">
-              <Icon icon="solar:star-bold" className="text-emerald-400" width={18} />
-              <span className="text-xs sm:text-sm font-bold text-emerald-400">Bonus Active! ₹400/referral</span>
+            <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border ${weeklyStats.bonusUnlocked ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500/30' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'}`}>
+              <Icon icon="solar:star-bold" className={weeklyStats.bonusUnlocked ? 'text-emerald-400' : 'text-gray-400'} width={18} />
+              <span className={`text-xs sm:text-sm font-bold ${weeklyStats.bonusUnlocked ? 'text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                {weeklyStats.bonusUnlocked ? 'Bonanza Active! ₹400/referral' : 'Reach 2 Referrals for Bonanza!'}
+              </span>
             </div>
           </div>
 
@@ -150,8 +152,7 @@ export const ReferralsView = () => {
             <div className="flex-1">
               <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">Invite & Earn</h3>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 leading-relaxed">
-                Earn <span className="font-bold text-gray-900 dark:text-white">₹200 Base + ₹200 Bonanza</span> per referral instantly!
-                Plus weekly royalty bonus when you hit 6 directs.
+                Earn <span className="font-bold text-gray-900 dark:text-white">₹200 Base</span> per referral instantly, plus <span className="font-bold text-emerald-600 dark:text-emerald-400">₹200 Bonanza</span> per referral when you reach 2+ referrals in a week.
               </p>
             </div>
             <div className="hidden sm:flex h-10 w-10 lg:h-12 lg:w-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl lg:rounded-2xl items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0">
@@ -179,7 +180,7 @@ export const ReferralsView = () => {
                   <Icon icon="solar:star-bold" width={16} className="hidden sm:block" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[9px] sm:text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium truncate">Instant Bonanza</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium truncate">Weekly Bonanza (2+)</p>
                   <p className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">₹200</p>
                 </div>
               </div>
@@ -219,7 +220,7 @@ export const ReferralsView = () => {
               <Icon icon="solar:check-circle-bold" width={14} className="hidden sm:block" />
             </div>
             <p className="text-gray-600 dark:text-gray-400 dark:text-gray-500 leading-relaxed">
-              Earn a flat <span className="font-bold text-gray-900 dark:text-white">₹400</span> (200 Base + 200 Bonanza) for every successful verification
+              Earn a <span className="font-bold text-gray-900 dark:text-white">₹200 Base</span> reward immediately, plus <span className="font-bold text-emerald-600 dark:text-emerald-400">₹200 Bonanza</span> per referral after reaching your 2-referral weekly target.
             </p>
           </div>
           <div className="flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm">
