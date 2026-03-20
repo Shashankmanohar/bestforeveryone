@@ -29,7 +29,7 @@ export const StatsCard = ({
   return (
     <div 
       onClick={handleClick}
-      className={`bg-white dark:bg-gray-900 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card card-hover group ${route ? 'cursor-pointer' : ''}`}
+      className={`glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl border border-gray-200 dark:border-white/5 shadow-card glass-card-hover group ${route ? 'cursor-pointer' : ''}`}
     >
       <div className={`h-10 w-10 rounded-full ${iconBgClass} ${iconColorClass} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
         <Icon icon={icon} width={20} />

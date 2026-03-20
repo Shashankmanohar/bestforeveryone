@@ -35,7 +35,7 @@ export const WithdrawView = () => {
 
   const numAmount = parseFloat(amount) || 0;
   const isMatrix = selectedWallet === 'matrix';
-  const fee = isMatrix ? 0 : numAmount * 0.20;
+  const fee = numAmount * 0.20;
   const net = numAmount - fee;
 
   const today = new Date();
@@ -133,7 +133,7 @@ export const WithdrawView = () => {
     >
       {/* Header */}
       <div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider mb-1">Finance</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">Finance</p>
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Withdraw Funds</h2>
       </div>
 
@@ -146,15 +146,15 @@ export const WithdrawView = () => {
             exit={{ opacity: 0, scale: 1.05 }}
             className="space-y-6"
           >
-            <div className={`border rounded-3xl p-6 flex flex-col items-center text-center gap-4 ${kycStatus === 'pending' ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200' : kycStatus === 'rejected' ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700'}`}>
-              <div className={`h-16 w-16 rounded-full flex items-center justify-center ${kycStatus === 'pending' ? 'bg-blue-100 text-blue-600 dark:text-blue-400' : kycStatus === 'rejected' ? 'bg-red-100 text-red-600 dark:text-red-400' : 'bg-amber-100 text-amber-600 dark:text-amber-400'}`}>
+            <div className={`glass-card dark:backdrop-blur-xl rounded-3xl p-6 flex flex-col items-center text-center gap-4 ${kycStatus === 'pending' ? 'bg-blue-50 dark:bg-blue-500/5 border-blue-200 dark:border-blue-500/20' : kycStatus === 'rejected' ? 'bg-red-50 dark:bg-red-500/5 border-red-200 dark:border-red-500/20' : 'bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/20'}`}>
+              <div className={`h-16 w-16 rounded-full flex items-center justify-center ${kycStatus === 'pending' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' : kycStatus === 'rejected' ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400'}`}>
                 <Icon icon={kycStatus === 'pending' ? "solar:clock-circle-bold" : kycStatus === 'rejected' ? "solar:danger-bold" : "solar:shield-warning-bold"} width={32} />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {kycStatus === 'pending' ? 'KYC Pending Review' : kycStatus === 'rejected' ? 'KYC Rejected' : 'KYC Required'}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500 max-w-sm mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-sm mt-1">
                   {kycStatus === 'pending'
                     ? "Your KYC application is currently under review by our team. You'll be able to withdraw funds once it's approved."
                     : kycStatus === 'rejected'
@@ -216,7 +216,7 @@ export const WithdrawView = () => {
                         value={kycForm.accountHolderName}
                         onChange={(e) => setKycForm({ ...kycForm, accountHolderName: e.target.value })}
                         placeholder="Full name as per bank"
-                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                         required
                       />
                     </div>
@@ -227,7 +227,7 @@ export const WithdrawView = () => {
                         value={kycForm.bankName}
                         onChange={(e) => setKycForm({ ...kycForm, bankName: e.target.value })}
                         placeholder="e.g. State Bank of India"
-                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                         required
                       />
                     </div>
@@ -238,7 +238,7 @@ export const WithdrawView = () => {
                         value={kycForm.accountNumber}
                         onChange={(e) => setKycForm({ ...kycForm, accountNumber: e.target.value })}
                         placeholder="Enter account number"
-                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                         required
                       />
                     </div>
@@ -249,7 +249,7 @@ export const WithdrawView = () => {
                         value={kycForm.ifscCode}
                         onChange={(e) => setKycForm({ ...kycForm, ifscCode: e.target.value.toUpperCase() })}
                         placeholder="SBIN00XXXXX"
-                        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white outline-none"
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                         required
                       />
                     </div>
@@ -259,7 +259,7 @@ export const WithdrawView = () => {
                 <button
                   type="submit"
                   disabled={kycLoading}
-                  className="w-full bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-gray-900 dark:bg-white text-white dark:text-[#070b14] font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2"
                 >
                   {kycLoading ? (
                     <Icon icon="eos-icons:loading" className="animate-spin text-xl" />
@@ -311,42 +311,40 @@ export const WithdrawView = () => {
                 <div>
                   <p className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Matrix Wallet</p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white">₹{wallet.matrixWallet.toLocaleString()}</p>
-                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">0% Admin Fee (Tax Free)</p>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-1">20% Admin Fee Applies</p>
                 </div>
               </button>
             </div>
 
             {/* Status Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center gap-4 shadow-card card-hover">
-                <div className="h-12 w-12 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="glass-card p-5 rounded-2xl border border-gray-200 dark:border-white/5 flex items-center gap-4 glass-card-hover shadow-card">
+                <div className="h-12 w-12 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                   <Icon icon="solar:wallet-money-bold" width={24} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wide">Available</p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide">Available</p>
                   <p className="text-xl font-bold text-gray-900 dark:text-white amount-value">₹{wallet.balance.toLocaleString()}</p>
                 </div>
               </div>
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center gap-4 shadow-card card-hover">
-                <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 dark:text-gray-500 flex items-center justify-center shrink-0">
+              <div className="glass-card p-5 rounded-2xl border border-gray-200 dark:border-white/5 flex items-center gap-4 glass-card-hover shadow-card">
+                <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0">
                   <Icon icon="solar:calendar-bold" width={24} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wide">Weekly Used</p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide">Weekly Used</p>
                   <p className="text-xl font-bold text-gray-900 dark:text-white amount-value">
                     ₹{weekly.withdrawalUsed.toLocaleString()}<span className="text-gray-400 dark:text-gray-500 text-sm font-medium">/{weekly.withdrawalLimit.toLocaleString()}</span>
                   </p>
                 </div>
               </div>
-              <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-200 dark:border-gray-800 flex items-center gap-4 shadow-card card-hover">
-                <div className="h-12 w-12 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <div className="glass-card p-5 rounded-2xl border border-gray-200 dark:border-white/5 flex items-center gap-4 glass-card-hover shadow-card">
+                <div className="h-12 w-12 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                   <Icon icon="solar:bill-list-bold" width={24} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase font-bold tracking-wide">Charge</p>
-                  <p className={`text-xl font-bold amount-value ${isMatrix ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                    {isMatrix ? '0%' : '20%'}
-                  </p>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide">Charge</p>
+                    20%
                 </div>
               </div>
             </div>
@@ -374,7 +372,7 @@ export const WithdrawView = () => {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="₹200 - ₹50,000"
-                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-2xl font-bold rounded-2xl py-4 pl-10 pr-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all placeholder:text-gray-300 dark:text-gray-600 focus:bg-white dark:bg-gray-900"
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-2xl font-bold rounded-2xl py-4 pl-10 pr-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none transition-all placeholder:text-gray-300"
                 />
               </div>
 
@@ -413,7 +411,7 @@ export const WithdrawView = () => {
                   <span className="font-bold text-gray-900 dark:text-white">₹{numAmount.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-xs md:text-sm">
-                  <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Admin Fee ({isMatrix ? '0%' : '20%'})</span>
+                  <span className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Admin Fee (20%)</span>
                   <span className={`font-bold ${fee > 0 ? 'text-red-500 dark:text-red-400' : 'text-emerald-500'}`}>
                     {fee > 0 ? `-₹${fee.toLocaleString()}` : '₹0'}
                   </span>
@@ -428,7 +426,7 @@ export const WithdrawView = () => {
               <button
                 onClick={handleWithdraw}
                 disabled={loading || !isSaturday}
-                className={`w-full mt-8 ${!isSaturday ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 shadow-lg'} text-white font-bold py-4 rounded-xl click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full mt-8 ${!isSaturday ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-gray-900 dark:bg-white shadow-lg'} text-white dark:text-[#070b14] font-bold py-4 rounded-xl click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? (
                   <>

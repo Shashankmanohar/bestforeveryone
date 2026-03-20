@@ -51,12 +51,12 @@ export const PaymentVerificationView = () => {
         }
     };
 
-    // Immediate redirect if already verified
+    // Immediate redirect if already verified or it's a re-entry
     useEffect(() => {
-        if (user?.verified && user?.paymentStatus === 'approved') {
+        if ((user?.verified && user?.paymentStatus === 'approved') || user?.isReEntryPending) {
             navigate('/dashboard', { replace: true });
         }
-    }, [user?.verified, user?.paymentStatus, navigate]);
+    }, [user?.verified, user?.paymentStatus, user?.isReEntryPending, navigate]);
 
     const handlePaymentSubmit = async () => {
         setSubmitting(true);

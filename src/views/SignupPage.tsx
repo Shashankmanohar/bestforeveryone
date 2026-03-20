@@ -61,11 +61,11 @@ export const SignupPage = () => {
             <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-3xl shadow-lg dark:shadow-none dark:border dark:border-gray-800 p-8">
                 <div className="flex flex-col items-center gap-6 mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl flex items-center justify-center font-bold tracking-tighter text-base shadow-xl shadow-gray-200 dark:shadow-none">
+                        <div className="h-10 w-10 bg-gray-900 dark:bg-white text-white dark:text-[#070b14] rounded-2xl flex items-center justify-center font-bold tracking-tighter text-base shadow-xl shadow-gray-200 dark:shadow-none">
                             B
                         </div>
                         <span className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                            Best For <span className="text-gray-400 dark:text-gray-500 font-medium">Everyone</span>
+                            Best For <span className="text-gray-400 dark:text-gray-400 font-medium">Everyone</span>
                         </span>
                     </div>
                 </div>
@@ -84,7 +84,7 @@ export const SignupPage = () => {
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                             placeholder="Choose a unique username"
                             required
                         />
@@ -99,7 +99,7 @@ export const SignupPage = () => {
                             name="fullname"
                             value={formData.fullname}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                             placeholder="Enter your full name"
                             required
                         />
@@ -114,7 +114,7 @@ export const SignupPage = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                             placeholder="Enter your email"
                             required
                         />
@@ -130,7 +130,7 @@ export const SignupPage = () => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none pr-11 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none pr-11 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                                 placeholder="Min 6 chars"
                                 required
                                 minLength={6}
@@ -163,7 +163,7 @@ export const SignupPage = () => {
                             name="referralCode"
                             value={formData.referralCode}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all font-medium"
                             placeholder="Enter referral code"
                         />
                     </div>
@@ -178,7 +178,7 @@ export const SignupPage = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50"
+                        className="w-full bg-gray-900 dark:bg-white text-white dark:text-[#070b14] py-4 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all disabled:opacity-50 shadow-lg shadow-gray-200 dark:shadow-none click-scale"
                     >
                         {isLoading ? 'Creating Account...' : 'Sign Up'}
                     </button>

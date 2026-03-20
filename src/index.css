@@ -47,6 +47,7 @@
     --gray-700: 217 19% 27%;
     --gray-800: 215 28% 17%;
     --gray-900: 221 39% 11%;
+    --gray-950: 224 71% 4%;
 
     --emerald-50: 152 81% 96%;
     --emerald-100: 149 80% 90%;
@@ -95,104 +96,101 @@
   }
 
   .dark {
-    --background: 222 47% 6%;
+    --background: 224 71% 4%;
     --foreground: 210 40% 98%;
 
-    --card: 220 40% 8%;
+    --card: 224 71% 7%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 220 40% 8%;
+    --popover: 224 71% 8%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 40% 98%;
     --primary-foreground: 222 47% 11%;
 
-    --secondary: 217 33% 17%;
+    --secondary: 222 47% 12%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 17%;
+    --muted: 222 47% 12%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 217 33% 17%;
+    --accent: 222 47% 12%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 20% 18%;
-    --input: 217 20% 18%;
+    --border: 224 71% 12%;
+    --input: 224 71% 12%;
     --ring: 213 27% 84%;
 
-    /* Custom Matrix Dashboard Colors – Dark */
-    /* Semantic gray scale (flips in dark mode) */
-  --gray-50: #0f172a;    /* Deep Slate/Dark */
-  --gray-100: #1e293b;
-  --gray-200: #334155;
-  --gray-300: #475569;
-  --gray-400: #94a3b8;
-  --gray-500: #cbd5e1;
-  --gray-600: #e2e8f0;
-  --gray-700: #f1f5f9;
-  --gray-800: #f8fafc;
-  --gray-900: #ffffff;   /* Pure White/Bright */
+    /* Custom Matrix Dashboard Colors – Dark (Standard scale, 50=light, 900=dark) */
+    --gray-50: 210 40% 98%;
+    --gray-100: 210 40% 95%;
+    --gray-200: 217 33% 85%;
+    --gray-300: 217 33% 70%;
+    --gray-400: 215 20% 50%;
+    --gray-500: 215 20% 40%;
+    --gray-600: 217 33% 40%;
+    --gray-700: 224 71% 15%;
+    --gray-800: 224 71% 10%;
+    --gray-900: 224 71% 6%;
+    --gray-950: 224 71% 2%; /* Deeper Background */
 
-  --app-bg: #030712;
-  --app-border: #1f2937;
+    --app-bg: 224 71% 4%;
+    --app-border: 224 71% 12%;
 
-  --skeleton-shimmer: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0.03) 20%,
-    rgba(255, 255, 255, 0.06) 60%,
-    rgba(255, 255, 255, 0)
-  );
+    --skeleton-shimmer: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.02) 20%,
+      rgba(255, 255, 255, 0.05) 60%,
+      rgba(255, 255, 255, 0)
+    );
 
-  --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -6px rgba(0, 0, 0, 0.4);
 
-    --emerald-50: 160 40% 12%;
-    --emerald-100: 158 45% 18%;
-    --emerald-200: 156 50% 28%;
-    --emerald-400: 158 64% 45%;
+    --emerald-50: 160 84% 8%;
+    --emerald-100: 160 84% 12%;
+    --emerald-200: 160 84% 20%;
+    --emerald-400: 160 84% 45%;
     --emerald-500: 160 84% 39%;
-    --emerald-600: 161 94% 35%;
-    --emerald-700: 163 94% 28%;
+    --emerald-600: 160 84% 30%;
+    --emerald-700: 160 84% 24%;
 
-    --blue-50: 220 50% 12%;
-    --blue-100: 218 50% 18%;
-    --blue-400: 213 90% 60%;
-    --blue-500: 217 88% 55%;
-    --blue-600: 221 80% 55%;
-    --blue-800: 224 70% 45%;
+    --blue-50: 217 91% 8%;
+    --blue-100: 217 91% 12%;
+    --blue-400: 217 91% 65%;
+    --blue-500: 217 91% 60%;
+    --blue-600: 217 91% 50%;
+    --blue-800: 217 91% 40%;
 
-    --purple-50: 270 40% 14%;
-    --purple-600: 271 85% 65%;
+    --purple-50: 271 91% 8%;
+    --purple-600: 271 91% 65%;
 
-    --orange-50: 30 40% 14%;
-    --orange-600: 25 90% 55%;
+    --orange-50: 25 95% 8%;
+    --orange-600: 25 95% 53%;
 
-    --red-50: 0 40% 14%;
-    --red-100: 0 45% 18%;
-    --red-200: 0 50% 24%;
-    --red-400: 0 85% 60%;
-    --red-500: 0 80% 55%;
-    --red-600: 0 70% 50%;
+    --red-50: 0 84% 8%;
+    --red-100: 0 84% 12%;
+    --red-200: 0 84% 18%;
+    --red-400: 0 84% 65%;
+    --red-500: 0 84% 60%;
+    --red-600: 0 84% 50%;
 
-    /* App-specific colors */
-    --app-bg: 222 47% 6%;
-    --app-border: 217 20% 18%;
-
-    --sidebar-background: 220 40% 8%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar - Premium Dark */
+    --sidebar-background: 224 71% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 224 71% 10%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 224 71% 12%;
+    --sidebar-ring: 217 91% 60%;
 
     /* Skeleton shimmer */
-    --skeleton-base: hsl(220, 30%, 12%);
-    --skeleton-shine: hsl(220, 25%, 16%);
+    --skeleton-base: hsl(224, 71%, 10%);
+    --skeleton-shine: hsl(224, 71%, 14%);
   }
 }
 
@@ -262,17 +260,90 @@
 
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-    border-color: hsl(var(--gray-200));
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    border-color: hsl(var(--gray-300));
   }
 
   .dark .card-hover:hover {
     box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
   }
 
-  /* Safe Area Padding */
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 20px);
+  /* Premium Glass Card */
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/50 dark:border-white/10 shadow-xl;
+  }
+
+  .glass-card-hover {
+    @apply transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 dark:hover:shadow-emerald-500/5 hover:-translate-y-1 hover:border-emerald-500/30;
+  }
+
+  .glass-card-indigo {
+    @apply backdrop-blur-md bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/20 dark:border-indigo-500/10;
+  }
+
+  .glass-card-amber {
+    @apply backdrop-blur-md bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/10;
+  }
+
+  .glass-card-purple {
+    @apply backdrop-blur-md bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 dark:border-purple-500/10;
+  }
+
+  .glass-card-emerald {
+    @apply backdrop-blur-md bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 dark:border-emerald-500/10;
+  }
+
+  /* Subtle Glows */
+  .glow-emerald {
+    @apply relative after:absolute after:inset-0 after:rounded-[inherit] after:shadow-[0_0_20px_rgba(16,185,129,0.1)] dark:after:shadow-[0_0_30px_rgba(16,185,129,0.05)] after:pointer-events-none;
+  }
+
+  .glow-blue {
+    @apply relative after:absolute after:inset-0 after:rounded-[inherit] after:shadow-[0_0_20px_rgba(59,130,246,0.1)] dark:after:shadow-[0_0_30px_rgba(59,130,246,0.05)] after:pointer-events-none;
+  }
+
+  /* Progress Bar Glow */
+  .progress-glow {
+    @apply relative overflow-hidden;
+  }
+  
+  .progress-glow::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* Global Dark Mode Text Overrides */
+  /* This ensures that standard utility classes like text-gray-900 
+     automatically become light in dark mode, without breaking bg-gray-900 */
+  /* Ensure premium buttons with white background can still have dark text */
+.dark .text-premium-dark {
+    color: #070b14 !important;
+}
+
+  .dark .text-gray-900, .dark .text-slate-900 {
+    @apply text-white !important;
+  }
+
+  .dark .text-gray-700, .dark .text-gray-800, .dark .text-slate-700, .dark .text-slate-800 {
+    @apply text-slate-100 !important;
+  }
+
+  .dark .text-gray-600, .dark .text-slate-600 { 
+    @apply text-slate-300 !important; 
+  }
+
+  .dark .text-gray-500, .dark .text-slate-500 { 
+    color: hsl(var(--gray-300)) !important; 
+  }
+
+  .dark .text-gray-400, .dark .text-slate-400 { 
+    color: hsl(var(--gray-400)) !important; 
+  }
+
+  /* Premium Sidebar Gradient - Always Dark */
+  .sidebar-gradient {
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
   }
 }
 

@@ -77,11 +77,11 @@ export const ForgotPasswordView = () => {
             <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-3xl shadow-lg p-8">
                 <div className="flex flex-col items-center gap-6 mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-gray-900 text-white rounded-2xl flex items-center justify-center font-bold tracking-tighter text-base shadow-xl shadow-gray-200 dark:shadow-none">
+                        <div className="h-10 w-10 bg-gray-900 dark:bg-white text-white dark:text-[#070b14] rounded-2xl flex items-center justify-center font-bold tracking-tighter text-base shadow-xl shadow-gray-200 dark:shadow-none">
                             B
                         </div>
                         <span className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                            Best For <span className="text-gray-400 dark:text-gray-500 font-medium">Everyone</span>
+                            Best For <span className="text-gray-400 dark:text-gray-400 font-medium">Everyone</span>
                         </span>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ export const ForgotPasswordView = () => {
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
                     {step === 'request' ? 'Forgot Password' : 'Reset Password'}
                 </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 text-center mb-8">
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8">
                     {step === 'request'
                         ? 'Enter your username and email to receive an OTP'
                         : 'Enter the OTP sent to your email and your new password'}
@@ -105,7 +105,7 @@ export const ForgotPasswordView = () => {
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none transition-all placeholder:text-gray-400"
                                 placeholder="Enter your username"
                                 required
                             />
@@ -119,7 +119,7 @@ export const ForgotPasswordView = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none transition-all placeholder:text-gray-400"
                                 placeholder="Enter your registered email"
                                 required
                             />
@@ -142,7 +142,7 @@ export const ForgotPasswordView = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50"
+                            className="w-full bg-gray-900 dark:bg-white text-white dark:text-[#070b14] py-4 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all disabled:opacity-50 shadow-lg shadow-gray-200 dark:shadow-none click-scale"
                         >
                             {isLoading ? 'Sending OTP...' : 'Send OTP'}
                         </button>
@@ -157,7 +157,7 @@ export const ForgotPasswordView = () => {
                                 type="text"
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none text-center text-2xl font-bold tracking-[0.5em]"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none transition-all text-center text-2xl font-bold tracking-[0.5em] placeholder:text-gray-400"
                                 placeholder="• • • • • •"
                                 maxLength={6}
                                 required
@@ -173,7 +173,7 @@ export const ForgotPasswordView = () => {
                                     type={showPassword ? 'text' : 'password'}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none pr-12"
+                                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none transition-all pr-12 placeholder:text-gray-400"
                                     placeholder="Enter new password"
                                     minLength={6}
                                     required
@@ -205,7 +205,7 @@ export const ForgotPasswordView = () => {
                                 type={showPassword ? 'text' : 'password'}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none transition-all placeholder:text-gray-400"
                                 placeholder="Confirm new password"
                                 minLength={6}
                                 required
@@ -222,7 +222,7 @@ export const ForgotPasswordView = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50"
+                            className="w-full bg-gray-900 dark:bg-white text-white dark:text-[#070b14] py-4 rounded-xl font-bold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all disabled:opacity-50 shadow-lg shadow-gray-200 dark:shadow-none click-scale"
                         >
                             {isLoading ? 'Resetting...' : 'Reset Password'}
                         </button>

@@ -13,9 +13,6 @@ export const ReferralsView = () => {
 
   const [referralCode, setReferralCode] = useState(user?.referralCode || '');
   const [referralMembers, setReferralMembers] = useState<any[]>([]);
-  const [milestones, setMilestones] = useState({
-    milestone5: false
-  });
   const [totalVerified, setTotalVerified] = useState(0);
   const [weeklyStats, setWeeklyStats] = useState({
     directReferrals: 0,
@@ -42,7 +39,6 @@ export const ReferralsView = () => {
         if (codeData?.referralCode) setReferralCode(codeData.referralCode);
         if (membersData?.referrals) setReferralMembers(membersData.referrals);
         if (membersData?.totalVerified !== undefined) setTotalVerified(membersData.totalVerified);
-        if (membersData?.milestones) setMilestones(membersData.milestones);
         if (statsData) setWeeklyStats(statsData);
       } catch (error) {
         console.error('Failed to fetch referral data:', error);
@@ -81,11 +77,11 @@ export const ReferralsView = () => {
       <PageHeader title="Team & Referrals" subtitle="Network" />
 
       {/* Weekly Earnings Summary Card */}
-      <div className={`bg-gray-900 text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-xl transition-all duration-500 ${weeklyStats.isWeekend ? 'opacity-90 grayscale-[0.2]' : ''}`}>
+      <div className={`bg-gray-900 dark:glass-card dark:backdrop-blur-xl text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-xl transition-all duration-500 ${weeklyStats.isWeekend ? 'opacity-90 grayscale-[0.2]' : ''}`}>
         {!weeklyStats.isWeekend && (
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 sm:w-64 h-48 sm:h-64 bg-emerald-50 dark:bg-emerald-900/300 opacity-10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 sm:w-64 h-48 sm:h-64 bg-emerald-500 opacity-5 rounded-full blur-3xl animate-pulse" />
         )}
-        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 sm:w-48 h-32 sm:h-48 bg-white dark:bg-gray-900 opacity-5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 sm:w-48 h-32 sm:h-48 bg-blue-500 opacity-5 rounded-full blur-3xl" />
 
         <div className="relative z-10">
           {/* Week Header */}
@@ -100,7 +96,7 @@ export const ReferralsView = () => {
 
           {/* Bonus Status Indicator */}
           <div className="mb-4 sm:mb-6">
-            <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border ${weeklyStats.bonusUnlocked ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-500/30' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'}`}>
+            <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border ${weeklyStats.bonusUnlocked ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/30' : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10'}`}>
               <Icon icon="solar:star-bold" className={weeklyStats.bonusUnlocked ? 'text-emerald-400' : 'text-gray-400'} width={18} />
               <span className={`text-xs sm:text-sm font-bold ${weeklyStats.bonusUnlocked ? 'text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`}>
                 {weeklyStats.bonusUnlocked ? 'Bonanza Active! ₹400/referral' : 'Reach 2 Referrals for Bonanza!'}
@@ -146,7 +142,7 @@ export const ReferralsView = () => {
       </div>
 
       {/* Invite Card */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-card">
+      <div className="glass-card dark:backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/5 p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-card group glass-card-hover">
         <div className="relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
             <div className="flex-1">
@@ -194,7 +190,7 @@ export const ReferralsView = () => {
             </div>
             <button
               onClick={copyLink}
-              className="bg-gray-900 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold click-scale whitespace-nowrap hover:bg-gray-800 dark:hover:bg-gray-100 flex items-center justify-center gap-2"
+              className="bg-gray-900 dark:bg-white text-white dark:text-[#070b14] px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold click-scale whitespace-nowrap flex items-center justify-center gap-2"
             >
               <Icon icon="solar:copy-bold" width={16} />
               <span>Copy Link</span>
@@ -235,57 +231,90 @@ export const ReferralsView = () => {
         </div>
       </div>
 
-      {/* Referral Milestones Progress */}
+      {/* Royalty Qualification Progress */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 p-4 sm:p-6 shadow-card">
         <div className="flex items-center justify-between mb-4 sm:mb-5">
-          <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Referral Milestones</h3>
+          <div className="flex flex-col">
+            <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Royalty Qualification</h3>
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Reach direct referral targets to unlock weekly royalty pools</p>
+          </div>
           <Icon icon="solar:cup-star-bold" className="text-amber-500" width={20} />
         </div>
 
-        <div className="space-y-3 sm:space-y-4">
-          {/* Milestone 1: 6 Referrals */}
-          <div className={`border-2 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all ${milestones.milestone5
-            ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/30'
-            : 'border-gray-200 dark:border-gray-800 bg-gray-50'
-            }`}>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${milestones.milestone5 ? 'bg-emerald-50 dark:bg-emerald-900/300' : 'bg-blue-50 dark:bg-blue-900/300'
-                  }`}>
-                  <Icon
-                    icon={milestones.milestone5 ? "solar:check-circle-bold" : "solar:star-bold"}
-                    className="text-white"
-                    width={16}
-                  />
-                </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Level 1: 6 Referrals</p>
-                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Earn ₹1,200 bonus</p>
-                </div>
-              </div>
-              {milestones.milestone5 && (
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 px-2.5 py-1 rounded-lg">
-                  Completed ✓
-                </span>
-              )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Star Pool: 6 */}
+          <div className={`p-4 rounded-2xl border-2 transition-all ${totalVerified >= 6 ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+            <div className="flex items-center justify-between mb-3">
+               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${totalVerified >= 6 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                 <Icon icon={totalVerified >= 6 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
+               </div>
+               {totalVerified >= 6 && <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Qualified</span>}
             </div>
-            <div className="mt-3">
-              <div className="flex justify-between items-center mb-1.5">
-                <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">Progress</span>
-                <span className="text-[10px] sm:text-xs font-bold text-gray-900 dark:text-white">
-                  {Math.min(totalVerified, 6)} / 6
-                </span>
+            <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Star Pool</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">6 Directs (3% Pool)</p>
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[10px] font-medium">
+                <span className="text-gray-400">Progress</span>
+                <span className="text-gray-900 dark:text-white">{Math.min(totalVerified, 6)}/6</span>
               </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className={`h-full transition-all duration-500 ${milestones.milestone5 ? 'bg-emerald-50 dark:bg-emerald-900/300' : 'bg-blue-50 dark:bg-blue-900/300'
-                    }`}
-                  style={{ width: `${Math.min((totalVerified / 6) * 100, 100)}%` }}
+              <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-emerald-500 transition-all duration-500" 
+                  style={{ width: `${Math.min((totalVerified / 6) * 100, 100)}%` }} 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Double Star Pool: 12 */}
+          <div className={`p-4 rounded-2xl border-2 transition-all ${totalVerified >= 12 ? 'border-blue-500/20 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+            <div className="flex items-center justify-between mb-3">
+               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${totalVerified >= 12 ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                 <Icon icon={totalVerified >= 12 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
+               </div>
+               {totalVerified >= 12 && <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Qualified</span>}
+            </div>
+            <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Double Star</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">12 Directs (6% Pool)</p>
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[10px] font-medium">
+                <span className="text-gray-400">Progress</span>
+                <span className="text-gray-900 dark:text-white">{Math.min(totalVerified, 12)}/12</span>
+              </div>
+              <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-500 transition-all duration-500" 
+                  style={{ width: `${Math.min((totalVerified / 12) * 100, 100)}%` }} 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Super Star Pool: 18 */}
+          <div className={`p-4 rounded-2xl border-2 transition-all ${totalVerified >= 18 ? 'border-amber-500/20 bg-amber-50/50 dark:bg-amber-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+            <div className="flex items-center justify-between mb-3">
+               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${totalVerified >= 18 ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                 <Icon icon={totalVerified >= 18 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
+               </div>
+               {totalVerified >= 18 && <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Qualified</span>}
+            </div>
+            <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Super Star</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">18 Directs (11% Pool)</p>
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[10px] font-medium">
+                <span className="text-gray-400">Progress</span>
+                <span className="text-gray-900 dark:text-white">{Math.min(totalVerified, 18)}/18</span>
+              </div>
+              <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-amber-500 transition-all duration-500" 
+                  style={{ width: `${Math.min((totalVerified / 18) * 100, 100)}%` }} 
                 />
               </div>
             </div>
           </div>
         </div>
+      </div>
 
         {/* Team List */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card overflow-hidden">
@@ -361,7 +390,6 @@ export const ReferralsView = () => {
           </div>
 
         </div>
-      </div>
     </motion.div>
   );
 };

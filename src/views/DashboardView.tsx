@@ -90,13 +90,13 @@ export const DashboardView = () => {
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => navigate('/kyc')}
-              className="flex-1 sm:flex-none px-4 py-2 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 transition-colors"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-amber-600 text-white rounded-xl text-xs font-bold hover:bg-amber-700 transition-all shadow-md click-scale"
             >
               Start KYC
             </button>
             <button
               onClick={() => setHasSeenKycPrompt(true)}
-              className="flex-1 sm:flex-none px-4 py-2 bg-white dark:bg-gray-800 text-amber-900 dark:text-amber-200 border border-amber-200 dark:border-amber-700 rounded-xl text-xs font-bold hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-white dark:bg-white text-amber-900 dark:text-amber-900 rounded-xl text-xs font-bold hover:bg-amber-50 transition-all border border-amber-200 dark:border-white/10 shadow-sm click-scale"
             >
               Later
             </button>
@@ -108,23 +108,37 @@ export const DashboardView = () => {
       <div className="flex justify-between items-end">
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">Overview</p>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Namaste, {user?.fullname || 'User'}</h1>
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Winner, {user?.fullname || 'User'}</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">@{user?.username}</p>
         </div>
       </div>
 
       {/* Main Balance Card */}
-      <div className="bg-gray-900 dark:bg-white/5 dark:backdrop-blur-sm dark:border dark:border-white/10 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden shadow-2xl shadow-gray-200 dark:shadow-none group card-hover">
+      <div className="bg-gray-900 dark:glass-card dark:backdrop-blur-xl rounded-3xl p-6 md:p-10 text-white relative overflow-hidden shadow-2xl shadow-gray-200 dark:shadow-none group glass-card-hover border-transparent dark:border-white/10">
+        {/* Decorative Glows */}
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity duration-700" />
         <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-emerald-500 opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity duration-700" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-blue-500/5 dark:bg-blue-400/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row justify-between md:items-start gap-6">
             <div>
               <p className="text-gray-400 text-xs md:text-sm font-bold tracking-widest uppercase mb-2">Total Available Balance</p>
-              <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-1">
-                <AnimatedNumber value={wallet.balance} prefix="₹" />
-              </h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-1">
+                  <AnimatedNumber value={(wallet.balance || 0) + (wallet.matrixWallet || 0)} prefix="₹" />
+                </h2>
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 rounded-lg border border-white/10">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Main</span>
+                    <span className="text-xs font-bold text-white">₹{(wallet.balance || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                    <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-tighter">Matrix</span>
+                    <span className="text-xs font-bold text-emerald-400">₹{(wallet.matrixWallet || 0).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="h-12 w-12 bg-white/10 rounded-2xl items-center justify-center backdrop-blur-md border border-white/5 shadow-inner hidden md:flex">
               <Icon icon="solar:wallet-bold" width={24} />
@@ -161,13 +175,13 @@ export const DashboardView = () => {
           <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 md:gap-4">
             <button
               onClick={() => navigate('/withdraw')}
-              className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-4 px-6 rounded-2xl text-sm font-bold click-scale flex items-center justify-center gap-2 shadow-sm hover:shadow-md dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700"
+              className="flex-1 bg-white dark:bg-white text-gray-900 dark:text-premium-dark py-4 px-6 rounded-2xl text-sm font-bold click-scale flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-white/10"
             >
               Withdraw Funds <Icon icon="solar:arrow-right-up-linear" />
             </button>
             <button
               onClick={() => navigate('/profile')}
-              className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-4 px-6 rounded-2xl text-sm font-bold click-scale flex items-center justify-center gap-2 shadow-sm hover:shadow-md dark:hover:bg-gray-700 transition-all border border-gray-200 dark:border-gray-700"
+              className="flex-1 bg-white dark:bg-white text-gray-900 dark:text-premium-dark py-4 px-6 rounded-2xl text-sm font-bold click-scale flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-white/10"
             >
               Change Password <Icon icon="solar:lock-password-linear" />
             </button>
@@ -242,7 +256,7 @@ export const DashboardView = () => {
                       setShowBuyEpin(false);
                       setEpinSuccess(null);
                     }}
-                    className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl text-sm font-bold"
+                    className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-premium-dark rounded-2xl text-sm font-bold shadow-lg click-scale"
                   >
                     Close
                   </button>

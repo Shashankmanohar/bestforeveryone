@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useThemeStore } from '@/store/useThemeStore';
 import { authApi } from '@/lib/api';
 import { PageHeader } from '@/components/PageHeader';
 import { useToast } from '@/hooks/use-toast';
+import { UserIDCard } from '@/components/UserIDCard';
 
 export const ProfileView = () => {
   const { user, logout } = useAuthStore();
@@ -15,6 +16,7 @@ export const ProfileView = () => {
   const { toast } = useToast();
 
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showIDCard, setShowIDCard] = useState(false);
   const [loading, setLoading] = useState(false);
   const [passwords, setPasswords] = useState({
     current: '',
@@ -104,6 +106,13 @@ export const ProfileView = () => {
             <Icon icon="solar:verified-check-bold" /> {user.verified ? 'KYC Verified' : 'Pending Verification'}
           </div>
         </div>
+        <button
+          onClick={() => setShowIDCard(true)}
+          className="ml-auto p-3 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all click-scale flex flex-col items-center justify-center gap-1"
+        >
+          <Icon icon="solar:card-id-bold" width={24} />
+          <span className="text-[10px] font-black">ID CARD</span>
+        </button>
       </div>
 
       {/* Profile Details */}
@@ -260,6 +269,12 @@ export const ProfileView = () => {
       >
         Log Out
       </button>
+
+      <AnimatePresence>
+        {showIDCard && (
+          <UserIDCard user={user} onClose={() => setShowIDCard(false)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

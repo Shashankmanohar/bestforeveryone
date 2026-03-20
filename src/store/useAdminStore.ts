@@ -17,6 +17,8 @@ interface DashboardMetrics {
     pendingPayments: number;
 }
 
+
+
 interface User {
     _id: string;
     fullname: string;
@@ -72,16 +74,22 @@ interface AdminState {
     transactions: Transaction[];
     activities: Transaction[];
     pendingPayments: any[];
+    royaltyStats: any | null;
+    matrixTree: any | null;
+    completedCycles: any[];
     loading: boolean;
     error: string | null;
 
     // Actions
     fetchMetrics: () => Promise<void>;
+    fetchRoyaltyStats: () => Promise<void>;
     fetchUsers: (params?: { status?: string; search?: string }) => Promise<void>;
     fetchWithdrawals: () => Promise<void>;
     fetchLedger: () => Promise<void>;
     fetchActivity: () => Promise<void>;
     fetchPendingPayments: () => Promise<void>;
+    fetchMatrixTree: (userId: string, cycle?: number) => Promise<void>;
+    fetchCompletedCycles: () => Promise<void>;
     approveWithdrawal: (id: string, status: 'approved' | 'rejected', reason?: string) => Promise<void>;
     adjustWallet: (userId: string, amount: number, type: 'credit' | 'debit', description?: string) => Promise<void>;
     updateUserStatus: (userId: string, status: string) => Promise<void>;
@@ -97,6 +105,9 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     transactions: [],
     activities: [],
     pendingPayments: [],
+    royaltyStats: null,
+    matrixTree: null,
+    completedCycles: [],
     loading: false,
     error: null,
 
@@ -107,6 +118,16 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             set({ metrics: response.data, loading: false });
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to fetch metrics', loading: false });
+        }
+    },
+
+    fetchRoyaltyStats: async () => {
+        set({ loading: true, error: null });
+        try {
+            const response = await adminApi.get('/royalty-stats');
+            set({ royaltyStats: response.data, loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to fetch royalty stats', loading: false });
         }
     },
 
@@ -159,6 +180,28 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             set({ pendingPayments: response.data.pendingUsers, loading: false });
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to fetch pending payments', loading: false });
+        }
+    },
+
+    fetchMatrixTree: async (userId: string, cycle?: number) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await adminApi.get(`/matrix-tree/${userId}`, {
+                params: { cycle }
+            });
+            set({ matrixTree: response.data, loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to fetch matrix tree', loading: false });
+        }
+    },
+
+    fetchCompletedCycles: async () => {
+        set({ loading: true, error: null });
+        try {
+            const response = await adminApi.get('/matrix/completions');
+            set({ completedCycles: response.data.completions, loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to fetch completed cycles', loading: false });
         }
     },
 
@@ -230,7 +273,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     distributeRoyalty: async () => {
         try {
             const response = await adminApi.post('/distribute-royalty');
-            // Refresh ledger to show new payouts
+            // Refresh ledger
             await get().fetchLedger();
             return response.data;
         } catch (error: any) {
@@ -238,4 +281,5 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             throw error;
         }
     },
+
 }));

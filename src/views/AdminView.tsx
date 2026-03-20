@@ -4,8 +4,9 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useToast } from '@/hooks/use-toast';
 import { Icon } from '@iconify/react';
+import { useThemeStore } from '@/store/useThemeStore';
 
-type ViewType = 'dashboard' | 'users' | 'payments' | 'withdrawals' | 'ledger' | 'matrix' | 'settings';
+type ViewType = 'dashboard' | 'users' | 'payments' | 'withdrawals' | 'ledger' | 'matrix' | 'completions' | 'settings';
 
 export const AdminView = () => {
     const [currentView, setCurrentView] = useState<ViewType>('dashboard');
@@ -13,7 +14,6 @@ export const AdminView = () => {
 
     const navigate = useNavigate();
     const { logoutAdmin, admin } = useAuthStore();
-    const { toast } = useToast();
     const {
         metrics,
         users,
@@ -30,14 +30,21 @@ export const AdminView = () => {
         fetchActivity,
         fetchPendingPayments,
         approvePayment,
-        rejectPayment
+        rejectPayment,
+        royaltyStats,
+        matrixTree,
+        completedCycles,
+        fetchRoyaltyStats,
+        fetchMatrixTree,
+        fetchCompletedCycles
     } = useAdminStore();
+    const { theme, setTheme } = useThemeStore();
 
     useEffect(() => {
-        // Fetch initial data based on current view
         const fetchData = () => {
             if (currentView === 'dashboard') {
                 fetchMetrics();
+                fetchRoyaltyStats();
                 fetchActivity();
             } else if (currentView === 'users') {
                 fetchUsers();
@@ -47,17 +54,18 @@ export const AdminView = () => {
                 fetchWithdrawals();
             } else if (currentView === 'ledger') {
                 fetchLedger();
+            } else if (currentView === 'completions') {
+                fetchCompletedCycles();
             }
         };
 
         fetchData();
 
-        // Set up polling for real-time updates
         const interval = setInterval(() => {
             if (currentView === 'dashboard' || currentView === 'payments') {
                 fetchData();
             }
-        }, 10000); // Poll every 10 seconds
+        }, 30000); // Poll every 30 seconds to save resources
 
         return () => clearInterval(interval);
     }, [currentView, fetchMetrics, fetchActivity, fetchUsers, fetchPendingPayments, fetchWithdrawals, fetchLedger]);
@@ -68,144 +76,93 @@ export const AdminView = () => {
     };
 
     return (
-        <div className="flex h-screen bg-slate-50">
+        <div className="flex h-screen bg-slate-50 dark:bg-[#020617] transition-colors duration-300">
             {/* Sidebar */}
             <aside
-                className={`w-64 bg-white dark:bg-gray-900 border-r border-slate-200 flex flex-col z-30 transition-all duration-300 absolute md:relative ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    } md:translate-x-0 h-full`}
+                className={`w-64 sidebar-gradient border-r border-slate-800/50 flex flex-col z-30 transition-all duration-300 absolute md:relative ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                    } md:translate-x-0 h-full shadow-2xl`}
             >
                 {/* Brand */}
-                <div className="h-14 flex items-center px-4 border-b border-slate-100 gap-3">
-                    <div className="h-7 w-7 bg-slate-900 rounded-md flex items-center justify-center text-white font-semibold text-xs shadow-sm">
-                        B
-                    </div>
-                    <div>
-                        <h1 className="text-sm font-semibold text-slate-900 tracking-tight leading-none">
-                            Best For Everyone <span className="text-slate-400 font-normal">Ent.</span>
+                <div className="h-20 flex flex-col justify-center px-6 border-b border-slate-800/40 gap-1 bg-white/5 backdrop-blur-sm">
+                    <div className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 bg-indigo-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-[0_0_15px_rgba(99,102,241,0.4)]">
+                            B
+                        </div>
+                        <h1 className="text-sm font-bold text-white tracking-tight leading-none uppercase">
+                            Best For Everyone
                         </h1>
-                        <p className="text-[10px] text-slate-400 leading-none mt-1 font-mono">
-                            ADMIN CONSOLE
-                        </p>
                     </div>
                 </div>
 
-                {/* Navigation */}
-                <div className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5">
-                    <div className="px-3 mb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                        Overview
+                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
+                    <NavItem icon="solar:widget-bold-duotone" label="Dashboard" active={currentView === 'dashboard'} onClick={() => setCurrentView('dashboard')} />
+                    <NavItem icon="solar:users-group-two-rounded-bold-duotone" label="User Management" active={currentView === 'users'} onClick={() => setCurrentView('users')} />
+                    <NavItem icon="solar:card-2-bold-duotone" label="Payment Approvals" active={currentView === 'payments'} onClick={() => setCurrentView('payments')} badge={pendingPayments.length} />
+                    <NavItem icon="solar:card-send-bold-duotone" label="Withdrawals" active={currentView === 'withdrawals'} onClick={() => setCurrentView('withdrawals')} />
+                    <NavItem icon="solar:checklist-minimalistic-bold-duotone" label="Ledger & Royalty" active={currentView === 'ledger'} onClick={() => setCurrentView('ledger')} />
+                    <NavItem icon="solar:layers-minimalistic-bold-duotone" label="Matrix Control" active={currentView === 'matrix'} onClick={() => setCurrentView('matrix')} />
+                    <NavItem icon="solar:history-bold-duotone" label="Completed Cycles" active={currentView === 'completions'} onClick={() => setCurrentView('completions')} />
+                    <div className="pt-4 mt-4 border-t border-slate-800/50">
+                        <NavItem icon="solar:settings-bold-duotone" label="System Settings" active={currentView === 'settings'} onClick={() => setCurrentView('settings')} />
                     </div>
-                    <NavItem
-                        icon="solar:widget-linear"
-                        label="Dashboard"
-                        active={currentView === 'dashboard'}
-                        onClick={() => setCurrentView('dashboard')}
-                    />
-                    <NavItem
-                        icon="solar:users-group-rounded-linear"
-                        label="User Management"
-                        active={currentView === 'users'}
-                        onClick={() => setCurrentView('users')}
-                    />
-                    <NavItem
-                        icon="solar:shield-check-linear"
-                        label="Payment Approvals"
-                        active={currentView === 'payments'}
-                        onClick={() => setCurrentView('payments')}
-                        badge={pendingPayments.length > 0 ? pendingPayments.length : undefined}
-                    />
+                </nav>
 
-                    <div className="px-3 mb-2 mt-6 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                        Finance
-                    </div>
-                    <NavItem
-                        icon="solar:card-transfer-linear"
-                        label="Withdrawals"
-                        active={currentView === 'withdrawals'}
-                        onClick={() => setCurrentView('withdrawals')}
-                        badge={withdrawals.length > 0 ? withdrawals.length : undefined}
-                    />
-                    <NavItem
-                        icon="solar:wallet-money-linear"
-                        label="Master Ledger"
-                        active={currentView === 'ledger'}
-                        onClick={() => setCurrentView('ledger')}
-                    />
-
-                    <div className="px-3 mb-2 mt-6 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                        Engine
-                    </div>
-                    <NavItem
-                        icon="solar:layers-minimalistic-linear"
-                        label="Matrix Control"
-                        active={currentView === 'matrix'}
-                        onClick={() => setCurrentView('matrix')}
-                    />
-                    <NavItem
-                        icon="solar:settings-linear"
-                        label="System Config"
-                        active={currentView === 'settings'}
-                        onClick={() => setCurrentView('settings')}
-                    />
-                </div>
-
-                {/* Profile */}
-                <div className="p-3 border-t border-slate-200 bg-slate-50/50">
-                    <div className="w-full flex items-center gap-3 p-2 rounded-lg">
-                        <div className="h-8 w-8 rounded bg-slate-900 text-white flex items-center justify-center font-semibold text-xs">
-                            SA
+                <div className="p-4 border-t border-slate-800/50 bg-slate-900/50">
+                    <div className="flex items-center gap-3 px-3 py-2">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs ring-2 ring-indigo-500/20">
+                            AD
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-slate-900 truncate">
-                                {admin?.adminName || 'Super Admin'}
-                            </p>
-                            <p className="text-[10px] text-slate-500 truncate font-medium">
-                                ● Full Access
-                            </p>
+                            <p className="text-xs font-bold text-white truncate">{admin?.fullname || 'Administrator'}</p>
+                            <p className="text-[10px] text-slate-400 font-medium truncate uppercase tracking-wider">Super Admin</p>
                         </div>
                     </div>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col min-w-0 relative h-full">
-                {/* Header */}
-                <header className="h-14 bg-white dark:bg-gray-900/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-20 flex items-center justify-between px-4 md:px-6">
-                    <div className="flex items-center gap-3 md:hidden">
+            <main className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-[#020617] h-screen overflow-hidden transition-colors duration-300">
+                <header className="h-20 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 flex items-center justify-between px-4 md:px-8 z-20 sticky top-0">
+                    <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="text-slate-500"
+                            className="md:hidden h-10 w-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-600 dark:text-slate-400"
                         >
-                            <Icon icon="solar:hamburger-menu-linear" className="text-xl" />
+                            <Icon icon={sidebarOpen ? "solar:close-circle-linear" : "solar:hamburger-menu-linear"} className="text-xl" />
                         </button>
-                        <span className="font-semibold text-slate-900">Best For Everyone</span>
-                    </div>
-
-                    <div className="hidden md:flex flex-1 max-w-lg">
-                        <div className="w-full flex items-center gap-2 px-3 py-1.5 bg-slate-50/50 border border-slate-200 rounded-md text-slate-400">
-                            <Icon icon="solar:magnifer-linear" />
-                            <span className="text-xs font-medium">Search users, transactions, logs...</span>
-                            <span className="ml-auto text-[10px] bg-white dark:bg-gray-900 border border-slate-200 px-1.5 rounded text-slate-400">
-                                ⌘K
-                            </span>
+                        <div className="hidden md:flex items-center gap-3 bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-2xl border border-slate-200 dark:border-white/10 w-80 group focus-within:ring-2 focus-within:ring-indigo-500/20 focus-within:border-indigo-500/50 transition-all">
+                            <Icon icon="solar:magnifer-linear" className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="Search system commands..."
+                                className="bg-transparent border-none outline-none text-xs font-medium w-full text-slate-900 dark:text-white placeholder:text-slate-400"
+                            />
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="h-4 w-px bg-slate-200 mx-1"></div>
+                        <button
+                            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                            className="h-9 w-9 rounded-xl bg-slate-100/50 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all border border-transparent hover:border-amber-200/50"
+                            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                        >
+                            <Icon icon={theme === 'dark' ? 'solar:sun-2-linear' : 'solar:moon-linear'} className="text-xl" />
+                        </button>
                         <button
                             onClick={handleLogout}
-                            className="text-slate-400 hover:text-rose-600 transition-colors"
+                            className="h-9 w-9 rounded-xl bg-rose-50/50 dark:bg-rose-500/5 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-all border border-transparent hover:border-rose-200/50"
                             title="Logout"
                         >
-                            <Icon icon="solar:logout-2-linear" className="text-lg" />
+                            <Icon icon="solar:logout-3-linear" className="text-xl" />
                         </button>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth pb-20">
-                    {currentView === 'dashboard' && (
+                <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar relative">
+                    {currentView === 'dashboard' && metrics && (
                         <DashboardContent
                             metrics={metrics}
+                            royaltyStats={royaltyStats}
                             activities={activities}
                             onNavigate={setCurrentView}
                         />
@@ -214,7 +171,22 @@ export const AdminView = () => {
                     {currentView === 'payments' && <PaymentsContent pendingPayments={pendingPayments} />}
                     {currentView === 'withdrawals' && <WithdrawalsContent withdrawals={withdrawals} />}
                     {currentView === 'ledger' && <LedgerContent transactions={transactions} />}
-                    {currentView === 'matrix' && <MatrixContent />}
+                    {currentView === 'matrix' && (
+                        <MatrixContent
+                            matrixTree={matrixTree}
+                            onSearch={fetchMatrixTree}
+                            loading={loading}
+                        />
+                    )}
+                    {currentView === 'completions' && (
+                        <CompletionsContent 
+                            completions={completedCycles} 
+                            onViewTree={(userId, cycle) => {
+                                fetchMatrixTree(userId, cycle);
+                                setCurrentView('matrix');
+                            }}
+                        />
+                    )}
                     {currentView === 'settings' && <SettingsContent />}
                 </div>
             </main>
@@ -223,261 +195,308 @@ export const AdminView = () => {
 };
 
 // Navigation Item Component
-const NavItem = ({
-    icon,
-    label,
-    active,
-    onClick,
-    badge
-}: {
-    icon: string;
-    label: string;
-    active: boolean;
-    onClick: () => void;
-    badge?: number;
-}) => (
+const NavItem = ({ icon, label, active, onClick, badge }: { icon: string; label: string; active: boolean; onClick: () => void; badge?: number }) => (
     <button
         onClick={onClick}
-        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${active
-            ? 'bg-slate-100 text-slate-900 font-semibold'
-            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group ${active
+            ? 'bg-indigo-600 text-white shadow-[0_4px_15px_rgba(79,70,229,0.4)]'
+            : 'text-slate-400 hover:text-white hover:bg-white/10'
             }`}
     >
-        <Icon icon={icon} className="text-lg" />
-        {label}
-        {badge && badge > 0 && (
-            <span className="ml-auto bg-rose-50 text-rose-600 text-[10px] font-semibold px-1.5 py-0.5 rounded border border-rose-100">
-                {badge}
-            </span>
-        )}
+        <Icon icon={icon} className={`text-lg transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110 group-hover:text-indigo-400'}`} />
+        <span className="flex-1 text-left">{label}</span>
+        {badge && badge > 0 && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${active ? 'bg-white text-indigo-600' : 'bg-rose-500/20 text-rose-400'}`}>{badge}</span>}
     </button>
 );
 
 // Dashboard Content
-const DashboardContent = ({
-    metrics,
-    activities,
-    onNavigate
-}: {
-    metrics: any;
-    activities: any[];
-    onNavigate: (view: ViewType) => void;
-}) => (
-    <div className="space-y-6 animate-in fade-in duration-400 max-w-7xl mx-auto">
+const DashboardContent = ({ metrics, royaltyStats, activities, onNavigate }: { metrics: any; royaltyStats: any; activities: any[]; onNavigate: (view: ViewType) => void }) => (
+    <div className="space-y-8 animate-in fade-in duration-400 max-w-7xl mx-auto">
         <div className="flex justify-between items-end">
             <div>
-                <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
-                    System Overview
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-none mb-1">
+                    System Intelligence
                 </h2>
-                <p className="text-sm text-slate-500">Live metrics from production environment</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Real-time health and performance metrics</p>
             </div>
         </div>
 
-        {/* KPI Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard
-                title="Platform Revenue"
-                value={`₹${(metrics?.totalRevenue || 0).toLocaleString()}`}
-                change={`Fees: ₹${(metrics?.totalAdminFees || 0).toLocaleString()}`}
-                color="emerald"
-                icon="solar:wallet-money-bold-duotone"
-            />
-            <KPICard
-                title="Active Users"
-                value={metrics?.activeUsers || 0}
-                change={`Paid: ₹${(metrics?.totalUserEarnings || 0).toLocaleString()}`}
-                color="indigo"
-                icon="solar:users-group-rounded-bold-duotone"
-                onClick={() => onNavigate('users')}
-            />
-            <KPICard
-                title="Pending Payouts"
-                value={metrics?.pendingWithdrawals || 0}
-                change={`₹${(metrics?.pendingWithdrawalAmount || 0).toLocaleString()}`}
-                color="amber"
-                icon="solar:card-transfer-bold-duotone"
-                onClick={() => onNavigate('withdrawals')}
-            />
-            <KPICard
-                title="Pending Approvals"
-                value={metrics?.pendingPayments || 0}
-                change={`Joining: ₹${(metrics?.totalJoiningFees || 0).toLocaleString()}`}
-                color="purple"
-                icon="solar:shield-check-bold-duotone"
-                onClick={() => onNavigate('payments')}
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <KPICard title="Revenue" value={`₹${metrics?.totalRevenue?.toLocaleString() || '0'}`} icon="solar:plain-bold-duotone" color="indigo" />
+            <KPICard title="Active Global Pool" value={(metrics?.activeUsers || 0).toString()} icon="solar:users-group-rounded-bold-duotone" color="emerald" />
+            <KPICard title="Pending Payouts" value={(metrics?.pendingWithdrawals || 0).toString()} icon="solar:wallet-bold-duotone" color="orange" onAction={() => onNavigate('withdrawals')} />
+            <KPICard title="Pending IDs" value={(metrics?.pendingPayments || 0).toString()} icon="solar:card-send-bold-duotone" color="rose" onAction={() => onNavigate('payments')} />
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 className="text-xs font-semibold text-slate-900 uppercase tracking-wide">
-                    Recent Activity
-                </h3>
+        {/* Royalty Stats Section */}
+        {royaltyStats && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 glass-card rounded-3xl p-6 border-none shadow-xl bg-white/50 dark:bg-white/5">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-6 flex items-center gap-2">
+                        <Icon icon="solar:star-bold-duotone" className="text-amber-500 text-lg" />
+                        Weekly Royalty Breakdown
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Total Royalty Paid</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">₹{royaltyStats.totalPaid?.toLocaleString()}</p>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/10">
+                            <p className="text-[10px] font-bold text-indigo-400 uppercase mb-1">Weekly Pool Payout</p>
+                            <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">₹{royaltyStats.weeklyPaid?.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="glass-card rounded-3xl p-6 border-none shadow-xl bg-white/50 dark:bg-white/5">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-6">Rank Distribution</h3>
+                    <div className="space-y-4">
+                        <RankProgress label="Star" count={royaltyStats.starCount || 0} color="blue" />
+                        <RankProgress label="Double Star" count={royaltyStats.doubleStarCount || 0} color="purple" />
+                        <RankProgress label="Super Star" count={royaltyStats.superStarCount || 0} color="amber" />
+                    </div>
+                </div>
             </div>
-            <div className="max-h-64 overflow-y-auto">
-                {activities && activities.length > 0 ? (
-                    activities.map((activity: any) => (
-                        <div key={activity._id} className="flex items-center gap-4 px-5 py-3 border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                            <div className={`h-8 w-8 rounded-full ${activity.status === 'credit' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 text-rose-600'} flex items-center justify-center text-sm border border-white shadow-sm`}>
-                                <Icon icon={activity.status === 'credit' ? 'solar:arrow-left-down-linear' : 'solar:arrow-right-up-linear'} />
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="glass-card rounded-3xl border-none shadow-2xl p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Live System Logs</h3>
+                    <div className="px-3 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-bold uppercase tracking-wider">Auto Refreshing</div>
+                </div>
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {activities.map((activity, idx) => (
+                        <div key={idx} className="flex gap-4 p-4 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-100 dark:border-white/5 hover:border-indigo-500/30 transition-all group">
+                            <div className="h-10 w-10 rounded-xl bg-white dark:bg-white/10 shadow-sm flex items-center justify-center text-indigo-500 text-xl">
+                                <Icon icon="solar:shield-check-bold-duotone" />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-slate-900 truncate">{activity.type}</p>
-                                <p className="text-[10px] text-slate-400 font-mono">{activity.user?.username || activity.user?.fullname || 'N/A'}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className={`text-sm font-semibold font-mono ${activity.status === 'credit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
-                                    {activity.status === 'credit' ? '+' : '-'}₹{activity.amount}
-                                </p>
-                                <p className="text-[10px] text-slate-400">Just now</p>
+                            <div className="flex-1">
+                                <div className="flex justify-between items-start">
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">{activity.description}</p>
+                                    <span className="text-[10px] text-slate-400 font-bold">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className={`text-[10px] font-bold uppercase ${activity.status === 'credit' ? 'text-emerald-500' : 'text-rose-500'}`}>Amount: ₹{activity.amount}</span>
+                                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                                    <span className="text-[10px] text-slate-400 font-medium">Tx Ref: #{idx + 10024}</span>
+                                </div>
                             </div>
                         </div>
-                    ))
-                ) : (
-                    <div className="p-4 text-center text-slate-500 text-sm">
-                        No recent activity
+                    ))}
+                </div>
+            </div>
+
+            <div className="glass-card rounded-3xl border-none shadow-2xl p-6 bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-20 transform translate-x-1/4 -translate-y-1/4">
+                    <Icon icon="solar:crown-bold" className="text-[12rem]" />
+                </div>
+                <div className="relative z-10 h-full flex flex-col">
+                    <h3 className="text-lg font-bold mb-2">Alpha Terminal</h3>
+                    <p className="text-sm text-indigo-100 mb-8 opacity-80 leading-relaxed">Direct system control for manual income distribution and platform maintenance.</p>
+                    <div className="mt-auto space-y-3">
+                        <button onClick={() => onNavigate('ledger')} className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-bold text-sm shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <Icon icon="solar:bolt-bold" className="text-lg" />
+                            Go to Distribution Panel
+                        </button>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     </div>
 );
 
-// KPI Card Component
-const KPICard = ({
-    title,
-    value,
-    change,
-    color,
-    icon,
-    onClick
-}: {
-    title: string;
-    value: string | number;
-    change: string;
-    color: string;
-    icon: string;
-    onClick?: () => void;
-}) => {
-    const colorClasses = {
-        emerald: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-        indigo: 'bg-indigo-50 text-indigo-600',
-        amber: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400',
-        purple: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-    }[color as 'emerald' | 'indigo' | 'amber' | 'purple'];
+const RankProgress = ({ label, count, color }: { label: string; count: number; color: string }) => (
+    <div className="space-y-1.5">
+        <div className="flex justify-between text-[11px] font-bold">
+            <span className="text-slate-500 dark:text-slate-400">{label}</span>
+            <span className={`text-${color}-500`}>{count} Qualifiers</span>
+        </div>
+        <div className="h-1.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+            <div className={`h-full bg-${color}-500 rounded-full`} style={{ width: `${Math.min(100, (count / 100) * 100)}%` }}></div>
+        </div>
+    </div>
+);
+
+const MatrixContent = ({ matrixTree, onSearch, loading }: { matrixTree: any; onSearch: (id: string) => void; loading: boolean }) => {
+    const [searchId, setSearchId] = useState('');
 
     return (
-        <div
-            onClick={onClick}
-            className={`bg-white dark:bg-gray-900 p-5 rounded-xl border border-slate-200 shadow-sm transition-all ${onClick ? 'cursor-pointer hover:shadow-md hover:border-slate-300 active:scale-[0.98]' : ''
-                }`}
-        >
-            <div className="flex justify-between items-start">
+        <div className="space-y-8 animate-in fade-in duration-700 max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                        {title}
-                    </p>
-                    <h3 className="text-2xl font-semibold text-slate-900 font-mono leading-tight">
-                        {value}
-                    </h3>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Global Matrix Explorer</h3>
+                    <p className="text-sm text-slate-500 mt-1">Visualize and audit any node in the global 1:6 hierarchy</p>
                 </div>
-                <div className={`h-9 w-9 rounded-lg ${colorClasses} flex items-center justify-center`}>
-                    <Icon icon={icon} className="text-lg" />
+                <div className="flex gap-2 w-full md:w-auto">
+                    <input
+                        type="text"
+                        placeholder="Enter User ID..."
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                        className="flex-1 md:w-64 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
+                    />
+                    <button
+                        onClick={() => onSearch(searchId)}
+                        disabled={loading || !searchId}
+                        className="bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                        {loading ? 'Searching...' : 'Search Node'}
+                    </button>
                 </div>
             </div>
-            <div className={`mt-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${colorClasses}`}>
-                {change}
-            </div>
+
+            {!matrixTree ? (
+                <div className="glass-card rounded-[2.5rem] border-none shadow-2xl p-20 text-center flex flex-col items-center justify-center bg-white/50 dark:bg-white/5">
+                    <div className="h-24 w-24 bg-indigo-500/10 rounded-full flex items-center justify-center text-indigo-500 text-5xl mb-6">
+                        <Icon icon="solar:globus-linear" />
+                    </div>
+                    <h4 className="text-slate-900 dark:text-white font-bold text-xl">Enter a User ID to start exploring</h4>
+                    <p className="text-slate-500 text-sm mt-2 max-w-sm">Use the search bar above to fetch real-time matrix data for any specific member.</p>
+                </div>
+            ) : (
+                <div className="space-y-8">
+                    {/* Parent/Target Node */}
+                    <div className="flex justify-center">
+                        <div className="glass-card rounded-3xl p-6 border-2 border-indigo-500/50 shadow-2xl bg-white dark:bg-slate-900 w-full max-w-xs text-center relative">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-indigo-600 text-white rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-lg">Current Parent</div>
+                            <div className="h-16 w-16 bg-indigo-100 dark:bg-indigo-500/20 rounded-2xl mx-auto flex items-center justify-center text-indigo-600 text-3xl mb-4 font-bold">
+                                {matrixTree.user?.fullname?.charAt(0)}
+                            </div>
+                            <h4 className="font-bold text-slate-900 dark:text-white">{matrixTree.user?.fullname}</h4>
+                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">@{matrixTree.user?.username}</p>
+                            <div className="flex justify-center gap-1">
+                                {[...Array(6)].map((_, i) => (
+                                    <div key={i} className={`h-2 w-2 rounded-full ${i < (matrixTree.level1?.length || 0) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-200 dark:bg-white/10'}`}></div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap justify-center gap-6">
+                        {[...Array(6)].map((_, i) => {
+                            const position = i + 1;
+                            const member = matrixTree.level1?.find((m: any) => m.position === position);
+                            const isFilled = !!member;
+                            const isLatest = isFilled && member === [...(matrixTree.level1 || [])].sort((a: any, b: any) => 
+                                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                            )[0];
+
+                            return (
+                                <div 
+                                    key={position} 
+                                    className={`glass-card rounded-[2rem] p-5 border shadow-xl w-full max-w-[170px] text-center transition-all duration-300 relative ${
+                                        isFilled 
+                                            ? isLatest
+                                                ? 'bg-blue-50/50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30 -translate-y-1'
+                                                : 'bg-emerald-50/50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30' 
+                                            : 'bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/5 opacity-60'
+                                    } ${isFilled ? 'hover:-translate-y-2 cursor-pointer' : 'cursor-not-allowed'}`} 
+                                    onClick={() => isFilled && onSearch(member.user?._id)}
+                                >
+                                    <div className={`h-11 w-11 rounded-xl mx-auto flex items-center justify-center text-lg font-bold mb-3 border relative ${
+                                        isFilled
+                                            ? isLatest
+                                                ? 'bg-blue-500 text-white border-blue-400'
+                                                : 'bg-emerald-500 text-white border-emerald-400'
+                                            : 'bg-slate-100 dark:bg-white/10 text-slate-400 border-dashed border-slate-300 dark:border-white/10'
+                                    }`}>
+                                        {isFilled ? member.user?.fullname?.charAt(0) : position}
+                                        {isLatest && (
+                                            <div className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-blue-500 text-[6px] font-black text-white rounded-full animate-bounce shadow-lg ring-2 ring-white dark:ring-gray-900 z-20">
+                                                NEW!
+                                            </div>
+                                        )}
+                                    </div>
+                                    <p className={`text-xs font-bold truncate ${isFilled ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
+                                        {isFilled ? member.user?.fullname : 'Empty Slot'}
+                                    </p>
+                                    <p className={`text-[9px] font-bold tracking-tighter uppercase ${isFilled ? 'text-indigo-500' : 'text-slate-400'}`}>
+                                        Pos {position}
+                                    </p>
+                                    {isFilled && (
+                                        <button className="mt-1.5 text-[8px] font-bold text-indigo-500 uppercase flex items-center gap-1 mx-auto hover:text-indigo-600 transition-colors">
+                                            Expand <Icon icon="solar:alt-arrow-right-linear" />
+                                        </button>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-// Users Content
+const KPICard = ({ title, value, icon, color, onAction }: { title: string; value: string; icon: string; color: string; onAction?: () => void }) => (
+    <div
+        onClick={onAction}
+        className={`glass-card rounded-3xl p-6 border-none shadow-xl hover:shadow-2xl transition-all duration-300 group ${onAction ? 'cursor-pointer hover:-translate-y-1' : ''}`}
+    >
+        <div className="flex items-center justify-between mb-4">
+            <div className={`h-12 w-12 rounded-2xl bg-${color}-500/10 text-${color}-500 flex items-center justify-center text-2xl border border-${color}-500/20 group-hover:scale-110 transition-transform`}>
+                <Icon icon={icon} />
+            </div>
+            {onAction && <Icon icon="solar:alt-arrow-right-linear" className="text-slate-400 group-hover:text-indigo-500 transition-colors" />}
+        </div>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{title}</p>
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight amount-value">{value}</h3>
+    </div>
+);
+
+
 const UsersContent = ({ users }: { users: any[] }) => {
     const { updateUserStatus } = useAdminStore();
-    const { toast } = useToast();
-
-    const handleBlockUser = async (userId: string, currentStatus: string) => {
-        try {
-            const newStatus = currentStatus === 'active' ? 'blocked' : 'active';
-            await updateUserStatus(userId, newStatus);
-            toast({
-                title: "Success",
-                description: `User ${newStatus === 'blocked' ? 'blocked' : 'unblocked'} successfully`
-            });
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to update user status",
-                variant: "destructive"
-            });
-        }
-    };
-
     return (
-        <div className="animate-in fade-in duration-400">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
-                    User Management
-                </h2>
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex justify-between items-center px-4">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Active User Registry</h3>
+                <div className="flex items-center gap-2 text-xs text-slate-500"><span className="h-2 w-2 rounded-full bg-emerald-500"></span> {users.length} Verified Users</div>
             </div>
-
-            <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                <div className="overflow-auto">
-                    <table className="w-full text-left text-sm whitespace-nowrap">
-                        <thead className="bg-slate-50 sticky top-0">
-                            <tr className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                <th className="px-4 py-3 border-b border-slate-200">User Profile</th>
-                                <th className="px-4 py-3 border-b border-slate-200">Wallet</th>
-                                <th className="px-4 py-3 border-b border-slate-200">Earnings</th>
-                                <th className="px-4 py-3 border-b border-slate-200">Status</th>
-                                <th className="px-4 py-3 border-b border-slate-200 text-right">Action</th>
+            <div className="glass-card rounded-[2rem] border-none shadow-2xl overflow-hidden">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">User Details</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Balances</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {users && users.length > 0 ? (
-                                users.map((user: any) => (
-                                    <tr key={user._id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="px-4 py-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded bg-slate-100 border border-slate-200 flex items-center justify-center font-semibold text-slate-600 text-xs">
-                                                    {user.fullname?.charAt(0) || 'U'}
-                                                </div>
-                                                <div>
-                                                    <div className="font-medium text-slate-900">{user.fullname}</div>
-                                                    <div className="text-xs text-slate-500 font-semibold">{user.username}</div>
-                                                    <div className="text-[10px] text-slate-400 font-mono">{user.email}</div>
-                                                </div>
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            {users.map((user) => (
+                                <tr key={user._id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-50 to-white dark:from-white/5 dark:to-white/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform">
+                                                {user.fullname?.charAt(0)}
                                             </div>
-                                        </td>
-                                        <td className="px-4 py-3 font-mono font-medium">₹{user.wallet?.balance?.toLocaleString() || 0}</td>
-                                        <td className="px-4 py-3">
-                                            <div className="text-xs text-slate-600">Total: <span className="font-semibold">₹{user.wallet?.totalEarnings?.toLocaleString() || 0}</span></div>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${user.status === 'active' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
-                                                <span className={`w-1 h-1 rounded-full ${user.status === 'active' ? 'bg-emerald-50 dark:bg-emerald-900/300' : 'bg-rose-500'}`}></span>
-                                                {user.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3 text-right">
-                                            <button
-                                                onClick={() => handleBlockUser(user._id, user.status)}
-                                                className="text-slate-400 hover:text-indigo-600 font-medium text-xs border border-slate-200 hover:border-indigo-200 px-2 py-1 rounded bg-white dark:bg-gray-900 transition-all"
-                                            >
-                                                {user.status === 'active' ? 'Block' : 'Unblock'}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                                        No users found
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{user.username}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.status === 'active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'}`}>
+                                            {user.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">₹{user.wallet?.currentBalance?.toLocaleString() || '0'}</p>
+                                        <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Earnings: ₹{user.wallet?.totalEarnings?.toLocaleString() || '0'}</p>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button
+                                            onClick={() => updateUserStatus(user._id, user.status === 'active' ? 'blocked' : 'active')}
+                                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${user.status === 'active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white hover:shadow-rose-500/30' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white hover:shadow-emerald-500/30'}`}
+                                        >
+                                            {user.status === 'active' ? 'Block Identity' : 'Restore Identity'}
+                                        </button>
                                     </td>
                                 </tr>
-                            )}
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -486,314 +505,38 @@ const UsersContent = ({ users }: { users: any[] }) => {
     );
 };
 
-// Withdrawals Content
-const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
-    const { approveWithdrawal } = useAdminStore();
-    const { toast } = useToast();
-
-    const handleApprove = async (id: string, approved: boolean) => {
-        try {
-            await approveWithdrawal(id, approved ? 'approved' : 'rejected');
-            toast({
-                title: approved ? "Approved" : "Rejected",
-                description: `Withdrawal ${approved ? 'approved' : 'rejected'} successfully`
-            });
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to process withdrawal",
-                variant: "destructive"
-            });
-        }
-    };
-
-    const hasPending = withdrawals && withdrawals.length > 0;
-
-    return (
-        <div className="space-y-6 animate-in fade-in duration-400 max-w-5xl mx-auto">
-            <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
-                    Withdrawal Queue
-                </h2>
-            </div>
-
-            {!hasPending ? (
-                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl p-12 text-center flex flex-col items-center justify-center">
-                    <div className="h-16 w-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center text-3xl mb-4">
-                        <Icon icon="solar:check-circle-bold-duotone" />
-                    </div>
-                    <h3 className="text-slate-900 font-semibold">All Caught Up!</h3>
-                    <p className="text-slate-500 text-sm mt-1">
-                        No pending withdrawal requests in the queue.
-                    </p>
-                </div>
-            ) : (
-                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div className="divide-y divide-slate-100">
-                        {withdrawals.map((w: any) => (
-                            <div key={w._id} className="p-4 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                                <div className="flex items-center gap-4 w-full md:w-auto">
-                                    <div className="h-10 w-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-semibold text-xs border border-slate-200">
-                                        UPI
-                                    </div>
-                                    <div>
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-lg font-semibold text-slate-900 font-mono">₹{w.amount}</span>
-                                            <span className="text-xs text-slate-400">Fee: ₹{w.adminFee}</span>
-                                        </div>
-                                        <div className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Net Payable: ₹{w.netPayable}</div>
-                                    </div>
-                                </div>
-
-                                <div className="flex-1 md:px-8 w-full md:w-auto">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-semibold text-slate-700">{w.user?.fullname}</span>
-                                    </div>
-                                    <div className="text-xs space-y-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-slate-400">A/C:</span>
-                                            <span className="font-mono text-slate-700 font-medium">{w.bankDetails?.accountNumber || 'N/A'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-slate-400">IFSC:</span>
-                                            <span className="font-mono text-slate-500">{w.bankDetails?.ifscCode || 'N/A'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-slate-400">Name:</span>
-                                            <span className="text-slate-600 font-medium">{w.bankDetails?.accountHolderName || 'N/A'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2 w-full md:w-auto justify-end">
-                                    <button
-                                        onClick={() => handleApprove(w._id, false)}
-                                        className="px-3 py-1.5 rounded border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 text-xs font-semibold transition-all"
-                                    >
-                                        Reject
-                                    </button>
-                                    <button
-                                        onClick={() => handleApprove(w._id, true)}
-                                        className="px-3 py-1.5 rounded bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold shadow-sm transition-all flex items-center gap-1"
-                                    >
-                                        <Icon icon="solar:check-circle-linear" /> Approve
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-// Ledger Content
-const LedgerContent = ({ transactions }: { transactions: any[] }) => {
-    const { distributeRoyalty } = useAdminStore();
-    const { toast } = useToast();
-    const [isDistributing, setIsDistributing] = useState(false);
-
-    const handleDistributeRoyalty = async () => {
-        if (!confirm("Are you sure you want to distribute the Weekly Royalty Bonus? This action cannot be undone.")) return;
-
-        setIsDistributing(true);
-        try {
-            const res = await distributeRoyalty();
-            toast({
-                title: "Royalty Distributed!",
-                description: res.message || "Successfully distributed weekly royalty."
-            });
-        } catch (error: any) {
-            toast({
-                title: "Distribution Failed",
-                description: error.response?.data?.message || "An error occurred.",
-                variant: "destructive"
-            });
-        } finally {
-            setIsDistributing(false);
-        }
-    };
-
-    return (
-        <div className="animate-in fade-in duration-400">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
-                    Financial Ledger
-                </h2>
-                <button
-                    onClick={handleDistributeRoyalty}
-                    disabled={isDistributing}
-                    className="px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 text-xs font-semibold rounded-md shadow-sm transition-all flex items-center gap-2"
-                >
-                    {isDistributing ? (
-                        <Icon icon="solar:spinner-linear" className="animate-spin text-lg" />
-                    ) : (
-                        <Icon icon="solar:star-fall-line-duotone" className="text-lg text-amber-400" />
-                    )}
-                    Distribute Weekly Royalty
-                </button>
-            </div>
-            <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-auto">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-slate-50 sticky top-0">
-                        <tr className="text-xs font-semibold text-slate-500 uppercase">
-                            <th className="px-4 py-3 border-b border-slate-200">Transaction ID</th>
-                            <th className="px-4 py-3 border-b border-slate-200">Type</th>
-                            <th className="px-4 py-3 border-b border-slate-200">Category</th>
-                            <th className="px-4 py-3 border-b border-slate-200">User</th>
-                            <th className="px-4 py-3 border-b border-slate-200 text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {transactions && transactions.length > 0 ? (
-                            transactions.map((tx: any) => (
-                                <tr key={tx._id} className="hover:bg-slate-50">
-                                    <td className="px-4 py-3 font-mono text-xs text-slate-500">{tx._id.slice(-8)}</td>
-                                    <td className="px-4 py-3">
-                                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${tx.status === 'credit' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 text-rose-700 border-rose-100'} uppercase`}>
-                                            {tx.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-slate-900 font-medium">{tx.type}</td>
-                                    <td className="px-4 py-3 text-slate-600 text-xs">{tx.user?.fullname || 'N/A'}</td>
-                                    <td className={`px-4 py-3 text-right font-mono font-semibold ${tx.status === 'credit' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
-                                        {tx.status === 'credit' ? '+' : '-'}₹{tx.amount}
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
-                                    No transactions found
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-};
-
-// Payments Content
 const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
     const { approvePayment, rejectPayment } = useAdminStore();
-    const { toast } = useToast();
-
-    const handleApprove = async (userId: string, fullname: string) => {
-        try {
-            await approvePayment(userId);
-            toast({
-                title: "Payment Approved",
-                description: `${fullname}'s payment has been approved`
-            });
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to approve payment",
-                variant: "destructive"
-            });
-        }
-    };
-
-    const handleReject = async (userId: string, fullname: string) => {
-        try {
-            await rejectPayment(userId, "Payment verification failed");
-            toast({
-                title: "Payment Rejected",
-                description: `${fullname}'s payment has been rejected`
-            });
-        } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to reject payment",
-                variant: "destructive"
-            });
-        }
-    };
-
     return (
-        <div className="animate-in fade-in duration-400 max-w-6xl mx-auto space-y-6">
-            <div className="flex justify-between items-end">
-                <div>
-                    <h2 className="text-lg font-semibold text-slate-900 tracking-tight">
-                        Payment Approvals
-                    </h2>
-                    <p className="text-sm text-slate-500">Review and approve user payment submissions</p>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <Icon icon="solar:shield-check-linear" className="text-emerald-600 dark:text-emerald-400" />
-                    <span>{pendingPayments.length} pending</span>
-                </div>
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex justify-between items-center px-4">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Pending Verification Queue</h3>
+                <div className="px-4 py-1 bg-amber-500/10 text-amber-500 rounded-full text-[10px] font-bold uppercase tracking-widest">{pendingPayments.length} Actions Required</div>
             </div>
-
-            {pendingPayments.length === 0 ? (
-                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm p-12 text-center">
-                    <div className="h-16 w-16 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Icon icon="solar:check-circle-linear" className="text-3xl" />
-                    </div>
-                    <h3 className="text-base font-semibold text-slate-900 mb-2">All Caught Up!</h3>
-                    <p className="text-sm text-slate-500">No pending payment approvals at the moment</p>
-                </div>
-            ) : (
-                <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-slate-50/50 border-b border-slate-100">
-                            <tr>
-                                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">User</th>
-                                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Email</th>
-                                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Submitted</th>
-                                <th className="px-5 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+            <div className="glass-card rounded-[2rem] border-none shadow-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Requester Account</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Submission Date</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Approval Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {pendingPayments.map((payment: any, index: number) => (
-                                <tr key={payment._id || index} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-5 py-4">
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            {pendingPayments.map((user) => (
+                                <tr key={user._id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all">
+                                    <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-9 w-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-sm">
-                                                {payment.fullname?.charAt(0) || 'U'}
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-slate-900">{payment.fullname}</p>
-                                                <p className="text-xs text-slate-500 font-semibold">{payment.username}</p>
-                                                <p className="text-[10px] text-slate-400 font-mono">ID: {payment._id?.slice(-6)}</p>
-                                            </div>
+                                            <div className="h-10 w-10 rounded-xl bg-white dark:bg-white/10 text-indigo-500 flex items-center justify-center text-xl shadow-sm border border-slate-200 dark:border-white/10"><Icon icon="solar:user-rounded-bold" /></div>
+                                            <div><p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p><p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{user.username}</p></div>
                                         </div>
                                     </td>
-                                    <td className="px-5 py-4">
-                                        <span className="text-sm font-mono text-slate-600">{payment.email}</span>
-                                    </td>
-                                    <td className="px-5 py-4">
-                                        <span className="text-xs text-slate-500">
-                                            {payment.paymentProof?.submittedAt
-                                                ? new Date(payment.paymentProof.submittedAt).toLocaleDateString('en-IN', {
-                                                    day: 'numeric',
-                                                    month: 'short',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })
-                                                : 'N/A'
-                                            }
-                                        </span>
-                                    </td>
-                                    <td className="px-5 py-4">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => handleApprove(payment._id, payment.fullname)}
-                                                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-md hover:bg-emerald-100 transition-colors border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5"
-                                            >
-                                                <Icon icon="solar:check-circle-linear" className="text-sm" />
-                                                Approve
-                                            </button>
-                                            <button
-                                                onClick={() => handleReject(payment._id, payment.fullname)}
-                                                className="px-3 py-1.5 bg-rose-50 text-rose-700 text-xs font-semibold rounded-md hover:bg-rose-100 transition-colors border border-rose-200 flex items-center gap-1.5"
-                                            >
-                                                <Icon icon="solar:close-circle-linear" className="text-sm" />
-                                                Reject
-                                            </button>
+                                    <td className="px-6 py-4"><p className="text-xs font-bold text-slate-900 dark:text-white">{new Date(user.updatedAt).toLocaleDateString()}</p><p className="text-[10px] text-slate-400 font-medium">{new Date(user.updatedAt).toLocaleTimeString()}</p></td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <button onClick={() => approvePayment(user._id)} className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:shadow-lg hover:shadow-emerald-500/30 transition-all">Approve ID</button>
+                                            <button onClick={() => rejectPayment(user._id)} className="px-4 py-2 bg-rose-500 text-white rounded-xl text-xs font-bold hover:shadow-lg hover:shadow-rose-500/30 transition-all">Reject</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -801,31 +544,184 @@ const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
                         </tbody>
                     </table>
                 </div>
-            )}
+            </div>
         </div>
     );
 };
 
-// Matrix Content
-const MatrixContent = () => (
-    <div className="animate-in fade-in duration-400 max-w-4xl mx-auto">
-        <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-4">
-            Matrix Engine Logic
-        </h2>
-        <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm p-8 text-center">
-            <p className="text-slate-500">Matrix control interface will be implemented here</p>
+const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
+    return (
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex justify-between items-center px-4">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Financial Payout Management</h3>
+                <div className="flex gap-2">
+                    <div className="px-3 py-1 bg-slate-100 dark:bg-white/5 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-widest">{withdrawals.length} Items</div>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {withdrawals.map((w) => (
+                    <div key={w._id} className="glass-card rounded-[2rem] p-6 border-none shadow-2xl relative group overflow-hidden bg-white/50 dark:bg-[#0f172a]/50">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <Icon icon="solar:wallet-bold" className="text-6xl text-indigo-500 -rotate-12" />
+                        </div>
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-2xl border border-indigo-500/20 group-hover:scale-110 transition-all"><Icon icon="solar:card-send-bold-duotone" /></div>
+                            <div><p className="text-sm font-bold text-slate-900 dark:text-white">{w.user?.fullname}</p><p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{w.user?.username}</p></div>
+                        </div>
+                        <div className="space-y-4 mb-6">
+                            <div className="p-4 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200/30 dark:border-white/5">
+                                <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest">Payout Amount</p>
+                                <p className="text-2xl font-bold text-emerald-500">₹{w.amount?.toLocaleString() || '0'}</p>
+                            </div>
+                            <div className="space-y-2 px-1">
+                                <div className="flex justify-between text-[11px] font-medium"><span className="text-slate-500">Account:</span><span className="text-slate-900 dark:text-slate-300 font-bold select-all tracking-wider">{w.bankDetails?.accountNumber}</span></div>
+                                <div className="flex justify-between text-[11px] font-medium"><span className="text-slate-500">IFSC Code:</span><span className="text-slate-900 dark:text-slate-300 font-bold select-all tracking-wider font-mono">{w.bankDetails?.ifsc}</span></div>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <button className="flex-1 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Approve</button>
+                            <button className="flex-1 py-3 bg-rose-500/10 text-rose-500 rounded-2xl text-xs font-bold border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all">Reject</button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const LedgerContent = ({ transactions }: { transactions: any[] }) => {
+    const { distributeRoyalty } = useAdminStore();
+    return (
+        <div className="space-y-6 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-4">
+                <div><h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Platform Financial Ledger</h3><p className="text-xs text-slate-500 mt-1">Audit log of all system-generated payouts and transactions</p></div>
+                <button onClick={() => distributeRoyalty()} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-2xl text-sm font-bold shadow-xl shadow-amber-500/20 hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-2 border border-amber-400/20"><Icon icon="solar:star-bold" className="text-xl" />Trigger Weekly Royalty</button>
+            </div>
+            <div className="glass-card rounded-[2rem] border-none shadow-2xl overflow-hidden">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Beneficiary</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Transaction Origin</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Settlement</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                            {transactions.map((tx) => (
+                                <tr key={tx._id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-9 w-9 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center font-bold text-xs text-slate-500 group-hover:text-amber-500 transition-colors border border-slate-200 dark:border-white/10">{tx.user?.username?.charAt(0) || 'U'}</div>
+                                            <div><p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{tx.user?.fullname}</p><p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{tx.user?.username}</p></div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4"><p className="text-xs font-bold text-slate-900 dark:text-white mb-0.5">{tx.type}</p><p className="text-[10px] text-slate-400 font-medium truncate max-w-[200px]">{tx.description}</p></td>
+                                    <td className="px-6 py-4 text-center"><span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded text-[10px] font-bold uppercase border border-emerald-500/20">{tx.status}</span></td>
+                                    <td className="px-6 py-4 text-right">
+                                        <p className={`text-sm font-bold ${tx.amount > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>₹{tx.amount?.toLocaleString() || '0'}</p>
+                                        <p className="text-[10px] text-slate-400 font-medium tracking-tighter uppercase">{new Date(tx.createdAt).toLocaleDateString()}</p>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Settings Content
+const SettingsContent = () => (
+    <div className="animate-in fade-in duration-700 max-w-4xl mx-auto space-y-6">
+        <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-slate-500/10 text-slate-500 flex items-center justify-center text-xl border border-slate-500/20">
+                <Icon icon="solar:settings-bold-duotone" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight uppercase">
+                System General Configuration
+            </h2>
+        </div>
+        <div className="glass-card rounded-3xl border-none shadow-2xl p-20 text-center flex flex-col items-center justify-center">
+            <div className="h-24 w-24 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-700 text-5xl mb-6">
+                <Icon icon="solar:tuning-square-2-linear" />
+            </div>
+            <h3 className="text-slate-900 dark:text-white font-bold text-lg">Configuration Module Locked</h3>
+            <p className="text-slate-500 text-sm mt-2 max-w-sm leading-relaxed">
+                Global system variables and platform settings are managed through this secure interface. Currently accessible only via root terminal.
+            </p>
         </div>
     </div>
 );
 
-// Settings Content
-const SettingsContent = () => (
-    <div className="animate-in fade-in duration-400 max-w-3xl mx-auto">
-        <h2 className="text-lg font-semibold text-slate-900 tracking-tight mb-4">
-            System Configuration
-        </h2>
-        <div className="bg-white dark:bg-gray-900 border border-slate-200 rounded-xl shadow-sm p-8 text-center">
-            <p className="text-slate-500">Settings interface will be implemented here</p>
+const CompletionsContent = ({ completions, onViewTree }: { completions: any[], onViewTree: (userId: string, cycle: number) => void }) => (
+    <div className="space-y-6 animate-in fade-in duration-700 max-w-6xl mx-auto">
+        <div className="flex justify-between items-center px-4">
+            <div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Matrix Cycle Completions</h3>
+                <p className="text-xs text-slate-500 mt-1">History of all successfully finalized 6X cycles</p>
+            </div>
+            <div className="px-4 py-1 bg-indigo-500/10 text-indigo-500 rounded-full text-[10px] font-bold uppercase tracking-widest">{completions.length} Total Completions</div>
+        </div>
+
+        <div className="glass-card rounded-[2rem] border-none shadow-2xl overflow-hidden">
+            <div className="overflow-x-auto custom-scrollbar">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
+                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">User Details</th>
+                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Cycle #</th>
+                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Completion Date</th>
+                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                        {completions.length === 0 ? (
+                            <tr>
+                                <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
+                                    No completed cycles found in the system yet.
+                                </td>
+                            </tr>
+                        ) : (
+                            completions.map((c) => (
+                                <tr key={c._id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold border border-indigo-100 dark:border-indigo-800/50 group-hover:scale-110 transition-transform">
+                                                {c.fullname?.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[200px]">{c.fullname}</p>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{c.username}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-[10px] font-bold uppercase border border-emerald-500/20">
+                                            Cycle {c.cycle}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <p className="text-xs font-bold text-slate-900 dark:text-white">{new Date(c.completedAt).toLocaleDateString()}</p>
+                                        <p className="text-[10px] text-slate-400 font-medium">{new Date(c.completedAt).toLocaleTimeString()}</p>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button
+                                            onClick={() => onViewTree(c.userId, c.cycle)}
+                                            className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 ml-auto"
+                                        >
+                                            <Icon icon="solar:layers-minimalistic-bold" />
+                                            View Tree
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 );

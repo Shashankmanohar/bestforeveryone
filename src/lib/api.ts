@@ -141,7 +141,8 @@ export const walletApi = {
 // Matrix API
 export const matrixApi = {
     getStatus: () => apiClient('/user/matrix'),
-    getTree: () => apiClient('/user/matrix/tree'),
+    getTree: (cycle?: number) => apiClient(`/user/matrix/tree${cycle ? `?cycle=${cycle}` : ''}`),
+    getHistory: () => apiClient('/user/matrix/history'),
 };
 
 // Referral API

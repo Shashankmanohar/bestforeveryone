@@ -27,6 +27,7 @@ import { SupportView } from "./views/SupportView";
 import { KycView } from "./views/KycView";
 import { AdminKycView } from "./views/AdminKycView";
 import { BusinessPlanView } from "./views/BusinessPlanView";
+import { authApi } from "./lib/api";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore, resolveTheme } from "./store/useThemeStore";
 
@@ -40,7 +41,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   // Check if user has verified payment
+  // Exception: Allow access to dashboard and other routes if they are in re-entry pending status
+  // (The re-entry payment is handled via a popup in the Matrix section)
   if (user && user.paymentStatus !== 'approved' && !user.verified) {
+    if (user.isReEntryPending) {
+      return <>{children}</>;
+    }
     return <Navigate to="/payment-verification" replace />;
   }
 
@@ -53,8 +59,22 @@ const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
-  const { isAuthenticated, isAdminAuthenticated } = useAuthStore();
+  const { isAuthenticated, isAdminAuthenticated, user } = useAuthStore();
   const { theme } = useThemeStore();
+
+  useEffect(() => {
+    const refreshProfile = async () => {
+      if (isAuthenticated) {
+        try {
+          const profile = await authApi.getProfile();
+          if (profile) useAuthStore.getState().updateUser(profile);
+        } catch (error) {
+          console.error('Failed to refresh profile in App:', error);
+        }
+      }
+    };
+    refreshProfile();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const apply = () => {
@@ -99,7 +119,13 @@ const App = () => {
             {/* Payment Verification (authenticated but not verified) */}
             <Route
               path="/payment-verification"
-              element={isAuthenticated ? <PaymentVerificationView /> : <Navigate to="/login" replace />}
+              element={
+                isAuthenticated ? (
+                  user?.isReEntryPending ? <Navigate to="/dashboard" replace /> : <PaymentVerificationView />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
             />
 
             {/* Admin routes */}

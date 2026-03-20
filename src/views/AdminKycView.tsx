@@ -75,9 +75,9 @@ export const AdminKycView = () => {
             </div>
 
             {pendingUsers.length === 0 ? (
-                <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-20 text-center shadow-card">
+                <div className="bg-white dark:bg-gray-950/80 backdrop-blur-xl rounded-3xl border border-gray-200 dark:border-white/10 p-20 text-center shadow-xl">
                     <Icon icon="solar:check-read-linear" className="mx-auto text-gray-300 dark:text-gray-600 mb-4" width={48} />
-                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">All caught up! No pending KYC requests.</p>
+                    <p className="text-gray-500 dark:text-gray-400 font-medium font-bold">All caught up! No pending KYC requests.</p>
                 </div>
             ) : (
                 <div className="grid gap-4">
@@ -86,7 +86,7 @@ export const AdminKycView = () => {
                             key={user._id}
                             initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 shadow-card overflow-hidden"
+                            className="bg-white dark:bg-gray-950/80 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/10 p-6 shadow-xl overflow-hidden glass-card-hover"
                         >
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                                 <div className="flex items-center gap-4">
@@ -137,9 +137,9 @@ export const AdminKycView = () => {
                                     <button
                                         onClick={() => handleApprove(user._id)}
                                         disabled={actionLoading === user._id}
-                                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all"
+                                        className="flex items-center gap-2 bg-emerald-600 dark:bg-white text-white dark:text-[#070b14] px-6 py-3 rounded-xl font-bold text-sm shadow-lg transition-all click-scale"
                                     >
-                                        {actionLoading === user._id ? <Icon icon="eos-icons:loading" className="animate-spin" /> : <Icon icon="solar:check-read-bold" />} Approve
+                                        {actionLoading === user._id ? <Icon icon="eos-icons:loading" className="animate-spin text-white dark:text-gray-900" /> : <Icon icon="solar:check-read-bold" />} Approve
                                     </button>
                                 </div>
                             </div>

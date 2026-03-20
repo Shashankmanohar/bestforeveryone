@@ -94,7 +94,7 @@ export const ActivateOthers = () => {
                             value={targetUsername}
                             onChange={(e) => setTargetUsername(e.target.value)}
                             placeholder="Enter username (e.g. john_doe)"
-                            className="block w-full pl-11 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="block w-full pl-11 pr-4 py-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-white/20 focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400 dark:text-white"
                         />
                     </div>
                 </div>
@@ -111,7 +111,7 @@ export const ActivateOthers = () => {
                                 value={pin}
                                 onChange={(e) => setPin(e.target.value.toUpperCase())}
                                 placeholder="Enter E-pin code"
-                                className="block w-full pl-11 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                                className="block w-full pl-11 pr-4 py-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-white/20 focus:border-transparent transition-all outline-none font-medium placeholder:text-gray-400 dark:text-white"
                             />
                         </div>
                     </div>
@@ -142,10 +142,10 @@ export const ActivateOthers = () => {
                 <button
                     disabled={!targetUsername.trim() || !pin.trim() || loading}
                     onClick={() => setShowConfirm(true)}
-                    className="w-full py-4 bg-gray-900 text-white rounded-2xl text-sm font-bold shadow-lg hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:bg-gray-400 transition-all click-scale flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-[#070b14] rounded-2xl text-sm font-bold shadow-lg disabled:opacity-50 disabled:bg-gray-400 transition-all click-scale flex items-center justify-center gap-2"
                 >
                     {loading ? (
-                        <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="h-5 w-5 border-2 border-white/30 border-t-white dark:border-gray-900/30 dark:border-t-gray-900 rounded-full animate-spin" />
                     ) : (
                         <>
                             <Icon icon="solar:ticket-bold" width={20} />
@@ -173,10 +173,10 @@ export const ActivateOthers = () => {
                                     setPin(e.pin);
                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
-                                className="group flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-2xl hover:border-blue-200 hover:bg-blue-50 dark:bg-blue-900/30/50 transition-all text-left click-scale"
+                                className="group flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-2xl hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-white/10 transition-all text-left click-scale"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-xl bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:text-blue-400 transition-colors shadow-sm">
+                                    <div className="h-10 w-10 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center text-gray-400 transition-colors shadow-sm">
                                         <Icon icon="solar:ticket-bold" width={20} />
                                     </div>
                                     <div>
@@ -210,7 +210,7 @@ export const ActivateOthers = () => {
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white dark:bg-gray-900 rounded-[32px] p-8 max-w-sm w-full relative z-10 shadow-2xl text-center"
+                            className="bg-white dark:bg-gray-950 rounded-[32px] p-8 max-w-sm w-full relative z-10 shadow-2xl text-center border border-gray-100 dark:border-white/10"
                         >
                             <div className="h-16 w-16 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Icon icon="solar:question-square-bold" width={32} />
@@ -230,7 +230,7 @@ export const ActivateOthers = () => {
                                 <button
                                     disabled={loading}
                                     onClick={handleActivate}
-                                    className="flex-1 py-4 px-4 bg-blue-600 text-white rounded-2xl text-xs font-bold shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center"
+                                    className="flex-1 py-4 px-4 bg-blue-600 text-white rounded-2xl text-xs font-bold shadow-lg hover:bg-blue-700 transition-all flex items-center justify-center click-scale"
                                 >
                                     {loading ? (
                                         <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

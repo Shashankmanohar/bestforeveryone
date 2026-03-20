@@ -46,22 +46,22 @@ export const AdminLoginView = () => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-50 dark:bg-[#070b14] flex items-center justify-center p-4 transition-colors duration-300">
             {/* Background Blur Effects */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-indigo-100/50 blur-3xl opacity-60 mix-blend-multiply"></div>
                 <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-blue-100/50 blur-3xl opacity-60 mix-blend-multiply"></div>
             </div>
 
-            <div className="relative w-full max-w-sm bg-white dark:bg-gray-900/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-2xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
+            <div className="relative w-full max-w-sm bg-white dark:bg-gray-950/80 backdrop-blur-xl border border-gray-100 dark:border-white/10 shadow-2xl rounded-3xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-400">
                 <div className="flex flex-col items-center mb-8">
-                    <div className="h-10 w-10 bg-slate-900 rounded-lg flex items-center justify-center text-white text-lg font-semibold shadow-lg mb-4">
+                    <div className="h-12 w-12 bg-gray-900 dark:bg-white text-white dark:text-[#070b14] rounded-2xl flex items-center justify-center font-bold tracking-tighter text-xl shadow-xl mb-4">
                         B
                     </div>
-                    <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
-                        Best For Everyone Enterprise
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+                        Best For Everyone <span className="text-gray-400 font-medium">Enterprise</span>
                     </h1>
-                    <p className="text-xs text-slate-500 font-medium mt-1">
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-2">
                         Authorized Personnel Only
                     </p>
                 </div>
@@ -76,7 +76,7 @@ export const AdminLoginView = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 pl-9 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 transition-all placeholder:text-slate-400"
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 dark:focus:ring-white/20 transition-all placeholder:text-gray-400 font-medium"
                                 placeholder="name@company.com"
                                 required
                             />
@@ -105,7 +105,7 @@ export const AdminLoginView = () => {
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 pl-9 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 transition-all placeholder:text-slate-400"
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900/10 dark:focus:ring-white/20 transition-all placeholder:text-gray-400 font-medium"
                                 placeholder="••••••••"
                                 required
                             />
@@ -145,14 +145,14 @@ export const AdminLoginView = () => {
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
-                                className="rounded border-slate-300 text-slate-900 focus:ring-0 w-3.5 h-3.5"
+                                className="rounded border-gray-300 dark:border-gray-700 text-gray-900 focus:ring-0 w-3.5 h-3.5 bg-transparent"
                             />
-                            <span className="text-xs text-slate-500">Remember session</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">Remember session</span>
                         </label>
                         <button
                             type="button"
                             onClick={() => navigate('/admin/forgot-password')}
-                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
                         >
                             Forgot access?
                         </button>
@@ -161,11 +161,11 @@ export const AdminLoginView = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-lg shadow-lg shadow-slate-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 disabled:opacity-50"
+                        className="w-full bg-gray-900 dark:bg-white text-white dark:text-[#070b14] font-bold py-4 rounded-xl shadow-lg shadow-gray-200 dark:shadow-none transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-2 disabled:opacity-50 click-scale"
                     >
                         {isLoading ? (
                             <>
-                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white dark:border-gray-900/30 dark:border-t-gray-900 rounded-full animate-spin" />
                                 <span>Authenticating...</span>
                             </>
                         ) : (
@@ -178,11 +178,10 @@ export const AdminLoginView = () => {
                         )}
                     </button>
                 </form>
-
-                <div className="mt-6 pt-6 border-t border-slate-100 text-center flex flex-col gap-4">
+                <div className="mt-6 pt-6 border-t border-slate-100 dark:border-white/5 text-center flex flex-col gap-4">
                     <button
                         onClick={() => navigate('/login')}
-                        className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider"
+                        className="text-xs font-bold text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center justify-center gap-1.5 uppercase tracking-wider"
                     >
                         Return to User Portal
                     </button>

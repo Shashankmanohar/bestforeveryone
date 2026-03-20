@@ -67,7 +67,7 @@ export const KycView = () => {
     if (kycStatus === 'approved') {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="h-20 w-20 bg-emerald-100 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6">
+                <div className="h-20 w-20 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/20">
                     <Icon icon="solar:verified-check-bold" width={40} />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">KYC Verified</h2>
@@ -110,7 +110,7 @@ export const KycView = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Document Uploads */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-card">
+                    <div className="glass-card rounded-3xl border border-gray-200 dark:border-white/5 p-6 shadow-card glass-card-hover group">
                         <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                             <Icon icon="solar:user-id-bold" className="text-blue-600 dark:text-blue-400" /> Aadhar Card
                         </h3>
@@ -150,7 +150,7 @@ export const KycView = () => {
                 </div>
 
                 {/* Bank Details */}
-                <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 md:p-8 shadow-card">
+                <div className="glass-card rounded-3xl border border-gray-200 dark:border-white/5 p-6 md:p-8 shadow-card glass-card-hover group">
                     <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                         <Icon icon="solar:bank-bold" className="text-blue-600 dark:text-blue-400" /> Bank Account Information
                     </h3>
@@ -162,7 +162,7 @@ export const KycView = () => {
                                 value={bankDetails.accountHolderName}
                                 onChange={(e) => setBankDetails({ ...bankDetails, accountHolderName: e.target.value })}
                                 placeholder="Full name as per bank"
-                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                                 required
                             />
                         </div>
@@ -173,7 +173,7 @@ export const KycView = () => {
                                 value={bankDetails.bankName}
                                 onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
                                 placeholder="e.g. State Bank of India"
-                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                                 required
                             />
                         </div>
@@ -184,7 +184,7 @@ export const KycView = () => {
                                 value={bankDetails.accountNumber}
                                 onChange={(e) => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
                                 placeholder="Enter account number"
-                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                                 required
                             />
                         </div>
@@ -195,7 +195,7 @@ export const KycView = () => {
                                 value={bankDetails.ifscCode}
                                 onChange={(e) => setBankDetails({ ...bankDetails, ifscCode: e.target.value.toUpperCase() })}
                                 placeholder="SBIN00XXXXX"
-                                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white focus:border-transparent outline-none transition-all"
+                                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm font-bold rounded-xl py-3 px-4 focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 outline-none transition-all placeholder:text-gray-400"
                                 required
                             />
                         </div>
@@ -205,7 +205,7 @@ export const KycView = () => {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full bg-gray-900 dark:bg-white text-white dark:text-[#070b14] font-bold py-4 rounded-xl shadow-lg click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {loading ? (
                         <>

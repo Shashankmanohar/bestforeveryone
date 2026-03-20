@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { walletApi, withdrawalApi, referralApi, epinApi } from '@/lib/api';
+import { walletApi, withdrawalApi, referralApi, epinApi, leadershipApi } from '@/lib/api';
 
 export interface Transaction {
   _id: string;
@@ -22,6 +22,7 @@ export interface LeadershipLog {
   amount: number;
   trigger: string;
   date: string;
+  type?: 'leadership' | 'weekly_royalty';
 }
 
 export interface ReferralMember {
@@ -247,9 +248,11 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   fetchWalletData: async () => {
     try {
-      const [walletData, weeklyData] = await Promise.all([
+      const [walletData, weeklyData, leadershipData, leadershipLogs] = await Promise.all([
         walletApi.getBalance(),
-        referralApi.getWeeklyStats()
+        referralApi.getWeeklyStats(),
+        leadershipApi.getRoyalty(),
+        leadershipApi.getLogs()
       ]);
 
       if (walletData?.wallet) {
@@ -277,6 +280,15 @@ export const useAppStore = create<AppState>((set, get) => ({
             weeklyBonanza: weeklyData.bonusEarnings || 0,
           }
         }));
+      }
+
+      if (leadershipData) {
+        // We can temporarily store extra data in the weekly state or add to AppState
+        // For now, let's just make sure leadershipLogs are set
+        set({ 
+          leadershipLogs: leadershipLogs.leadershipLogs || [],
+          // We can add more fields to AppState if needed, e.g., royaltyDetails
+        });
       }
     } catch (error) {
       console.error('Failed to fetch wallet data:', error);
