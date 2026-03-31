@@ -292,7 +292,7 @@ export const DashboardView = () => {
       </AnimatePresence>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-5">
         <StatsCard
           icon="solar:graph-up-bold"
           label="Total Earnings"
@@ -302,15 +302,23 @@ export const DashboardView = () => {
           route="/wallet"
         />
         <StatsCard
-          icon="solar:gift-bold"
-          label="Weekly Bonanza"
-          value={`₹${(weeklyStats?.weeklyBonanza ?? 0).toLocaleString()}`}
-          iconBgClass="bg-blue-50 dark:bg-blue-900/30"
-          iconColorClass="text-blue-600 dark:text-blue-400"
-          route="/bonanza"
+          icon="solar:users-group-rounded-bold"
+          label="Referrals"
+          value={`₹${wallet.referral_income?.toLocaleString() || 0}`}
+          iconBgClass="bg-indigo-50 dark:bg-indigo-900/30"
+          iconColorClass="text-indigo-600 dark:text-indigo-400"
+          route="/referrals"
         />
         <StatsCard
-          icon="solar:crown-bold"
+          icon="solar:widget-add-bold"
+          label="Auto-Pool"
+          value={`₹${wallet.matrix_income?.toLocaleString() || 0}`}
+          iconBgClass="bg-orange-50 dark:bg-orange-900/30"
+          iconColorClass="text-orange-600 dark:text-orange-400"
+          route="/matrix"
+        />
+        <StatsCard
+          icon="solar:star-bold"
           label="Leadership"
           value={`₹${wallet.royalty?.toLocaleString() || 0}`}
           iconBgClass="bg-purple-50 dark:bg-purple-900/30"
@@ -318,12 +326,12 @@ export const DashboardView = () => {
           route="/leadership"
         />
         <StatsCard
-          icon="solar:refresh-circle-bold"
-          label="Matrix Cycles"
-          value={`#${matrix.cycle || 1}`}
-          iconBgClass="bg-orange-50 dark:bg-orange-900/30"
-          iconColorClass="text-orange-600 dark:text-orange-400"
-          route="/matrix"
+          icon="solar:medal-star-bold"
+          label="Bonanza"
+          value={`₹${wallet.bonanza_income?.toLocaleString() || 0}`}
+          iconBgClass="bg-amber-50 dark:bg-amber-900/30"
+          iconColorClass="text-amber-600 dark:text-amber-400"
+          route="/bonanza"
         />
       </div>
 

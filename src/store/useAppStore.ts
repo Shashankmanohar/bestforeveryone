@@ -63,6 +63,7 @@ export interface AppState {
     matrix_income: number;
     referral_income: number;
     royalty: number;
+    bonanza_income: number;
     matrixWallet: number;
   };
 
@@ -124,6 +125,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     matrix_income: 0,
     referral_income: 0,
     royalty: 0,
+    bonanza_income: 0,
     matrixWallet: 0
   },
 
@@ -267,6 +269,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             matrix_income: walletData.wallet.matrixIncome || 0,
             referral_income: walletData.wallet.referralIncome || 0,
             royalty: walletData.wallet.royalty || 0,
+            bonanza_income: walletData.wallet.bonanzaIncome || 0,
           }
         }));
       }

@@ -23,6 +23,13 @@ export const LeadershipView = () => {
   }, [fetchWalletData]);
 
   const directsCount = royaltyInfo?.directsCount || 0;
+  const globalTeamCount = royaltyInfo?.globalTeamCount || 0;
+
+  const tiers = [
+    { label: 'Star Pool', req: 6, percent: '3%', color: 'emerald', icon: 'solar:star-bold' },
+    { label: 'Double Star', req: 12, percent: '6%', color: 'blue', icon: 'solar:stars-bold' },
+    { label: 'Super Star', req: 18, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold' }
+  ];
 
   return (
     <motion.div
@@ -42,49 +49,97 @@ export const LeadershipView = () => {
           <div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Weekly Royalty Pool</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Earn a share of the total company sponsoring pool (₹200 per ID) distributed every Friday. Reach direct referral milestones to qualify for different pool percentages.
+              Earn a share of the total company sponsoring pool (₹200 per ID) distributed every Friday. Your <span className="font-bold text-indigo-600 dark:text-indigo-400">Entire Global Team</span> (all levels) counts toward qualification. Reach milestones progressively to unlock higher pools.
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Team Stats Summary */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-white/5 p-4 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <Icon icon="solar:users-group-rounded-bold" width={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Direct Referrals</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{directsCount}</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-white/5 p-4 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <Icon icon="solar:people-nearby-bold" width={20} />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Global Team (All Levels)</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white">{globalTeamCount}</p>
           </div>
         </div>
       </div>
 
       {/* Qualification Progress */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {[
-          { label: 'Star Pool', req: 6, percent: '3%', color: 'emerald' },
-          { label: 'Double Star', req: 12, percent: '6%', color: 'blue' },
-          { label: 'Super Star', req: 18, percent: '11%', color: 'amber' }
-        ].map((tier, idx) => {
-          const progress = Math.min((directsCount / tier.req) * 100, 100);
-          const isQualified = directsCount >= tier.req;
+        {tiers.map((tier, idx) => {
+          const prevReq = idx === 0 ? 0 : tiers[idx - 1].req;
+          const isQualified = globalTeamCount >= tier.req;
+          const isNextTierStarted = globalTeamCount > prevReq;
+
+          // Progressive progress calculation
+          let progress = 0;
+          if (globalTeamCount >= tier.req) {
+            progress = 100;
+          } else if (globalTeamCount > prevReq) {
+            // How far into THIS pool's requirement segment we are
+            const segmentProgress = globalTeamCount - prevReq;
+            const segmentTotal = tier.req - prevReq;
+            progress = (segmentProgress / segmentTotal) * 100;
+          }
+
+          const colorMap: any = {
+            emerald: 'bg-emerald-500',
+            blue: 'bg-blue-500',
+            amber: 'bg-amber-500'
+          };
 
           return (
-            <div key={idx} className={`bg-white dark:bg-gray-900/40 p-5 rounded-3xl border ${isQualified ? 'border-emerald-500/30' : 'border-gray-200 dark:border-white/5'} shadow-sm relative overflow-hidden`}>
+            <div key={idx} className={`bg-white dark:bg-gray-900/40 p-5 rounded-3xl border transition-all duration-300 ${isQualified ? 'border-emerald-500/30 shadow-lg shadow-emerald-500/5' : isNextTierStarted ? 'border-indigo-500/30 shadow-lg shadow-indigo-500/5' : 'border-gray-200 dark:border-white/5 opacity-60'} shadow-sm relative overflow-hidden`}>
               <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tier.label}</p>
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white">{tier.percent} Pool</h4>
+                <div className="flex items-center gap-2">
+                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${isQualified ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
+                    <Icon icon={tier.icon} width={18} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tier.label}</p>
+                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">{tier.percent} Pool</h4>
+                  </div>
                 </div>
                 {isQualified ? (
                   <div className="h-6 w-6 bg-emerald-500 text-white rounded-full flex items-center justify-center">
                     <Icon icon="solar:check-read-linear" width={14} />
                   </div>
-                ) : (
+                ) : isNextTierStarted ? (
                   <div className="text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-lg">
-                    {tier.req - directsCount} More
+                    {tier.req - globalTeamCount} More
+                  </div>
+                ) : (
+                  <div className="h-6 w-6 bg-gray-200 dark:bg-gray-800 text-gray-400 rounded-full flex items-center justify-center">
+                    <Icon icon="solar:lock-bold" width={12} />
                   </div>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between text-[10px] font-bold uppercase">
-                  <span className="text-gray-400">Verified Directs</span>
-                  <span className={isQualified ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}>{directsCount}/{tier.req}</span>
+                  <span className="text-gray-400">Team Progress</span>
+                  <span className={isQualified ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}>
+                    {isQualified ? (tier.req - prevReq) : Math.max(0, globalTeamCount - prevReq)}/{(tier.req - prevReq)}
+                  </span>
                 </div>
                 <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
                     className={`h-full ${isQualified ? 'bg-emerald-500' : 'bg-indigo-500'}`}
                   />
                 </div>
@@ -93,6 +148,26 @@ export const LeadershipView = () => {
           );
         })}
       </div>
+
+      {/* Level Breakdown */}
+      {royaltyInfo?.levelStats && Object.keys(royaltyInfo.levelStats).length > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Team Breakdown by Level</h3>
+            <span className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded-full font-bold uppercase">Verified Members</span>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+              {Object.entries(royaltyInfo.levelStats).map(([level, count]: [string, any]) => (
+                <div key={level} className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-100 dark:border-gray-700/50 flex flex-col items-center justify-center text-center group hover:border-indigo-500/30 transition-colors">
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 group-hover:text-indigo-500 transition-colors">Level {level}</span>
+                  <p className="text-2xl font-black text-gray-900 dark:text-white">{count}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

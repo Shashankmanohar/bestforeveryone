@@ -114,6 +114,44 @@ export const WalletView = () => {
         </div>
       </div>
 
+      {/* Income Breakdown */}
+      <div className="pt-2">
+        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-4">Income Breakdown</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/30 transition-all">
+            <div className="h-10 w-10 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center mb-3">
+              <Icon icon="solar:users-group-rounded-bold" width={20} />
+            </div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Referral Income</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mt-1 amount-value">₹{wallet.referral_income.toLocaleString()}</p>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm group hover:border-blue-500/30 transition-all">
+            <div className="h-10 w-10 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center mb-3">
+              <Icon icon="solar:widget-add-bold" width={20} />
+            </div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Matrix Income</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mt-1 amount-value">₹{wallet.matrix_income.toLocaleString()}</p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm group hover:border-purple-500/30 transition-all">
+            <div className="h-10 w-10 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center mb-3">
+              <Icon icon="solar:star-bold" width={20} />
+            </div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Weekly Royalty</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mt-1 amount-value">₹{wallet.royalty.toLocaleString()}</p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm group hover:border-amber-500/30 transition-all">
+            <div className="h-10 w-10 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center mb-3">
+              <Icon icon="solar:medal-star-bold" width={20} />
+            </div>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Bonanza Income</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white mt-1 amount-value">₹{wallet.bonanza_income.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
       {/* Transaction List */}
       <div className="bg-white dark:bg-gray-950/80 backdrop-blur-xl rounded-3xl border border-gray-200 dark:border-white/10 shadow-card overflow-hidden">
         <div className="p-5 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5">

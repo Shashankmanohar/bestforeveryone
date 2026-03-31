@@ -13,7 +13,7 @@ export const ReferralsView = () => {
 
   const [referralCode, setReferralCode] = useState(user?.referralCode || '');
   const [referralMembers, setReferralMembers] = useState<any[]>([]);
-  const [totalVerified, setTotalVerified] = useState(0);
+  const [globalTeamCount, setGlobalTeamCount] = useState(0);
   const [weeklyStats, setWeeklyStats] = useState({
     directReferrals: 0,
     bonusThreshold: 2,
@@ -38,7 +38,7 @@ export const ReferralsView = () => {
 
         if (codeData?.referralCode) setReferralCode(codeData.referralCode);
         if (membersData?.referrals) setReferralMembers(membersData.referrals);
-        if (membersData?.totalVerified !== undefined) setTotalVerified(membersData.totalVerified);
+        if (membersData?.globalTeamCount !== undefined) setGlobalTeamCount(membersData.globalTeamCount);
         if (statsData) setWeeklyStats(statsData);
       } catch (error) {
         console.error('Failed to fetch referral data:', error);
@@ -60,10 +60,6 @@ export const ReferralsView = () => {
     showToast('Link Copied', 'Referral link copied to clipboard.');
   };
 
-  const progressPercentage = Math.min(
-    (weeklyStats.directReferrals / weeklyStats.bonusThreshold) * 100,
-    100
-  );
 
   const verifiedMembers = referralMembers.filter(m => m.verified && m.status === 'active');
 
@@ -231,84 +227,85 @@ export const ReferralsView = () => {
         </div>
       </div>
 
+
       {/* Royalty Qualification Progress */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 p-4 sm:p-6 shadow-card">
         <div className="flex items-center justify-between mb-4 sm:mb-5">
           <div className="flex flex-col">
             <h3 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white">Royalty Qualification</h3>
-            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Reach direct referral targets to unlock weekly royalty pools</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Reach global team targets to unlock weekly royalty pools</p>
           </div>
           <Icon icon="solar:cup-star-bold" className="text-amber-500" width={20} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Star Pool: 6 */}
-          <div className={`p-4 rounded-2xl border-2 transition-all ${totalVerified >= 6 ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+          <div className={`p-4 rounded-2xl border-2 transition-all ${globalTeamCount >= 6 ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
             <div className="flex items-center justify-between mb-3">
-               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${totalVerified >= 6 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
-                 <Icon icon={totalVerified >= 6 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
+               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${globalTeamCount >= 6 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                 <Icon icon={globalTeamCount >= 6 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
                </div>
-               {totalVerified >= 6 && <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Qualified</span>}
+               {globalTeamCount >= 6 && <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Qualified</span>}
             </div>
             <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Star Pool</p>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">6 Directs (3% Pool)</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">6 Global Team (3% Pool)</p>
             <div className="space-y-1.5">
               <div className="flex justify-between text-[10px] font-medium">
                 <span className="text-gray-400">Progress</span>
-                <span className="text-gray-900 dark:text-white">{Math.min(totalVerified, 6)}/6</span>
+                <span className="text-gray-900 dark:text-white">{Math.min(globalTeamCount, 6)}/6</span>
               </div>
               <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-emerald-500 transition-all duration-500" 
-                  style={{ width: `${Math.min((totalVerified / 6) * 100, 100)}%` }} 
+                  style={{ width: `${Math.min((globalTeamCount / 6) * 100, 100)}%` }} 
                 />
               </div>
             </div>
           </div>
 
           {/* Double Star Pool: 12 */}
-          <div className={`p-4 rounded-2xl border-2 transition-all ${totalVerified >= 12 ? 'border-blue-500/20 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+          <div className={`p-4 rounded-2xl border-2 transition-all ${globalTeamCount >= 12 ? 'border-blue-500/20 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
             <div className="flex items-center justify-between mb-3">
-               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${totalVerified >= 12 ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
-                 <Icon icon={totalVerified >= 12 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
+               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${globalTeamCount >= 12 ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                 <Icon icon={globalTeamCount >= 12 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
                </div>
-               {totalVerified >= 12 && <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Qualified</span>}
+               {globalTeamCount >= 12 && <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Qualified</span>}
             </div>
             <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Double Star</p>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">12 Directs (6% Pool)</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">12 Global Team (6% Pool)</p>
             <div className="space-y-1.5">
               <div className="flex justify-between text-[10px] font-medium">
                 <span className="text-gray-400">Progress</span>
-                <span className="text-gray-900 dark:text-white">{Math.min(totalVerified, 12)}/12</span>
+                <span className="text-gray-900 dark:text-white">{Math.min(Math.max(0, globalTeamCount - 6), 6)}/6</span>
               </div>
               <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-blue-500 transition-all duration-500" 
-                  style={{ width: `${Math.min((totalVerified / 12) * 100, 100)}%` }} 
+                  style={{ width: `${Math.min((Math.max(0, globalTeamCount - 6) / 6) * 100, 100)}%` }} 
                 />
               </div>
             </div>
           </div>
 
           {/* Super Star Pool: 18 */}
-          <div className={`p-4 rounded-2xl border-2 transition-all ${totalVerified >= 18 ? 'border-amber-500/20 bg-amber-50/50 dark:bg-amber-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+          <div className={`p-4 rounded-2xl border-2 transition-all ${globalTeamCount >= 18 ? 'border-amber-500/20 bg-amber-50/50 dark:bg-amber-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
             <div className="flex items-center justify-between mb-3">
-               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${totalVerified >= 18 ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
-                 <Icon icon={totalVerified >= 18 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
+               <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${globalTeamCount >= 18 ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
+                 <Icon icon={globalTeamCount >= 18 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
                </div>
-               {totalVerified >= 18 && <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Qualified</span>}
+               {globalTeamCount >= 18 && <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Qualified</span>}
             </div>
             <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Super Star</p>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">18 Directs (11% Pool)</p>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">18 Global Team (11% Pool)</p>
             <div className="space-y-1.5">
               <div className="flex justify-between text-[10px] font-medium">
                 <span className="text-gray-400">Progress</span>
-                <span className="text-gray-900 dark:text-white">{Math.min(totalVerified, 18)}/18</span>
+                <span className="text-gray-900 dark:text-white">{Math.min(Math.max(0, globalTeamCount - 12), 6)}/6</span>
               </div>
               <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-amber-500 transition-all duration-500" 
-                  style={{ width: `${Math.min((totalVerified / 18) * 100, 100)}%` }} 
+                  style={{ width: `${Math.min((Math.max(0, globalTeamCount - 12) / 6) * 100, 100)}%` }} 
                 />
               </div>
             </div>
