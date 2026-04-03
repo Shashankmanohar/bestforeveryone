@@ -27,8 +27,8 @@ export const LeadershipView = () => {
 
   const tiers = [
     { label: 'Star Pool', req: 6, percent: '3%', color: 'emerald', icon: 'solar:star-bold' },
-    { label: 'Double Star', req: 12, percent: '6%', color: 'blue', icon: 'solar:stars-bold' },
-    { label: 'Super Star', req: 18, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold' }
+    { label: 'Double Star', req: 18, percent: '6%', color: 'blue', icon: 'solar:stars-bold' },
+    { label: 'Super Star', req: 36, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold' }
   ];
 
   return (
@@ -49,7 +49,7 @@ export const LeadershipView = () => {
           <div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Weekly Royalty Pool</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Earn a share of the total company sponsoring pool (₹200 per ID) distributed every Friday. Your <span className="font-bold text-indigo-600 dark:text-indigo-400">Entire Global Team</span> (all levels) counts toward qualification. Reach milestones progressively to unlock higher pools.
+              Earn a share of the total company sponsoring pool (₹200 per ID) distributed every Sunday. Your <span className="font-bold text-indigo-600 dark:text-indigo-400">Direct Referrals (Verified)</span> count toward qualification. Reach milestones progressively to unlock higher pools.
             </p>
           </div>
         </div>
@@ -81,16 +81,16 @@ export const LeadershipView = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {tiers.map((tier, idx) => {
           const prevReq = idx === 0 ? 0 : tiers[idx - 1].req;
-          const isQualified = globalTeamCount >= tier.req;
-          const isNextTierStarted = globalTeamCount > prevReq;
+          const isQualified = directsCount >= tier.req;
+          const isNextTierStarted = directsCount > prevReq;
 
           // Progressive progress calculation
           let progress = 0;
-          if (globalTeamCount >= tier.req) {
+          if (directsCount >= tier.req) {
             progress = 100;
-          } else if (globalTeamCount > prevReq) {
+          } else if (directsCount > prevReq) {
             // How far into THIS pool's requirement segment we are
-            const segmentProgress = globalTeamCount - prevReq;
+            const segmentProgress = directsCount - prevReq;
             const segmentTotal = tier.req - prevReq;
             progress = (segmentProgress / segmentTotal) * 100;
           }
@@ -119,7 +119,7 @@ export const LeadershipView = () => {
                   </div>
                 ) : isNextTierStarted ? (
                   <div className="text-[10px] font-bold text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-lg">
-                    {tier.req - globalTeamCount} More
+                    {tier.req - directsCount} More
                   </div>
                 ) : (
                   <div className="h-6 w-6 bg-gray-200 dark:bg-gray-800 text-gray-400 rounded-full flex items-center justify-center">
@@ -132,7 +132,7 @@ export const LeadershipView = () => {
                 <div className="flex justify-between text-[10px] font-bold uppercase">
                   <span className="text-gray-400">Team Progress</span>
                   <span className={isQualified ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}>
-                    {isQualified ? (tier.req - prevReq) : Math.max(0, globalTeamCount - prevReq)}/{(tier.req - prevReq)}
+                    {isQualified ? (tier.req - prevReq) : Math.max(0, directsCount - prevReq)}/{(tier.req - prevReq)}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">

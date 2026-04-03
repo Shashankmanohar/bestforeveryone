@@ -6,9 +6,9 @@ if (!API_BASE_URL && import.meta.env.PROD) {
 }
 
 // Token management
-const getToken = () => localStorage.getItem('token');
-const setToken = (token: string) => localStorage.setItem('token', token);
-const removeToken = () => localStorage.removeItem('token');
+const getToken = () => sessionStorage.getItem('token');
+const setToken = (token: string) => sessionStorage.setItem('token', token);
+const removeToken = () => sessionStorage.removeItem('token');
 
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -143,6 +143,9 @@ export const matrixApi = {
     getStatus: () => apiClient('/user/matrix'),
     getTree: (cycle?: number) => apiClient(`/user/matrix/tree${cycle ? `?cycle=${cycle}` : ''}`),
     getHistory: () => apiClient('/user/matrix/history'),
+    submitReEntry: () => apiClient('/user/matrix/re-entry', {
+        method: 'POST'
+    }),
 };
 
 // Referral API

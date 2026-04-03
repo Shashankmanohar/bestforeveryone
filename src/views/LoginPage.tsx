@@ -134,6 +134,9 @@ export const LoginPage = () => {
                             Sign Up
                         </button>
                     </p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                        Made by <a href="https://webfloratechnologies.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-bold">Webflora Technologies</a>
+                    </p>
                 </div>
             </div>
         </div>

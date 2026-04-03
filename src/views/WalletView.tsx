@@ -3,8 +3,9 @@ import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/PageHeader';
 import { useAppStore } from '@/store/useAppStore';
 import { useState, useEffect } from 'react';
-import { walletApi } from '@/lib/api';
+import { walletApi, epinApi } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useToast } from '@/hooks/use-toast';
 
 interface Transaction {
   _id: string;
@@ -16,9 +17,10 @@ interface Transaction {
 }
 
 export const WalletView = () => {
-  const { user } = useAuthStore();
   const { wallet, fetchWalletData, transactions, fetchTransactions } = useAppStore();
   const [loading, setLoading] = useState(true);
+  const [buying, setBuying] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -112,6 +114,55 @@ export const WalletView = () => {
             <Icon icon="solar:crown-bold" width={28} />
           </div>
         </div>
+      </div>
+
+      {/* Buy E-pin Section */}
+      <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-3xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl">
+            <Icon icon="solar:ticket-bold-duotone" />
+          </div>
+          <div>
+            <h4 className="text-xl font-bold">Generate Activation E-pin</h4>
+            <p className="text-blue-100 text-sm opacity-90">Purchase a pin for ₹1,357 to activate other accounts.</p>
+          </div>
+        </div>
+        <button 
+          onClick={async () => {
+            if (wallet.balance < 1357) {
+              toast({
+                title: "Insufficient Balance",
+                description: "You need at least ₹1,357 to purchase an E-pin.",
+                variant: "destructive"
+              });
+              return;
+            }
+            if (confirm("Are you sure you want to purchase an E-pin for ₹1,357?")) {
+              setBuying(true);
+              try {
+                await epinApi.buy();
+                toast({
+                  title: "Success!",
+                  description: "E-pin purchased successfully. View it in 'Activate Others' section.",
+                });
+                fetchWalletData();
+                fetchTransactions();
+              } catch (error: any) {
+                toast({
+                  title: "Purchase Failed",
+                  description: error.message || "Failed to purchase E-pin",
+                  variant: "destructive"
+                });
+              } finally {
+                setBuying(false);
+              }
+            }
+          }}
+          className={`px-8 py-3 bg-white text-indigo-600 rounded-2xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-all text-sm flex items-center gap-2 ${buying ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {buying ? <Icon icon="solar:restart-bold" className="animate-spin" /> : <Icon icon="solar:cart-large-bold" />}
+          {buying ? 'Processing...' : 'Buy Now'}
+        </button>
       </div>
 
       {/* Income Breakdown */}

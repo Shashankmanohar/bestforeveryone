@@ -25,8 +25,9 @@ export const AdminLoginView = () => {
             });
 
             const { token, admin } = response.data;
-            localStorage.setItem('adminToken', token);
+            sessionStorage.setItem('adminToken', token);
             loginAsAdmin(admin, token);
+
 
             toast({
                 title: 'Login Successful',
@@ -185,8 +186,11 @@ export const AdminLoginView = () => {
                     >
                         Return to User Portal
                     </button>
-                    <p className="text-[10px] text-slate-400 font-mono">
+                    <p className="text-[10px] text-slate-400 font-mono mb-2">
                         SYSTEM V2.4.0 • SECURE CONNECTION
+                    </p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                        Made by <a href="https://webfloratechnologies.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-bold">Webflora Technologies</a>
                     </p>
                 </div>
             </div>

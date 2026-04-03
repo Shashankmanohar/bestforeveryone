@@ -19,9 +19,9 @@ export const MatrixView = () => {
   // Payment states for re-entry modal
   const [paymentStep, setPaymentStep] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [upiId, setUpiId] = useState('');
   const [qrUrl, setQrUrl] = useState('');
   const [showQR, setShowQR] = useState(false);
+  const [isModalDismissed, setIsModalDismissed] = useState(false);
 
   useEffect(() => {
     const refreshProfile = async () => {
@@ -83,8 +83,8 @@ export const MatrixView = () => {
     fetchMatrixData();
   }, [selectedCycle]);
 
-  const handleUPIPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUPIPayment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setIsProcessingPayment(true);
 
     const trId = `BFE-RE-${user?.username}-${Date.now()}`;
@@ -103,6 +103,28 @@ export const MatrixView = () => {
         description: 'Scan the QR code to complete re-entry payment',
       });
     }, 1000);
+  };
+
+  const handleConfirmPayment = async () => {
+    try {
+      setIsProcessingPayment(true);
+      await matrixApi.submitReEntry();
+      toast({
+        title: 'Payment Submitted',
+        description: 'Your re-entry request is now pending admin approval.',
+      });
+      // Refresh profile to get updated paymentStatus
+      const profile = await authApi.getProfile();
+      if (profile) useAuthStore.getState().updateUser(profile);
+    } catch (error: any) {
+      toast({
+        title: 'Submission Failed',
+        description: error.message || 'Failed to submit payment details',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const handleDownloadQR = async () => {
@@ -161,7 +183,12 @@ export const MatrixView = () => {
               return (
                 <button
                   key={c}
-                  onClick={() => setSelectedCycle(c)}
+                  onClick={() => {
+                    if (c === maxCycle && user?.isReEntryPending) {
+                      setIsModalDismissed(false);
+                    }
+                    setSelectedCycle(c);
+                  }}
                   className={`px-4 py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-300 ${isActive
                     ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
                     : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -313,13 +340,20 @@ export const MatrixView = () => {
       )}
 
       {/* Re-entry Modal */}
-      {user?.isReEntryPending && (
+      {user?.isReEntryPending && !isModalDismissed && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white dark:bg-gray-950 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden"
+            className="bg-white dark:bg-gray-950 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden relative"
           >
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsModalDismissed(true)}
+              className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors z-10"
+            >
+              <Icon icon="solar:close-circle-bold" width={24} />
+            </button>
             <div className="p-6 sm:p-8 text-center">
               {paymentStep === 1 ? (
                 <>
@@ -347,71 +381,89 @@ export const MatrixView = () => {
                     </div>
                   </div>
 
-                  <form onSubmit={handleUPIPayment} className="space-y-4">
-                    <div className="text-left space-y-1.5">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Your UPI ID</label>
-                      <input
-                        type="text"
-                        value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        placeholder="example@upi"
-                        required
-                        className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white"
-                      />
-                    </div>
+                  <div className="space-y-4">
 
                     <button
-                      type="submit"
-                      disabled={isProcessingPayment}
+                      onClick={() => handleUPIPayment()}
+                      disabled={isProcessingPayment || user?.paymentStatus === 'submitted'}
                       className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {isProcessingPayment ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        'Generate QR & Pay ₹1,180'
+                        user?.paymentStatus === 'submitted' ? 'Waiting for Approval...' : 'Generate QR & Pay ₹1,180'
                       )}
                     </button>
-                  </form>
+                    {user?.paymentStatus === 'submitted' && (
+                      <p className="text-[10px] text-amber-600 font-bold mt-2 text-center">
+                        You have already submitted a payment. Please wait for admin approval.
+                      </p>
+                    )}
+                  </div>
                 </>
               ) : (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="mb-6">
-                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1">Step 2: Complete Payment</p>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Pay ₹1,180</h3>
-                  </div>
+                  {user?.paymentStatus === 'submitted' ? (
+                     <div className="py-6">
+                        <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                           <Icon icon="solar:clock-circle-bold" width={40} />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Awaiting Approval</h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
+                           Your re-entry payment has been submitted and is waiting for admin verification. 
+                           You can continue to use other platform features in the meantime.
+                        </p>
+                        <button
+                           onClick={() => window.location.reload()}
+                           className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3.5 rounded-xl transition-all"
+                        >
+                           Dismiss
+                        </button>
+                     </div>
+                  ) : (
+                    <>
+                      <div className="mb-6">
+                        <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1">Step 2: Complete Payment</p>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Pay ₹1,180</h3>
+                      </div>
 
-                  <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm inline-block mb-6 mx-auto">
-                    <img src={qrUrl} alt="Payment QR" className="w-48 h-48 sm:w-56 sm:h-56" />
-                  </div>
+                      <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm inline-block mb-6 mx-auto">
+                        <img src={qrUrl} alt="Payment QR" className="w-48 h-48 sm:w-56 sm:h-56" />
+                      </div>
 
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 mb-6 text-center border border-gray-100 dark:border-gray-800">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Payment ID</p>
-                    <p className="text-sm font-mono font-bold text-gray-900 dark:text-white">paytm.s21tpy8@pty</p>
-                  </div>
+                      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-4 mb-6 text-center border border-gray-100 dark:border-gray-800">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Payment ID</p>
+                        <p className="text-sm font-mono font-bold text-gray-900 dark:text-white">paytm.s21tpy8@pty</p>
+                      </div>
 
-                  <div className="flex flex-col gap-3">
-                    <button
-                      onClick={handleDownloadQR}
-                      className="flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform"
-                    >
-                      <Icon icon="solar:download-minimalistic-bold" width={18} />
-                      Download QR Code
-                    </button>
-                    
-                    <button
-                      onClick={() => window.location.reload()}
-                      className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3.5 rounded-xl transition-all"
-                    >
-                      Done, I've Paid
-                    </button>
-                    
-                    <button
-                      onClick={() => setPaymentStep(1)}
-                      className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      Back to details
-                    </button>
-                  </div>
+                      <div className="flex flex-col gap-3">
+                        <button
+                          onClick={handleDownloadQR}
+                          className="flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:scale-105 transition-transform"
+                        >
+                          <Icon icon="solar:download-minimalistic-bold" width={18} />
+                          Download QR Code
+                        </button>
+                        
+                        <button
+                          onClick={handleConfirmPayment}
+                          disabled={isProcessingPayment}
+                          className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {isProcessingPayment ? (
+                             <div className="w-5 h-5 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+                          ) : "Done, I've Paid"}
+                        </button>
+                        
+                        <button
+                          onClick={() => setPaymentStep(1)}
+                          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          Back to details
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

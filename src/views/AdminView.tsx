@@ -5,8 +5,9 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useToast } from '@/hooks/use-toast';
 import { Icon } from '@iconify/react';
 import { useThemeStore } from '@/store/useThemeStore';
+import { AdminEpinView } from './AdminEpinView';
 
-type ViewType = 'dashboard' | 'users' | 'payments' | 'withdrawals' | 'ledger' | 'matrix' | 'completions' | 'settings';
+type ViewType = 'dashboard' | 'users' | 'payments' | 'withdrawals' | 'ledger' | 'matrix' | 'completions' | 'epins' | 'settings';
 
 export const AdminView = () => {
     const [currentView, setCurrentView] = useState<ViewType>('dashboard');
@@ -56,6 +57,12 @@ export const AdminView = () => {
                 fetchLedger();
             } else if (currentView === 'completions') {
                 fetchCompletedCycles();
+            } else if (currentView === 'epins') {
+                const fetchEpinData = async () => {
+                    const { fetchEpins, fetchEpinStats } = useAdminStore.getState();
+                    await Promise.all([fetchEpins(), fetchEpinStats()]);
+                };
+                fetchEpinData();
             }
         };
 
@@ -102,6 +109,7 @@ export const AdminView = () => {
                     <NavItem icon="solar:checklist-minimalistic-bold-duotone" label="Ledger & Royalty" active={currentView === 'ledger'} onClick={() => setCurrentView('ledger')} />
                     <NavItem icon="solar:layers-minimalistic-bold-duotone" label="Matrix Control" active={currentView === 'matrix'} onClick={() => setCurrentView('matrix')} />
                     <NavItem icon="solar:history-bold-duotone" label="Completed Cycles" active={currentView === 'completions'} onClick={() => setCurrentView('completions')} />
+                    <NavItem icon="solar:ticket-bold-duotone" label="E-Pin Management" active={currentView === 'epins'} onClick={() => setCurrentView('epins')} />
                     <div className="pt-4 mt-4 border-t border-slate-800/50">
                         <NavItem icon="solar:settings-bold-duotone" label="System Settings" active={currentView === 'settings'} onClick={() => setCurrentView('settings')} />
                     </div>
@@ -187,6 +195,7 @@ export const AdminView = () => {
                             }}
                         />
                     )}
+                    {currentView === 'epins' && <AdminEpinView />}
                     {currentView === 'settings' && <SettingsContent />}
                 </div>
             </main>
@@ -363,7 +372,7 @@ const MatrixContent = ({ matrixTree, onSearch, loading }: { matrixTree: any; onS
                                 {matrixTree.user?.fullname?.charAt(0)}
                             </div>
                             <h4 className="font-bold text-slate-900 dark:text-white">{matrixTree.user?.fullname}</h4>
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">@{matrixTree.user?.username}</p>
+                            <p className="text-xs text-slate-500 font-bold tracking-wider mb-2">@{matrixTree.user?.username}</p>
                             <div className="flex justify-center gap-1">
                                 {[...Array(6)].map((_, i) => (
                                     <div key={i} className={`h-2 w-2 rounded-full ${i < (matrixTree.level1?.length || 0) ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-200 dark:bg-white/10'}`}></div>
@@ -458,9 +467,10 @@ const UsersContent = ({ users }: { users: any[] }) => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5">
-                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">User Details</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Full Name</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">User Name & Email</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Status</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Balances</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Earning & Balance</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
@@ -472,10 +482,13 @@ const UsersContent = ({ users }: { users: any[] }) => {
                                             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-50 to-white dark:from-white/5 dark:to-white/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform">
                                                 {user.fullname?.charAt(0)}
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{user.username}</p>
-                                            </div>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-col">
+                                            <p className="text-[10px] text-slate-400 font-bold tracking-wider">{user.username}</p>
+                                            <p className="text-xs text-indigo-500 font-medium lowercase truncate max-w-[180px]">{user.email}</p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
@@ -484,8 +497,10 @@ const UsersContent = ({ users }: { users: any[] }) => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <p className="text-sm font-bold text-slate-900 dark:text-white">₹{user.wallet?.currentBalance?.toLocaleString() || '0'}</p>
-                                        <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Earnings: ₹{user.wallet?.totalEarnings?.toLocaleString() || '0'}</p>
+                                        <div className="flex flex-col">
+                                            <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Earnings: ₹{user.wallet?.totalEarnings?.toLocaleString() || '0'}</p>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white">Balance: ₹{user.wallet?.balance?.toLocaleString() || '0'}</p>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <button
@@ -529,7 +544,13 @@ const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="h-10 w-10 rounded-xl bg-white dark:bg-white/10 text-indigo-500 flex items-center justify-center text-xl shadow-sm border border-slate-200 dark:border-white/10"><Icon icon="solar:user-rounded-bold" /></div>
-                                            <div><p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p><p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{user.username}</p></div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p>
+                                                <div className="flex flex-col">
+                                                    <p className="text-[10px] text-slate-400 font-bold tracking-wider">{user.username}</p>
+                                                    <p className="text-[10px] text-indigo-500 font-medium lowercase italic">{user.email}</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4"><p className="text-xs font-bold text-slate-900 dark:text-white">{new Date(user.updatedAt).toLocaleDateString()}</p><p className="text-[10px] text-slate-400 font-medium">{new Date(user.updatedAt).toLocaleTimeString()}</p></td>
@@ -566,7 +587,13 @@ const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
                         </div>
                         <div className="flex items-center gap-3 mb-6">
                             <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-2xl border border-indigo-500/20 group-hover:scale-110 transition-all"><Icon icon="solar:card-send-bold-duotone" /></div>
-                            <div><p className="text-sm font-bold text-slate-900 dark:text-white">{w.user?.fullname}</p><p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{w.user?.username}</p></div>
+                            <div>
+                                <p className="text-sm font-bold text-slate-900 dark:text-white">{w.user?.fullname}</p>
+                                <div className="flex flex-col">
+                                    <p className="text-[10px] text-slate-500 font-bold tracking-wider">{w.user?.username}</p>
+                                    <p className="text-[10px] text-indigo-500 font-medium lowercase italic">{w.user?.email}</p>
+                                </div>
+                            </div>
                         </div>
                         <div className="space-y-4 mb-6">
                             <div className="p-4 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200/30 dark:border-white/5">
@@ -614,7 +641,7 @@ const LedgerContent = ({ transactions }: { transactions: any[] }) => {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center font-bold text-xs text-slate-500 group-hover:text-amber-500 transition-colors border border-slate-200 dark:border-white/10">{tx.user?.username?.charAt(0) || 'U'}</div>
-                                            <div><p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{tx.user?.fullname}</p><p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{tx.user?.username}</p></div>
+                                            <div><p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{tx.user?.fullname}</p><p className="text-[10px] text-slate-400 font-bold tracking-wider">{tx.user?.username}</p></div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4"><p className="text-xs font-bold text-slate-900 dark:text-white mb-0.5">{tx.type}</p><p className="text-[10px] text-slate-400 font-medium truncate max-w-[200px]">{tx.description}</p></td>
@@ -694,7 +721,10 @@ const CompletionsContent = ({ completions, onViewTree }: { completions: any[], o
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[200px]">{c.fullname}</p>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{c.username}</p>
+                                                <div className="flex flex-col">
+                                                    <p className="text-[10px] text-slate-400 font-bold tracking-wider">{c.username}</p>
+                                                    <p className="text-[10px] text-indigo-500 font-medium lowercase italic">{c.email}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>

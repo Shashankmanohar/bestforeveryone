@@ -77,6 +77,8 @@ interface AdminState {
     royaltyStats: any | null;
     matrixTree: any | null;
     completedCycles: any[];
+    epins: any[];
+    pinStats: any | null;
     loading: boolean;
     error: string | null;
 
@@ -90,6 +92,10 @@ interface AdminState {
     fetchPendingPayments: () => Promise<void>;
     fetchMatrixTree: (userId: string, cycle?: number) => Promise<void>;
     fetchCompletedCycles: () => Promise<void>;
+    fetchEpins: () => Promise<void>;
+    fetchEpinStats: () => Promise<void>;
+    generateEpins: (count: number, amount: number) => Promise<void>;
+    assignEpin: (pinIds: string[], username: string) => Promise<void>;
     approveWithdrawal: (id: string, status: 'approved' | 'rejected', reason?: string) => Promise<void>;
     adjustWallet: (userId: string, amount: number, type: 'credit' | 'debit', description?: string) => Promise<void>;
     updateUserStatus: (userId: string, status: string) => Promise<void>;
@@ -108,6 +114,8 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     royaltyStats: null,
     matrixTree: null,
     completedCycles: [],
+    epins: [],
+    pinStats: null,
     loading: false,
     error: null,
 
@@ -278,6 +286,51 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             return response.data;
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to distribute royalty' });
+            throw error;
+        }
+    },
+
+    fetchEpins: async () => {
+        set({ loading: true, error: null });
+        try {
+            const response = await adminApi.get('/epin/list');
+            set({ epins: response.data.epins, loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to fetch e-pins', loading: false });
+        }
+    },
+
+    fetchEpinStats: async () => {
+        set({ loading: true, error: null });
+        try {
+            const response = await adminApi.get('/epin/stats');
+            set({ pinStats: response.data.stats, loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to fetch e-pin stats', loading: false });
+        }
+    },
+
+    generateEpins: async (count, amount) => {
+        set({ loading: true, error: null });
+        try {
+            await adminApi.post('/epin/generate', { count, amount });
+            await get().fetchEpins();
+            await get().fetchEpinStats();
+            set({ loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to generate e-pins', loading: false });
+            throw error;
+        }
+    },
+
+    assignEpin: async (pinIds, username) => {
+        set({ loading: true, error: null });
+        try {
+            await adminApi.post('/epin/assign', { pinIds, targetUsername: username });
+            await get().fetchEpins();
+            set({ loading: false });
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to assign e-pins', loading: false });
             throw error;
         }
     },

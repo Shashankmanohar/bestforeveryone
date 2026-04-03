@@ -118,6 +118,13 @@ export const Sidebar = () => {
             onClick={() => handleNavigate('/referrals')}
           />
           <NavItem
+            icon="solar:ticket-bold-duotone"
+            label="Activate Others"
+            route="/activate-others"
+            isActive={isActive('/activate-others')}
+            onClick={() => handleNavigate('/activate-others')}
+          />
+          <NavItem
             icon="solar:file-text-linear"
             label="Business Plan"
             route="/business-plan"
@@ -224,6 +231,13 @@ export const Sidebar = () => {
             </div>
             <Icon icon="solar:alt-arrow-right-linear" className="text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />
           </button>
+
+          {/* Credits */}
+          <div className="pt-2 text-center">
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+              Made by <a href="https://webfloratechnologies.com" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors font-bold">Webflora Technologies</a>
+            </p>
+          </div>
         </div>
       </aside>
     </>

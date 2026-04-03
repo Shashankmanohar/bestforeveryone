@@ -85,7 +85,7 @@ export const BusinessPlanView = () => {
                         <div className="p-6 bg-white dark:bg-gray-900 space-y-4">
                             <div className="flex justify-between items-center py-2.5 border-b border-gray-50">
                                 <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 flex items-center gap-2"><Icon icon="solar:users-group-rounded-bold" className="text-amber-400" /> Requirement</span>
-                                <span className="text-sm font-bold text-gray-900 dark:text-white">12 Direct Referrals</span>
+                                <span className="text-sm font-bold text-gray-900 dark:text-white">18 Direct Referrals</span>
                             </div>
                             <div className="flex justify-between items-center py-2.5 border-b border-gray-50">
                                 <span className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 flex items-center gap-2"><Icon icon="solar:wallet-money-bold" className="text-amber-400" /> Weekly Royalty</span>
@@ -117,7 +117,7 @@ export const BusinessPlanView = () => {
                         <div className="p-6 bg-gray-900 space-y-4 relative z-10">
                             <div className="flex justify-between items-center py-2.5 border-b border-gray-800">
                                 <span className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2"><Icon icon="solar:users-group-rounded-bold" className="text-purple-400" /> Requirement</span>
-                                <span className="text-sm font-bold text-white">18 Direct Referrals</span>
+                                <span className="text-sm font-bold text-white">36 Direct Referrals</span>
                             </div>
                             <div className="flex justify-between items-center py-2.5 border-b border-gray-800">
                                 <span className="text-sm text-gray-400 dark:text-gray-500 flex items-center gap-2"><Icon icon="solar:wallet-money-bold" className="text-purple-400" /> Weekly Royalty</span>
@@ -173,7 +173,7 @@ export const BusinessPlanView = () => {
                         </div>
 
                         <p className="text-xs text-indigo-200/60 max-w-xl mx-auto">
-                            Calculated dynamically every Friday based on total company growth and the number of qualified achievers in each specific pool (Not Accumulative — you earn from your highest qualified tier only).
+                            Calculated dynamically every Sunday based on total company growth and the number of qualified achievers in each specific pool (Accumulative Bonus — you earn from all pools you have qualified for).
                         </p>
                     </div>
                 </div>

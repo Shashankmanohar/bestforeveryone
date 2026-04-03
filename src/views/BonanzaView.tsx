@@ -56,7 +56,7 @@ export const BonanzaView = () => {
           <div>
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">How Bonanza Works</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              Earn amazing rewards every week (Monday to Friday)! Refer 2 people to get ₹400, refer 3 people to get ₹600, refer 4 people to get ₹800, and so on. Reach the target to unlock your weekly Bonanza!
+              Earn amazing rewards every week (Monday to Sunday)! Refer 2 people to get ₹400, refer 3 people to get ₹600, refer 4 people to get ₹800, and so on. Reach the target to unlock your weekly Bonanza!
             </p>
           </div>
         </div>

@@ -5,10 +5,12 @@ import { authApi, epinApi } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/PageHeader';
+import { useNavigate } from 'react-router-dom';
 
 export const ActivateOthers = () => {
     const { user, updateUser } = useAuthStore();
     const { fetchMatrixStatus } = useAppStore();
+    const navigate = useNavigate();
     const [targetUsername, setTargetUsername] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -188,8 +190,17 @@ export const ActivateOthers = () => {
                             </button>
                         ))
                     ) : (
-                        <div className="col-span-full py-8 text-center text-gray-400 dark:text-gray-500 text-sm italic">
-                            No unused E-pins available
+                        <div className="col-span-full py-8 text-center space-y-4">
+                            <div className="h-12 w-12 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto text-gray-300 dark:text-gray-600">
+                                <Icon icon="solar:ticket-broken" width={24} />
+                            </div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium italic">No unused E-pins available</p>
+                            <button 
+                                onClick={() => navigate('/wallet')}
+                                className="px-6 py-2 bg-blue-600/10 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                            >
+                                Buy E-pins now
+                            </button>
                         </div>
                     )}
                 </div>
