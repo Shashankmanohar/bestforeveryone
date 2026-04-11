@@ -150,6 +150,13 @@ export const Sidebar = () => {
             isActive={isActive('/withdraw')}
             onClick={() => handleNavigate('/withdraw')}
           />
+          <NavItem
+            icon="solar:ticket-bold"
+            label="E-Pin Management"
+            route="/epin"
+            isActive={isActive('/epin')}
+            onClick={() => handleNavigate('/epin')}
+          />
 
           {/* Rewards Section */}
           <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 px-3 mt-6">
@@ -225,8 +232,9 @@ export const Sidebar = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user?.fullname || 'User'}</p>
-              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold truncate flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> {user?.status || 'Active'}
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate font-medium">@{user?.username}</p>
+              <p className={`text-[10px] font-bold truncate flex items-center gap-1 mt-0.5 ${user?.status === 'blocked' ? 'text-rose-600 dark:text-rose-500' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${user?.status === 'blocked' ? 'bg-rose-500' : 'bg-emerald-500'}`} /> {user?.status || 'Active'}
               </p>
             </div>
             <Icon icon="solar:alt-arrow-right-linear" className="text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white transition-colors" />

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
 import { PageHeader } from '@/components/PageHeader';
 import { leadershipApi } from '@/lib/api';
+import { AnimatedNumber } from '@/components/AnimatedNumber';
 
 export const LeadershipView = () => {
   const { wallet, leadershipLogs, fetchWalletData } = useAppStore();
@@ -26,9 +27,9 @@ export const LeadershipView = () => {
   const globalTeamCount = royaltyInfo?.globalTeamCount || 0;
 
   const tiers = [
-    { label: 'Star Pool', req: 6, percent: '3%', color: 'emerald', icon: 'solar:star-bold' },
-    { label: 'Double Star', req: 18, percent: '6%', color: 'blue', icon: 'solar:stars-bold' },
-    { label: 'Super Star', req: 36, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold' }
+    { label: 'Star Pool', req: 6, percent: '3%', color: 'emerald', icon: 'solar:star-bold', cap: 10000 },
+    { label: 'Double Star', req: 18, percent: '6%', color: 'blue', icon: 'solar:stars-bold', cap: 50000 },
+    { label: 'Super Star', req: 36, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold', cap: 100000 }
   ];
 
   return (
@@ -127,21 +128,45 @@ export const LeadershipView = () => {
                   </div>
                 )}
               </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-[10px] font-bold uppercase">
-                  <span className="text-gray-400">Team Progress</span>
-                  <span className={isQualified ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}>
-                    {isQualified ? (tier.req - prevReq) : Math.max(0, directsCount - prevReq)}/{(tier.req - prevReq)}
-                  </span>
+              <div className="space-y-4">
+                {/* Team Progress */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-[10px] font-bold uppercase">
+                    <span className="text-gray-400">Team Progress</span>
+                    <span className={isQualified ? 'text-emerald-500' : 'text-gray-900 dark:text-white'}>
+                      {isQualified ? (tier.req - prevReq) : Math.max(0, directsCount - prevReq)}/{(tier.req - prevReq)}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      className={`h-full ${isQualified ? 'bg-emerald-500' : 'bg-indigo-50'}`}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className={`h-full ${isQualified ? 'bg-emerald-500' : 'bg-indigo-500'}`}
-                  />
+
+                {/* Earning Cap Info */}
+                <div className={`p-3 rounded-2xl border transition-colors ${isQualified ? 'bg-white/50 dark:bg-white/5 border-emerald-500/10' : 'bg-gray-50/50 dark:bg-white/5 border-gray-100 dark:border-white/5'}`}>
+                  <div className="flex justify-between items-end mb-1.5">
+                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Remaining Capacity</span>
+                    <span className={`text-sm font-black font-mono ${isQualified ? (tier.color === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' : tier.color === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400') : 'text-gray-400'}`}>
+                      <AnimatedNumber value={Math.max(0, tier.cap - (wallet?.royalty || 0))} prefix="₹" />
+                    </span>
+                  </div>
+                  <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(((wallet?.royalty || 0) / tier.cap) * 100, 100)}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className={`h-full opacity-60 ${isQualified ? colorMap[tier.color] : 'bg-gray-300'}`} 
+                    />
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <p className="text-[8px] text-gray-400 font-medium">Cap: ₹{tier.cap.toLocaleString()}</p>
+                    <p className="text-[8px] text-gray-400 font-medium">{Math.min(Math.round(((wallet?.royalty || 0) / tier.cap) * 100), 100)}% used</p>
+                  </div>
                 </div>
               </div>
             </div>

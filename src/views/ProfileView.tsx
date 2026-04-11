@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -75,6 +75,12 @@ export const ProfileView = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Refresh user profile to get latest status (e.g. if blocked by admin)
+    const { fetchProfile } = useAuthStore.getState();
+    fetchProfile();
+  }, []);
 
   if (!user) return null;
 

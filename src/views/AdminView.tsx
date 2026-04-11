@@ -6,8 +6,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Icon } from '@iconify/react';
 import { useThemeStore } from '@/store/useThemeStore';
 import { AdminEpinView } from './AdminEpinView';
+import { AdminKycView } from './AdminKycView';
+import adminApi from '@/lib/adminApi';
 
-type ViewType = 'dashboard' | 'users' | 'payments' | 'withdrawals' | 'ledger' | 'matrix' | 'completions' | 'epins' | 'settings';
+type ViewType = 'dashboard' | 'users' | 'payments' | 'withdrawals' | 'kyc' | 'ledger' | 'matrix' | 'completions' | 'epins' | 'settings';
 
 export const AdminView = () => {
     const [currentView, setCurrentView] = useState<ViewType>('dashboard');
@@ -106,6 +108,7 @@ export const AdminView = () => {
                     <NavItem icon="solar:users-group-two-rounded-bold-duotone" label="User Management" active={currentView === 'users'} onClick={() => setCurrentView('users')} />
                     <NavItem icon="solar:card-2-bold-duotone" label="Payment Approvals" active={currentView === 'payments'} onClick={() => setCurrentView('payments')} badge={pendingPayments.length} />
                     <NavItem icon="solar:card-send-bold-duotone" label="Withdrawals" active={currentView === 'withdrawals'} onClick={() => setCurrentView('withdrawals')} />
+                    <NavItem icon="solar:shield-check-bold-duotone" label="KYC Documents" active={currentView === 'kyc'} onClick={() => setCurrentView('kyc')} />
                     <NavItem icon="solar:checklist-minimalistic-bold-duotone" label="Ledger & Royalty" active={currentView === 'ledger'} onClick={() => setCurrentView('ledger')} />
                     <NavItem icon="solar:layers-minimalistic-bold-duotone" label="Matrix Control" active={currentView === 'matrix'} onClick={() => setCurrentView('matrix')} />
                     <NavItem icon="solar:history-bold-duotone" label="Completed Cycles" active={currentView === 'completions'} onClick={() => setCurrentView('completions')} />
@@ -196,6 +199,7 @@ export const AdminView = () => {
                         />
                     )}
                     {currentView === 'epins' && <AdminEpinView />}
+                    {currentView === 'kyc' && <AdminKycView />}
                     {currentView === 'settings' && <SettingsContent />}
                 </div>
             </main>
@@ -455,7 +459,89 @@ const KPICard = ({ title, value, icon, color, onAction }: { title: string; value
 
 
 const UsersContent = ({ users }: { users: any[] }) => {
-    const { updateUserStatus } = useAdminStore();
+    const { updateUserStatus, approveKyc, rejectKyc, updateUserKycBankDetails } = useAdminStore();
+    const [kycUser, setKycUser] = useState<any | null>(null);         // user whose KYC drawer is open
+    const [kycLoading, setKycLoading] = useState(false);
+    const [lightbox, setLightbox] = useState<{ url: string; label: string } | null>(null);
+    const [kycActionLoading, setKycActionLoading] = useState(false);
+    const [editingBank, setEditingBank] = useState(false);
+    const [bankForm, setBankForm] = useState({ accountNumber: '', ifscCode: '', accountHolderName: '', bankName: '' });
+    const { toast } = useToast();
+
+    const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5005' : '');
+    const getPhotoUrl = (path: string | undefined) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path; // Handle Cloudinary absolute URLs
+        // Normalize backslashes and prepend server base
+        return `${API_BASE}/${path.replace(/\\/g, '/')}`;
+    };
+
+    const openKyc = async (user: any) => {
+        setKycUser(user);
+        setEditingBank(false);
+        // Pre-populate bank form from existing KYC
+        setBankForm({
+            accountNumber: user.kyc?.bankDetails?.accountNumber || '',
+            ifscCode: user.kyc?.bankDetails?.ifscCode || '',
+            accountHolderName: user.kyc?.bankDetails?.accountHolderName || '',
+            bankName: user.kyc?.bankDetails?.bankName || '',
+        });
+    };
+
+    const handleKycApprove = async () => {
+        if (!kycUser) return;
+        setKycActionLoading(true);
+        try {
+            await approveKyc(kycUser._id);
+            // After re-fetch, kycUser in local state might still be old, but we want the drawer to stay open
+            // We can find the updated user in the prop users list if needed, but for now just showing toast is enough
+            setKycUser((prev: any) => ({ ...prev, kyc: { ...prev.kyc, status: 'approved' } }));
+            toast({ title: 'KYC Approved', description: `${kycUser.fullname}'s KYC has been approved.` });
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message || 'Failed', variant: 'destructive' });
+        } finally {
+            setKycActionLoading(false);
+        }
+    };
+
+    const handleKycReject = async () => {
+        if (!kycUser) return;
+        const reason = window.prompt('Enter rejection reason:');
+        if (!reason) return;
+        setKycActionLoading(true);
+        try {
+            await rejectKyc(kycUser._id, reason);
+            setKycUser((prev: any) => ({ ...prev, kyc: { ...prev.kyc, status: 'rejected', rejectionReason: reason } }));
+            toast({ title: 'KYC Rejected', description: `${kycUser.fullname}'s KYC has been rejected.` });
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message || 'Failed', variant: 'destructive' });
+        } finally {
+            setKycActionLoading(false);
+        }
+    };
+
+    const handleSaveBank = async () => {
+        if (!kycUser) return;
+        setKycActionLoading(true);
+        try {
+            await updateUserKycBankDetails(kycUser._id, bankForm);
+            setKycUser((prev: any) => ({ ...prev, kyc: { ...prev.kyc, bankDetails: { ...bankForm } } }));
+            setEditingBank(false);
+            toast({ title: 'Bank Details Saved', description: 'KYC bank details updated successfully.' });
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message || 'Failed to save bank details', variant: 'destructive' });
+        } finally {
+            setKycActionLoading(false);
+        }
+    };
+
+    const statusCfg: Record<string, { color: string; bg: string; border: string }> = {
+        approved: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+        pending:  { color: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/20' },
+        rejected: { color: 'text-rose-400',    bg: 'bg-rose-500/10',    border: 'border-rose-500/20' },
+        not_submitted: { color: 'text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/20' },
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
             <div className="flex justify-between items-center px-4">
@@ -470,55 +556,292 @@ const UsersContent = ({ users }: { users: any[] }) => {
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Full Name</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">User Name & Email</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">KYC</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Earning & Balance</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                            {users.map((user) => (
-                                <tr key={user._id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group">
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-50 to-white dark:from-white/5 dark:to-white/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform">
-                                                {user.fullname?.charAt(0)}
+                            {users.map((user) => {
+                                const kyc = user.kyc?.status || 'not_submitted';
+                                const cfg = statusCfg[kyc] || statusCfg.not_submitted;
+                                return (
+                                    <tr key={user._id} className="hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-50 to-white dark:from-white/5 dark:to-white/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform">
+                                                    {user.fullname?.charAt(0)}
+                                                </div>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p>
                                             </div>
-                                            <p className="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[150px]">{user.fullname}</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex flex-col">
-                                            <p className="text-[10px] text-slate-400 font-bold tracking-wider">{user.username}</p>
-                                            <p className="text-xs text-indigo-500 font-medium lowercase truncate max-w-[180px]">{user.email}</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-center">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.status === 'active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'}`}>
-                                            {user.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex flex-col">
-                                            <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Earnings: ₹{user.wallet?.totalEarnings?.toLocaleString() || '0'}</p>
-                                            <p className="text-sm font-bold text-slate-900 dark:text-white">Balance: ₹{user.wallet?.balance?.toLocaleString() || '0'}</p>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => updateUserStatus(user._id, user.status === 'active' ? 'blocked' : 'active')}
-                                            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${user.status === 'active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white hover:shadow-rose-500/30' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white hover:shadow-emerald-500/30'}`}
-                                        >
-                                            {user.status === 'active' ? 'Block Identity' : 'Restore Identity'}
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <p className="text-[10px] text-slate-400 font-bold tracking-wider">{user.username}</p>
+                                                <p className="text-xs text-indigo-500 font-medium lowercase truncate max-w-[180px]">{user.email}</p>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.status === 'active' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-500 border border-rose-500/20'}`}>
+                                                {user.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <button
+                                                onClick={() => openKyc(user)}
+                                                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all hover:scale-105 ${cfg.bg} ${cfg.color} ${cfg.border}`}
+                                                title="View / Edit KYC"
+                                            >
+                                                <Icon icon="solar:shield-check-bold" className="text-sm" />
+                                                {kyc === 'not_submitted' ? 'No KYC' : kyc}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex flex-col">
+                                                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter">Earnings: ₹{user.wallet?.totalEarnings?.toLocaleString() || '0'}</p>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white">Balance: ₹{user.wallet?.balance?.toLocaleString() || '0'}</p>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <button
+                                                onClick={() => {
+                                                    const newStatus = user.status === 'blocked' ? 'active' : 'blocked';
+                                                    if (newStatus === 'blocked' && !window.confirm(`Are you sure you want to BLOCK ${user.fullname}? They will not be able to withdraw funds.`)) return;
+                                                    updateUserStatus(user._id, newStatus);
+                                                }}
+                                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${user.status === 'blocked' ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white shadow-emerald-500/10' : 'bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white shadow-rose-500/10'}`}
+                                            >
+                                                {user.status === 'blocked' ? 'Unblock Account' : 'Block Identity'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* KYC Slide-over Drawer */}
+            {kycUser && (
+                <div className="fixed inset-0 z-50 flex">
+                    {/* Backdrop */}
+                    <div className="flex-1 bg-black/60 backdrop-blur-sm" onClick={() => setKycUser(null)} />
+                    {/* Drawer */}
+                    <div className="w-full max-w-md h-full bg-slate-900 border-l border-white/10 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
+                        {/* Drawer header */}
+                        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-white/5">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-lg">
+                                    {kycUser.fullname?.charAt(0)}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-white">{kycUser.fullname}</p>
+                                    <p className="text-[10px] text-slate-400">@{kycUser.username}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {(() => {
+                                    const cfg = statusCfg[kycUser.kyc?.status || 'not_submitted'];
+                                    return (
+                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${cfg.bg} ${cfg.color} ${cfg.border}`}>
+                                            {kycUser.kyc?.status || 'Not Submitted'}
+                                        </span>
+                                    );
+                                })()}
+                                <button onClick={() => setKycUser(null)} className="h-8 w-8 rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 flex items-center justify-center transition-all">
+                                    <Icon icon="solar:close-bold" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Drawer body */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                            {/* KYC Photos */}
+                            <div>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
+                                    <Icon icon="solar:gallery-bold" className="text-indigo-400" /> Identity Documents
+                                </p>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {/* Aadhar */}
+                                    {(() => {
+                                        const url = getPhotoUrl(kycUser.kyc?.aadharCard);
+                                        return (
+                                            <div
+                                                onClick={() => url && setLightbox({ url, label: `${kycUser.fullname} — Aadhar Card` })}
+                                                className={`relative rounded-2xl overflow-hidden border-2 border-dashed transition-all group ${url ? 'border-blue-500/30 cursor-pointer hover:border-blue-500/60' : 'border-slate-700'}`}
+                                                style={{ aspectRatio: '4/3' }}
+                                            >
+                                                {url ? (
+                                                    <>
+                                                        <img src={url} alt="Aadhar" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                                                            <span className="text-white text-[10px] font-bold flex items-center gap-1"><Icon icon="solar:eye-bold" /> View</span>
+                                                        </div>
+                                                        <div className="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded-full">Aadhar</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="flex flex-col items-center justify-center h-full gap-1 p-4 bg-slate-800/50">
+                                                        <Icon icon="solar:document-bold" className="text-2xl text-slate-600" />
+                                                        <span className="text-[9px] text-slate-500 font-bold text-center">Aadhar Not Uploaded</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                    {/* PAN */}
+                                    {(() => {
+                                        const url = getPhotoUrl(kycUser.kyc?.panCard);
+                                        return (
+                                            <div
+                                                onClick={() => url && setLightbox({ url, label: `${kycUser.fullname} — PAN Card` })}
+                                                className={`relative rounded-2xl overflow-hidden border-2 border-dashed transition-all group ${url ? 'border-amber-500/30 cursor-pointer hover:border-amber-500/60' : 'border-slate-700'}`}
+                                                style={{ aspectRatio: '4/3' }}
+                                            >
+                                                {url ? (
+                                                    <>
+                                                        <img src={url} alt="PAN" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                                                            <span className="text-white text-[10px] font-bold flex items-center gap-1"><Icon icon="solar:eye-bold" /> View</span>
+                                                        </div>
+                                                        <div className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500 text-white text-[9px] font-bold rounded-full">PAN</div>
+                                                    </>
+                                                ) : (
+                                                    <div className="flex flex-col items-center justify-center h-full gap-1 p-4 bg-slate-800/50">
+                                                        <Icon icon="solar:card-bold" className="text-2xl text-slate-600" />
+                                                        <span className="text-[9px] text-slate-500 font-bold text-center">PAN Not Uploaded</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* Bank Details */}
+                            <div>
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                                        <Icon icon="solar:bank-bold" className="text-indigo-400" /> Bank Details
+                                    </p>
+                                    <button
+                                        onClick={() => setEditingBank(!editingBank)}
+                                        className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
+                                    >
+                                        <Icon icon={editingBank ? 'solar:close-bold' : 'solar:pen-bold'} />
+                                        {editingBank ? 'Cancel' : 'Edit'}
+                                    </button>
+                                </div>
+
+                                {editingBank ? (
+                                    <div className="space-y-2">
+                                        {[
+                                            { key: 'accountHolderName', label: 'Account Holder Name' },
+                                            { key: 'bankName', label: 'Bank Name' },
+                                            { key: 'accountNumber', label: 'Account Number' },
+                                            { key: 'ifscCode', label: 'IFSC Code' },
+                                        ].map(({ key, label }) => (
+                                            <div key={key}>
+                                                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">{label}</label>
+                                                <input
+                                                    value={bankForm[key as keyof typeof bankForm]}
+                                                    onChange={(e) => setBankForm(prev => ({ ...prev, [key]: e.target.value }))}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                                                    placeholder={label}
+                                                />
+                                            </div>
+                                        ))}
+                                        <button
+                                            onClick={handleSaveBank}
+                                            disabled={kycActionLoading}
+                                            className="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 mt-1"
+                                        >
+                                            {kycActionLoading ? <Icon icon="eos-icons:loading" className="animate-spin" /> : <Icon icon="solar:check-bold" />}
+                                            Save Bank Details
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="bg-white/5 rounded-2xl p-4 border border-white/5 space-y-2">
+                                        {[
+                                            { label: 'Holder', value: kycUser.kyc?.bankDetails?.accountHolderName },
+                                            { label: 'Bank', value: kycUser.kyc?.bankDetails?.bankName },
+                                            { label: 'Account', value: kycUser.kyc?.bankDetails?.accountNumber },
+                                            { label: 'IFSC', value: kycUser.kyc?.bankDetails?.ifscCode },
+                                        ].map(({ label, value }) => (
+                                            <div key={label} className="flex justify-between text-[11px]">
+                                                <span className="text-slate-500">{label}:</span>
+                                                <span className="font-bold text-white font-mono">{value || '—'}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Submission info */}
+                            {kycUser.kyc?.submittedAt && (
+                                <div className="text-[10px] text-slate-500 text-center">
+                                    Submitted: {new Date(kycUser.kyc.submittedAt).toLocaleString()}
+                                </div>
+                            )}
+                            {kycUser.kyc?.rejectionReason && (
+                                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-[11px] text-rose-400 font-medium">
+                                    ✗ Rejection Reason: {kycUser.kyc.rejectionReason}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Drawer footer actions */}
+                        {kycUser.kyc?.status === 'pending' && (
+                            <div className="p-4 border-t border-white/10 flex gap-3">
+                                <button
+                                    onClick={handleKycReject}
+                                    disabled={kycActionLoading}
+                                    className="flex-1 py-3 rounded-2xl text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all"
+                                >
+                                    {kycActionLoading ? <Icon icon="eos-icons:loading" className="animate-spin mx-auto" /> : 'Reject KYC'}
+                                </button>
+                                <button
+                                    onClick={handleKycApprove}
+                                    disabled={kycActionLoading}
+                                    className="flex-1 py-3 rounded-2xl text-xs font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-1"
+                                >
+                                    {kycActionLoading ? <Icon icon="eos-icons:loading" className="animate-spin" /> : <><Icon icon="solar:check-bold" /> Approve KYC</>}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Photo lightbox */}
+            {lightbox && (
+                <div
+                    className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+                    onClick={() => setLightbox(null)}
+                >
+                    <div className="relative max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-3">
+                            <p className="text-white font-bold text-sm truncate">{lightbox.label}</p>
+                            <button onClick={() => setLightbox(null)} className="h-8 w-8 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all">
+                                <Icon icon="solar:close-bold" />
+                            </button>
+                        </div>
+                        <img src={lightbox.url} alt={lightbox.label} className="w-full rounded-2xl shadow-2xl max-h-[75vh] object-contain bg-slate-900" />
+                        <div className="flex gap-3 mt-3 justify-center">
+                            <a href={lightbox.url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white/10 text-white rounded-xl text-xs font-bold hover:bg-white/20 transition-all flex items-center gap-1.5">
+                                <Icon icon="solar:external-link-bold" /> Open in New Tab
+                            </a>
+                            <a href={lightbox.url} download className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all flex items-center gap-1.5">
+                                <Icon icon="solar:download-bold" /> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
 
 const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
     const { approvePayment, rejectPayment } = useAdminStore();
@@ -571,14 +894,65 @@ const PaymentsContent = ({ pendingPayments }: { pendingPayments: any[] }) => {
 };
 
 const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
+    const { approveWithdrawal } = useAdminStore();
+    const [rejectingId, setRejectingId] = useState<string | null>(null);
+    const [rejectionReason, setRejectionReason] = useState('');
+    const { toast } = useToast();
+
+    const today = new Date();
+    const isSaturday = today.getDay() === 6;
+    const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
+
+    const handleApprove = async (id: string) => {
+        try {
+            await approveWithdrawal(id, 'approved');
+            toast({ title: 'Approved', description: 'Withdrawal approved successfully.' });
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message || 'Failed to approve', variant: 'destructive' });
+        }
+    };
+
+    const handleReject = async (id: string) => {
+        if (!rejectionReason.trim()) {
+            toast({ title: 'Reason required', description: 'Please enter a rejection reason.', variant: 'destructive' });
+            return;
+        }
+        try {
+            await approveWithdrawal(id, 'rejected', rejectionReason);
+            toast({ title: 'Rejected', description: 'Withdrawal rejected.' });
+            setRejectingId(null);
+            setRejectionReason('');
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message || 'Failed to reject', variant: 'destructive' });
+        }
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
             <div className="flex justify-between items-center px-4">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Financial Payout Management</h3>
                 <div className="flex gap-2">
-                    <div className="px-3 py-1 bg-slate-100 dark:bg-white/5 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-widest">{withdrawals.length} Items</div>
+                    <div className="px-3 py-1 bg-slate-100 dark:bg-white/5 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-widest">{withdrawals.length} Pending</div>
                 </div>
             </div>
+
+            {/* Saturday restriction banner */}
+            <div className={`mx-4 rounded-2xl p-4 flex items-center gap-3 border ${isSaturday
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
+                <Icon icon={isSaturday ? 'solar:check-circle-bold' : 'solar:calendar-mark-bold'} className="text-xl shrink-0" />
+                <div>
+                    <p className="text-xs font-bold uppercase tracking-widest">
+                        {isSaturday
+                            ? 'Approval window is OPEN — Today is Saturday'
+                            : `Approval window is CLOSED — Opens on Saturday (${daysUntilSaturday} day${daysUntilSaturday !== 1 ? 's' : ''} away)`}
+                    </p>
+                    <p className="text-[10px] mt-0.5 opacity-70">
+                        Users can submit requests any day. Approvals are processed every Saturday only.
+                    </p>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {withdrawals.map((w) => (
                     <div key={w._id} className="glass-card rounded-[2rem] p-6 border-none shadow-2xl relative group overflow-hidden bg-white/50 dark:bg-[#0f172a]/50">
@@ -595,26 +969,112 @@ const WithdrawalsContent = ({ withdrawals }: { withdrawals: any[] }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="space-y-4 mb-6">
-                            <div className="p-4 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200/30 dark:border-white/5">
-                                <p className="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest">Payout Amount</p>
-                                <p className="text-2xl font-bold text-emerald-500">₹{w.amount?.toLocaleString() || '0'}</p>
+
+                        {/* Amount breakdown */}
+                        <div className="p-4 bg-slate-100/50 dark:bg-white/5 rounded-2xl border border-slate-200/30 dark:border-white/5 space-y-2 mb-4">
+                            <div className="flex justify-between text-[11px]">
+                                <span className="text-slate-500 font-medium">Requested Amount</span>
+                                <span className="font-bold text-slate-900 dark:text-white">₹{w.amount?.toLocaleString() || '0'}</span>
                             </div>
-                            <div className="space-y-2 px-1">
-                                <div className="flex justify-between text-[11px] font-medium"><span className="text-slate-500">Account:</span><span className="text-slate-900 dark:text-slate-300 font-bold select-all tracking-wider">{w.bankDetails?.accountNumber}</span></div>
-                                <div className="flex justify-between text-[11px] font-medium"><span className="text-slate-500">IFSC Code:</span><span className="text-slate-900 dark:text-slate-300 font-bold select-all tracking-wider font-mono">{w.bankDetails?.ifsc}</span></div>
+                            <div className="flex justify-between text-[11px]">
+                                <span className="text-slate-500 font-medium">Admin Fee (20%)</span>
+                                <span className="font-bold text-rose-500">-₹{(w.adminFee ?? w.amount * 0.20)?.toLocaleString()}</span>
+                            </div>
+                            <div className="h-px bg-slate-200 dark:bg-white/10 my-1" />
+                            <div className="flex justify-between items-center">
+                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Net Payable</span>
+                                <span className="text-lg font-bold text-emerald-500">₹{(w.netPayable ?? w.amount * 0.80)?.toLocaleString()}</span>
                             </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button className="flex-1 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-bold shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Approve</button>
-                            <button className="flex-1 py-3 bg-rose-500/10 text-rose-500 rounded-2xl text-xs font-bold border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all">Reject</button>
+
+                        {/* Bank details (Static display) */}
+                        <div className="space-y-1.5 px-1 mb-6">
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1">
+                                <Icon icon="solar:bank-bold" className="text-indigo-400" /> Bank Details
+                            </p>
+                            <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">Account No:</span>
+                                <span className="text-slate-900 dark:text-slate-300 font-bold font-mono">{w.bankDetails?.accountNumber || '—'}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">IFSC:</span>
+                                <span className="text-slate-900 dark:text-slate-300 font-bold font-mono">{w.bankDetails?.ifscCode || '—'}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">Bank:</span>
+                                <span className="text-slate-900 dark:text-slate-300 font-bold">{w.bankDetails?.bankName || '—'}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">Holder:</span>
+                                <span className="text-slate-900 dark:text-slate-300 font-bold">{w.bankDetails?.accountHolderName || '—'}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">Wallet:</span>
+                                <span className={`font-bold uppercase ${w.walletType === 'matrix' ? 'text-emerald-500' : 'text-indigo-400'}`}>{w.walletType || 'current'}</span>
+                            </div>
+                            <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">Requested:</span>
+                                <span className="text-slate-900 dark:text-slate-300 font-bold">{new Date(w.createdAt).toLocaleDateString()}</span>
+                            </div>
                         </div>
+
+                        {rejectingId === w._id ? (
+                            <div className="space-y-2">
+                                <textarea
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    placeholder="Enter rejection reason..."
+                                    className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white resize-none outline-none focus:ring-2 focus:ring-rose-500/30"
+                                    rows={2}
+                                />
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleReject(w._id)}
+                                        disabled={!isSaturday}
+                                        className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${isSaturday ? 'bg-rose-500 text-white hover:scale-[1.02]' : 'bg-slate-200 dark:bg-white/10 text-slate-400 cursor-not-allowed'}`}
+                                    >Confirm Reject</button>
+                                    <button onClick={() => { setRejectingId(null); setRejectionReason(''); }} className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 transition-all">Cancel</button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => handleApprove(w._id)}
+                                    disabled={!isSaturday}
+                                    title={!isSaturday ? 'Approvals only allowed on Saturdays' : ''}
+                                    className={`flex-1 py-3 rounded-2xl text-xs font-bold transition-all ${isSaturday
+                                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98]'
+                                        : 'bg-slate-200 dark:bg-white/5 text-slate-400 cursor-not-allowed'}`}
+                                >
+                                    {isSaturday ? 'Approve' : <span className="flex items-center justify-center gap-1"><Icon icon="solar:lock-bold" className="text-sm" /> Locked</span>}
+                                </button>
+                                <button
+                                    onClick={() => setRejectingId(w._id)}
+                                    disabled={!isSaturday}
+                                    title={!isSaturday ? 'Approvals only allowed on Saturdays' : ''}
+                                    className={`flex-1 py-3 rounded-2xl text-xs font-bold border transition-all ${isSaturday
+                                        ? 'bg-rose-500/10 text-rose-500 border-rose-500/20 hover:bg-rose-500 hover:text-white'
+                                        : 'bg-slate-200 dark:bg-white/5 text-slate-400 border-transparent cursor-not-allowed'}`}
+                                >
+                                    {isSaturday ? 'Reject' : <span className="flex items-center justify-center gap-1"><Icon icon="solar:lock-bold" className="text-sm" /> Locked</span>}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ))}
+                {withdrawals.length === 0 && (
+                    <div className="col-span-3 glass-card rounded-[2rem] p-16 text-center flex flex-col items-center gap-4">
+                        <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 text-3xl">
+                            <Icon icon="solar:wallet-bold-duotone" />
+                        </div>
+                        <p className="text-slate-500 font-bold text-sm">No pending withdrawals</p>
+                    </div>
+                )}
             </div>
         </div>
     );
 };
+
 
 const LedgerContent = ({ transactions }: { transactions: any[] }) => {
     const { distributeRoyalty } = useAdminStore();

@@ -117,12 +117,12 @@ export const UserIDCard: React.FC<UserIDCardProps> = ({ user, onClose }) => {
     const col1X = padding;
     const col2X = width / 2;
 
-    const drawDetail = (label: string, value: string, x: number, y: number) => {
+    const drawDetail = (label: string, value: string, x: number, y: number, color?: string) => {
       ctx.fillStyle = '#9ca3af'; // gray-400
       ctx.font = '500 18px Inter, sans-serif';
       ctx.fillText(label.toUpperCase(), x, y);
       
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = color || '#ffffff';
       ctx.font = 'bold 24px Inter, sans-serif';
       ctx.fillText(value, x, y + 35);
     };
@@ -130,7 +130,7 @@ export const UserIDCard: React.FC<UserIDCardProps> = ({ user, onClose }) => {
     drawDetail('User ID', user.id, col1X, gridY);
     drawDetail('Referral Code', user.referralCode, col2X, gridY);
     drawDetail('Joined Date', user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A', col1X, gridY + 90);
-    drawDetail('Status', user.status || 'Active', col2X, gridY + 90);
+    drawDetail('Status', user.status || 'Active', col2X, gridY + 90, user.status === 'blocked' ? '#ef4444' : '#ffffff');
 
     // Footer
     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';

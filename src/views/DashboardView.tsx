@@ -6,7 +6,6 @@ import { StatsCard } from '@/components/StatsCard';
 import { TransactionItem } from '@/components/TransactionItem';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useAppStore } from '@/store/useAppStore';
-import { walletApi, epinApi } from '@/lib/api';
 import { useState, useEffect } from 'react';
 
 export const DashboardView = () => {
@@ -27,17 +26,10 @@ export const DashboardView = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [epinSuccess, setEpinSuccess] = useState<string | null>(null);
-  const [epins, setEpins] = useState([]);
 
 
-  const fetchMyEpins = async () => {
-    try {
-      const data = await epinApi.getMyEpins();
-      setEpins(data.epins);
-    } catch (error) {
-      console.error('Failed to fetch E-pins:', error);
-    }
-  };
+
+
 
   const handleBuyEpin = async () => {
     setLoading(true);
@@ -47,7 +39,6 @@ export const DashboardView = () => {
       await fetchWalletData(); // Refresh balance
       await fetchMatrixStatus(); // Refresh cycle if influenced
       setEpinSuccess(response.epin.pin);
-      fetchMyEpins(); // Refresh pins list
       fetchStoreTransactions(); // Refresh transactions list
     } catch (err: any) {
       setError(err.message || 'Failed to purchase E-pin');
@@ -57,10 +48,13 @@ export const DashboardView = () => {
   };
 
   useEffect(() => {
+    // Refresh user profile to get latest status (e.g. if blocked by admin)
+    const { fetchProfile } = useAuthStore.getState();
+    fetchProfile();
+
     fetchWalletData();
     fetchStoreTransactions();
     fetchMatrixStatus();
-    fetchMyEpins();
   }, [fetchWalletData, fetchStoreTransactions, fetchMatrixStatus]);
 
 
@@ -71,8 +65,33 @@ export const DashboardView = () => {
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="space-y-6 md:space-y-8"
     >
+      {/* Account Blocked Banner */}
+      {user?.status === 'blocked' && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 shadow-xl shadow-rose-500/10"
+        >
+          <div className="h-16 w-16 bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center shrink-0 animate-pulse">
+            <Icon icon="solar:shield-cross-bold" width={32} />
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-xl font-black text-rose-900 dark:text-rose-200 mb-1">Account Blocked</h3>
+            <p className="text-sm text-rose-700 dark:text-rose-400 font-medium">
+              Your account has been blocked by the administrator. Withdrawal requests and certain financial actions are currently restricted. Please contact support for more information.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/support')}
+            className="px-8 py-3 bg-rose-600 text-white rounded-2xl text-sm font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/20 click-scale w-full md:w-auto"
+          >
+            Contact Support
+          </button>
+        </motion.div>
+      )}
+
       {/* KYC Prompt Banner */}
-      {user?.kyc?.status === 'not_submitted' && !hasSeenKycPrompt && (
+      {user?.kyc?.status === 'not_submitted' && !hasSeenKycPrompt && user?.status !== 'blocked' && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -339,38 +358,12 @@ export const DashboardView = () => {
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex items-center gap-3">
           <Icon icon="solar:info-circle-bold" className="text-amber-600 dark:text-amber-400 text-xl" />
           <p className="text-sm text-amber-900 dark:text-amber-200 font-medium">
-            This is your <strong>5th (final) cycle</strong>. After completing this cycle, account reactivation (₹1,180) will be required to continue.
+            This is your <strong>5th (final) cycle</strong>. After completing this cycle, account reactivation (₹1,357) will be required to continue.
           </p>
         </div>
       )}
 
-      {/* Active E-pins Section */}
-      {epins.filter((p: any) => p.status === 'active').length > 0 && (
-        <div className="pt-2">
-          <div className="flex justify-between items-center mb-4 px-1">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white">Your Active E-pins</h3>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {epins.filter((p: any) => p.status === 'active').map((epin: any) => (
-              <div key={epin._id} className="bg-white dark:bg-gray-900 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/50 shadow-sm flex justify-between items-center">
-                <div>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-bold">E-pin Code</p>
-                  <code className="text-lg font-bold text-blue-600 dark:text-blue-400 tracking-wider transition-all">{epin.pin}</code>
-                </div>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(epin.pin);
-                  }}
-                  className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors click-scale"
-                  title="Copy Pin"
-                >
-                  <Icon icon="solar:copy-linear" width={20} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
 
       {/* Recent Activity */}
       <div className="pt-2">

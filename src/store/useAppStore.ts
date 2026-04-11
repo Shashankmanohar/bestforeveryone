@@ -80,6 +80,10 @@ export interface AppState {
     level1: { total: number; filled: number };
     level2: { total: number; filled: number };
     cycle: number;
+    queuePosition?: number;
+    queueRank?: number;
+    globalWaitlistLength?: number;
+    totalActiveParents?: number;
   };
 
   // Transactions
@@ -107,6 +111,9 @@ export interface AppState {
   fetchTransactions: () => Promise<void>;
   setWallet: (walletData: any) => void;
   setWeekly: (weeklyData: any) => void;
+  myEpins: any[];
+  fetchMyEpins: () => Promise<void>;
+  usePin: (pin: string, targetUsername: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -139,7 +146,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   matrix: {
     level1: { total: 6, filled: 0 },
     level2: { total: 25, filled: 0 },
-    cycle: 1
+    cycle: 1,
+    queuePosition: 0,
+    queueRank: 0,
+    globalWaitlistLength: 0,
+    totalActiveParents: 0
   },
 
   transactions: [],
@@ -160,7 +171,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     bonusEarnings: 0,
     totalEarnings: 0
   },
-
+  myEpins: [],
   isSidebarOpen: false,
 
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
@@ -248,6 +259,27 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
+  fetchMyEpins: async () => {
+    try {
+      const response = await epinApi.getMyEpins();
+      if (response?.epins) {
+        set({ myEpins: response.epins });
+      }
+    } catch (error) {
+      console.error('Failed to fetch my e-pins:', error);
+    }
+  },
+
+  usePin: async (pin, targetUsername) => {
+    try {
+      await epinApi.use(pin, targetUsername);
+      // Refresh pins
+      await get().fetchMyEpins();
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to use E-pin');
+    }
+  },
+
   fetchWalletData: async () => {
     try {
       const [walletData, weeklyData, leadershipData, leadershipLogs] = await Promise.all([
@@ -288,7 +320,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (leadershipData) {
         // We can temporarily store extra data in the weekly state or add to AppState
         // For now, let's just make sure leadershipLogs are set
-        set({ 
+        set({
           leadershipLogs: leadershipLogs.leadershipLogs || [],
           // We can add more fields to AppState if needed, e.g., royaltyDetails
         });
@@ -302,8 +334,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     try {
       const { matrixApi } = await import('@/lib/api');
       const data = await matrixApi.getStatus();
-      if (data?.matrix) {
-        set({ matrix: data.matrix });
+      if (data) {
+        set({
+          matrix: {
+            ...(data.matrix || {}),
+            queuePosition: data.queuePosition || 0,
+            queueRank: data.queueRank || 0,
+            globalWaitlistLength: data.globalWaitlistLength || 0,
+            totalActiveParents: data.totalActiveParents || 0
+          }
+        });
       }
     } catch (error) {
       console.error('Failed to fetch matrix status:', error);

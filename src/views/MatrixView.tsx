@@ -5,10 +5,13 @@ import { PageHeader } from '@/components/PageHeader';
 import { useState, useEffect } from 'react';
 import { matrixApi, authApi } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 export const MatrixView = () => {
   const { user } = useAuthStore();
+  const { matrix: storeMatrix, fetchMatrixStatus } = useAppStore();
   const [matrixData, setMatrixData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<any[]>([]);
@@ -59,19 +62,23 @@ export const MatrixView = () => {
   useEffect(() => {
     const fetchMatrixData = async () => {
       if (selectedCycle === null) return;
-      
+
       try {
         setLoading(true);
-        const data = await matrixApi.getTree(selectedCycle);
-        if (data) {
-          setMatrixData(data);
-          if (data.maxCycle) setMaxCycle(data.maxCycle);
-          
-          // Update re-entry status in store if it changed
-          if (data.isReEntryPending !== undefined) {
-             const { updateUser } = useAuthStore.getState();
-             updateUser({ isReEntryPending: data.isReEntryPending });
-          }
+        // Always refresh status from store (Queue Position, etc)
+        fetchMatrixStatus();
+
+        const treeData = await matrixApi.getTree(selectedCycle);
+
+        if (treeData) {
+          setMatrixData(treeData);
+          if (treeData.maxCycle) setMaxCycle(treeData.maxCycle);
+
+          const { updateUser } = useAuthStore.getState();
+          updateUser({ 
+            isReEntryPending: treeData.isReEntryPending,
+            paymentStatus: treeData.paymentStatus 
+          });
         }
       } catch (error) {
         console.error('Failed to fetch matrix data:', error);
@@ -81,7 +88,14 @@ export const MatrixView = () => {
     };
 
     fetchMatrixData();
-  }, [selectedCycle]);
+
+    // Auto-refresh queue status every 10 seconds
+    const intervalId = setInterval(() => {
+      fetchMatrixStatus();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedCycle, fetchMatrixStatus]);
 
   const handleUPIPayment = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -89,9 +103,9 @@ export const MatrixView = () => {
 
     const trId = `BFE-RE-${user?.username}-${Date.now()}`;
     const receiverUpi = 'paytm.s21tpy8@pty';
-    const amount = 1180;
+    const amount = 1357;
     const data = `upi://pay?pa=${receiverUpi}&pn=BestForEveryone&am=${amount}&cu=INR&tr=${trId}`;
-    
+
     setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`);
 
     setTimeout(() => {
@@ -173,7 +187,7 @@ export const MatrixView = () => {
     >
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <PageHeader title="6X Matrix Tree" subtitle="Auto-Fill System" />
-        
+
         {/* Cycle Selector */}
         {maxCycle > 1 && (
           <div className="flex items-center gap-1.5 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-1.5 rounded-2xl shadow-sm">
@@ -204,14 +218,14 @@ export const MatrixView = () => {
 
       {/* Historical View Warning */}
       {selectedCycle !== null && selectedCycle < maxCycle && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50 p-3 rounded-xl flex items-center gap-3"
         >
           <Icon icon="solar:history-bold-duotone" width={20} className="text-amber-600" />
           <p className="text-xs text-amber-800 dark:text-amber-400 font-semibold">
-            You are viewing historical data for <span className="underline decoration-2 underline-offset-2">Cycle #{selectedCycle}</span>. 
+            You are viewing historical data for <span className="underline decoration-2 underline-offset-2">Cycle #{selectedCycle}</span>.
             This cycle is completed and finalized.
           </p>
         </motion.div>
@@ -275,6 +289,47 @@ export const MatrixView = () => {
             )}
           </div>
         </div>
+
+        {/* Queue Status Card */}
+        <div className="bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-gray-800 shadow-card">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wide mb-1">
+                YOUR RANK IN QUEUE
+              </p>
+              <h3 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tighter">
+                #{storeMatrix?.queueRank || '--'}
+              </h3>
+            </div>
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0">
+              <Icon icon="solar:ranking-bold-duotone" width={24} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800/50">
+               <p className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase font-bold mb-1">Next Child at</p>
+               <p className="text-sm font-bold text-gray-900 dark:text-white">+{storeMatrix?.queuePosition || '--'}</p>
+            </div>
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
+               <p className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-bold mb-1">Waitlist Depth</p>
+               <p className="text-sm font-bold text-gray-900 dark:text-white">
+                 {storeMatrix?.globalWaitlistLength || 0} IDs
+               </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 mt-3">
+            <div className="bg-gray-50 dark:bg-gray-800/50 p-2.5 rounded-xl border border-gray-100 dark:border-gray-800 flex justify-between items-center">
+               <p className="text-[9px] text-gray-400 uppercase font-bold">Total Active Parents</p>
+               <p className="text-xs font-bold text-gray-700 dark:text-gray-300">{storeMatrix?.totalActiveParents || 0} People</p>
+            </div>
+          </div>
+
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-4 leading-relaxed italic">
+            *Rank represents your turn in the Global FIFO line. Next Child shows how many signups are needed before you receive a placement.
+          </p>
+        </div>
       </div>
 
       {/* Matrix Tree Visualization */}
@@ -287,7 +342,7 @@ export const MatrixView = () => {
             <div className="h-6 w-1 bg-indigo-600 rounded-full" />
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Completion History</h3>
           </div>
-          
+
           <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -348,14 +403,32 @@ export const MatrixView = () => {
             className="bg-white dark:bg-gray-950 w-full max-w-md rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden relative"
           >
             {/* Close Button */}
-            <button 
+            <button
               onClick={() => setIsModalDismissed(true)}
               className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors z-10"
             >
               <Icon icon="solar:close-circle-bold" width={24} />
             </button>
             <div className="p-6 sm:p-8 text-center">
-              {paymentStep === 1 ? (
+              {user?.paymentStatus === 'submitted' ? (
+                <>
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon icon="solar:clock-circle-bold-duotone" width={48} />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Awaiting Approval</h3>
+                  <p className="text-muted-foreground text-sm mb-6">
+                    Your re-entry payment is currently being verified by our team. 
+                    Please wait for approval to enter the next cycle.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    fullWidth 
+                    onClick={() => setIsModalDismissed(true)}
+                  >
+                    Close
+                  </Button>
+                </>
+              ) : paymentStep === 1 ? (
                 <>
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Icon icon="solar:crown-minimalistic-bold-duotone" width={40} className="sm:hidden" />
@@ -377,7 +450,7 @@ export const MatrixView = () => {
                     <div className="h-px bg-gray-200 dark:bg-gray-800 w-full" />
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-500 dark:text-gray-400 font-medium">Re-entry Fee</span>
-                      <span className="text-gray-900 dark:text-white font-bold">₹1,180</span>
+                      <span className="text-gray-900 dark:text-white font-bold">₹1,357</span>
                     </div>
                   </div>
 
@@ -391,7 +464,7 @@ export const MatrixView = () => {
                       {isProcessingPayment ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        user?.paymentStatus === 'submitted' ? 'Waiting for Approval...' : 'Generate QR & Pay ₹1,180'
+                        user?.paymentStatus === 'submitted' ? 'Waiting for Approval...' : 'Generate QR & Pay ₹1,357'
                       )}
                     </button>
                     {user?.paymentStatus === 'submitted' && (
@@ -404,27 +477,27 @@ export const MatrixView = () => {
               ) : (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                   {user?.paymentStatus === 'submitted' ? (
-                     <div className="py-6">
-                        <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                           <Icon icon="solar:clock-circle-bold" width={40} />
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Awaiting Approval</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
-                           Your re-entry payment has been submitted and is waiting for admin verification. 
-                           You can continue to use other platform features in the meantime.
-                        </p>
-                        <button
-                           onClick={() => window.location.reload()}
-                           className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3.5 rounded-xl transition-all"
-                        >
-                           Dismiss
-                        </button>
-                     </div>
+                    <div className="py-6">
+                      <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Icon icon="solar:clock-circle-bold" width={40} />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Awaiting Approval</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">
+                        Your re-entry payment has been submitted and is waiting for admin verification.
+                        You can continue to use other platform features in the meantime.
+                      </p>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3.5 rounded-xl transition-all"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
                   ) : (
                     <>
                       <div className="mb-6">
                         <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1">Step 2: Complete Payment</p>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Pay ₹1,180</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Pay ₹1,357</h3>
                       </div>
 
                       <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm inline-block mb-6 mx-auto">
@@ -444,17 +517,17 @@ export const MatrixView = () => {
                           <Icon icon="solar:download-minimalistic-bold" width={18} />
                           Download QR Code
                         </button>
-                        
+
                         <button
                           onClick={handleConfirmPayment}
                           disabled={isProcessingPayment}
                           className="w-full bg-gray-900 dark:bg-white dark:text-gray-900 text-white font-bold py-3.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {isProcessingPayment ? (
-                             <div className="w-5 h-5 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+                            <div className="w-5 h-5 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
                           ) : "Done, I've Paid"}
                         </button>
-                        
+
                         <button
                           onClick={() => setPaymentStep(1)}
                           className="text-xs text-gray-400 hover:text-gray-600 transition-colors"

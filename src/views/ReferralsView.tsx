@@ -240,7 +240,7 @@ export const ReferralsView = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Star Pool: 6 */}
-          <div className={`p-4 rounded-2xl border-2 transition-all ${verifiedMembers.length >= 6 ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+          <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col ${verifiedMembers.length >= 6 ? 'border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
             <div className="flex items-center justify-between mb-3">
                <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${verifiedMembers.length >= 6 ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
                  <Icon icon={verifiedMembers.length >= 6 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
@@ -249,7 +249,7 @@ export const ReferralsView = () => {
             </div>
             <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Star Pool</p>
             <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">6 Direct Referrals (3% Pool)</p>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 mb-4">
               <div className="flex justify-between text-[10px] font-medium">
                 <span className="text-gray-400">Progress</span>
                 <span className="text-gray-900 dark:text-white">{Math.min(verifiedMembers.length, 6)}/6</span>
@@ -261,10 +261,46 @@ export const ReferralsView = () => {
                 />
               </div>
             </div>
+
+            {/* Earning Cap Info */}
+            <div className="mt-2 p-3 bg-white/50 dark:bg-white/5 rounded-xl border border-emerald-100/50 dark:border-emerald-500/10">
+              <div className="flex justify-between items-end mb-1">
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Remaining capacity</span>
+                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 font-mono">
+                  <AnimatedNumber value={Math.max(0, 10000 - (user?.wallet?.royalty || 0))} prefix="₹" />
+                </span>
+              </div>
+              <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-emerald-400/50 transition-all duration-700" 
+                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 10000) * 100, 100)}%` }} 
+                />
+              </div>
+              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹10,000 total royalty</p>
+            </div>
+
+            {/* Visualization */}
+            <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/5">
+              <div className="grid grid-cols-3 gap-y-3 gap-x-1">
+                {[...Array(6)].map((_, i) => {
+                  const member = verifiedMembers[i];
+                  return (
+                    <div key={i} className={`flex flex-col items-center gap-1 transition-all duration-300 ${member ? 'opacity-100 scale-100' : 'opacity-20 scale-95'}`}>
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm border ${member ? 'bg-emerald-500 border-emerald-400 text-white shadow-emerald-500/20' : 'border-dashed border-gray-400 text-gray-400'}`}>
+                        {member ? member.name.charAt(0).toUpperCase() : i + 1}
+                      </div>
+                      <span className="text-[7px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter truncate w-14 text-center">
+                        {member ? member.name.split(' ')[0] : `POS ${i + 1}`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Double Star Pool: 18 */}
-          <div className={`p-4 rounded-2xl border-2 transition-all ${verifiedMembers.length >= 18 ? 'border-blue-500/20 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+          <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col ${verifiedMembers.length >= 18 ? 'border-blue-500/20 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
             <div className="flex items-center justify-between mb-3">
                <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${verifiedMembers.length >= 18 ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
                  <Icon icon={verifiedMembers.length >= 18 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
@@ -273,7 +309,7 @@ export const ReferralsView = () => {
             </div>
             <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Double Star</p>
             <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">18 Direct Referrals (6% Pool)</p>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 mb-4">
               <div className="flex justify-between text-[10px] font-medium">
                 <span className="text-gray-400">Progress</span>
                 <span className="text-gray-900 dark:text-white">{Math.min(Math.max(0, verifiedMembers.length - 6), 12)}/12</span>
@@ -285,10 +321,46 @@ export const ReferralsView = () => {
                 />
               </div>
             </div>
+
+            {/* Earning Cap Info */}
+            <div className="mt-2 p-3 bg-white/50 dark:bg-white/5 rounded-xl border border-blue-100/50 dark:border-blue-500/10">
+              <div className="flex justify-between items-end mb-1">
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Remaining capacity</span>
+                <span className="text-sm font-black text-blue-600 dark:text-blue-400 font-mono">
+                  <AnimatedNumber value={Math.max(0, 50000 - (user?.wallet?.royalty || 0))} prefix="₹" />
+                </span>
+              </div>
+              <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-400/50 transition-all duration-700" 
+                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 50000) * 100, 100)}%` }} 
+                />
+              </div>
+              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹50,000 total royalty</p>
+            </div>
+
+            {/* Visualization */}
+            <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/5">
+              <div className="grid grid-cols-4 gap-y-3 gap-x-1">
+                {[...Array(12)].map((_, i) => {
+                  const member = verifiedMembers[i + 6];
+                  return (
+                    <div key={i} className={`flex flex-col items-center gap-1 transition-all duration-300 ${member ? 'opacity-100 scale-100' : 'opacity-20 scale-95'}`}>
+                      <div className={`h-7 w-7 rounded-full flex items-center justify-center text-[9px] font-bold shadow-sm border ${member ? 'bg-blue-500 border-blue-400 text-white shadow-blue-500/20' : 'border-dashed border-gray-400 text-gray-400'}`}>
+                        {member ? member.name.charAt(0).toUpperCase() : i + 7}
+                      </div>
+                      <span className="text-[6px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter truncate w-10 text-center">
+                        {member ? member.name.split(' ')[0] : `POS ${i + 7}`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Super Star Pool: 36 */}
-          <div className={`p-4 rounded-2xl border-2 transition-all ${verifiedMembers.length >= 36 ? 'border-amber-500/20 bg-amber-50/50 dark:bg-amber-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
+          <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col ${verifiedMembers.length >= 36 ? 'border-amber-500/20 bg-amber-50/50 dark:bg-amber-900/10' : 'border-gray-100 dark:border-gray-800 bg-gray-50/30'}`}>
             <div className="flex items-center justify-between mb-3">
                <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${verifiedMembers.length >= 36 ? 'bg-amber-500 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400'}`}>
                  <Icon icon={verifiedMembers.length >= 36 ? "solar:check-circle-bold" : "solar:star-bold"} width={16} />
@@ -297,7 +369,7 @@ export const ReferralsView = () => {
             </div>
             <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">Super Star</p>
             <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-3">36 Direct Referrals (11% Pool)</p>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 mb-4">
               <div className="flex justify-between text-[10px] font-medium">
                 <span className="text-gray-400">Progress</span>
                 <span className="text-gray-900 dark:text-white">{Math.min(Math.max(0, verifiedMembers.length - 18), 18)}/18</span>
@@ -307,6 +379,42 @@ export const ReferralsView = () => {
                   className="h-full bg-amber-500 transition-all duration-500" 
                   style={{ width: `${Math.min((Math.max(0, verifiedMembers.length - 18) / 18) * 100, 100)}%` }} 
                 />
+              </div>
+            </div>
+
+            {/* Earning Cap Info */}
+            <div className="mt-2 p-3 bg-white/50 dark:bg-white/5 rounded-xl border border-amber-100/50 dark:border-amber-500/10">
+              <div className="flex justify-between items-end mb-1">
+                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Remaining capacity</span>
+                <span className="text-sm font-black text-amber-600 dark:text-amber-400 font-mono">
+                  <AnimatedNumber value={Math.max(0, 100000 - (user?.wallet?.royalty || 0))} prefix="₹" />
+                </span>
+              </div>
+              <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-amber-400/50 transition-all duration-700" 
+                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 100000) * 100, 100)}%` }} 
+                />
+              </div>
+              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹1,00,000 total royalty</p>
+            </div>
+
+            {/* Visualization */}
+            <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/5">
+              <div className="grid grid-cols-6 gap-y-3 gap-x-1">
+                {[...Array(18)].map((_, i) => {
+                  const member = verifiedMembers[i + 18];
+                  return (
+                    <div key={i} className={`flex flex-col items-center gap-1 transition-all duration-300 ${member ? 'opacity-100 scale-100' : 'opacity-20 scale-95'}`}>
+                      <div className={`h-6 w-6 rounded-full flex items-center justify-center text-[8px] font-bold shadow-sm border ${member ? 'bg-amber-500 border-amber-400 text-white shadow-amber-500/20' : 'border-dashed border-gray-400 text-gray-400'}`}>
+                        {member ? member.name.charAt(0).toUpperCase() : i + 19}
+                      </div>
+                      <span className="text-[5px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter truncate w-8 text-center">
+                        {member ? member.name.split(' ')[0] : `P${i + 19}`}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

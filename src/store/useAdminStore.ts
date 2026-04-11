@@ -97,10 +97,14 @@ interface AdminState {
     generateEpins: (count: number, amount: number) => Promise<void>;
     assignEpin: (pinIds: string[], username: string) => Promise<void>;
     approveWithdrawal: (id: string, status: 'approved' | 'rejected', reason?: string) => Promise<void>;
+    updateWithdrawalBankDetails: (id: string, bankDetails: { accountNumber?: string; ifscCode?: string; accountHolderName?: string; bankName?: string }) => Promise<void>;
     adjustWallet: (userId: string, amount: number, type: 'credit' | 'debit', description?: string) => Promise<void>;
     updateUserStatus: (userId: string, status: string) => Promise<void>;
     approvePayment: (userId: string) => Promise<void>;
     rejectPayment: (userId: string, reason?: string) => Promise<void>;
+    updateUserKycBankDetails: (userId: string, bankDetails: { accountNumber?: string; ifscCode?: string; accountHolderName?: string; bankName?: string }) => Promise<void>;
+    approveKyc: (userId: string) => Promise<void>;
+    rejectKyc: (userId: string, reason?: string) => Promise<void>;
     distributeRoyalty: () => Promise<any>;
 }
 
@@ -226,6 +230,22 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         }
     },
 
+    updateWithdrawalBankDetails: async (id, bankDetails) => {
+        try {
+            const response = await adminApi.patch(`/withdrawals/${id}/bank-details`, bankDetails);
+            // Optimistically update local state
+            set((state) => ({
+                withdrawals: state.withdrawals.map((w) =>
+                    w._id === id ? { ...w, bankDetails: { ...w.bankDetails, ...bankDetails } } : w
+                )
+            }));
+            return response.data;
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to update bank details' });
+            throw error;
+        }
+    },
+
     adjustWallet: async (userId, amount, type, description) => {
         try {
             await adminApi.post(`/users/${userId}/wallet`,
@@ -274,6 +294,37 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             await get().fetchPendingPayments();
         } catch (error: any) {
             set({ error: error.response?.data?.message || 'Failed to reject payment' });
+            throw error;
+        }
+    },
+
+    updateUserKycBankDetails: async (userId, bankDetails) => {
+        try {
+            await adminApi.patch(`/kyc/${userId}/bank-details`, bankDetails);
+            // Refresh users to sync everything
+            await get().fetchUsers();
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to update KYC bank details' });
+            throw error;
+        }
+    },
+
+    approveKyc: async (userId) => {
+        try {
+            await adminApi.put(`/kyc/approve/${userId}`);
+            await get().fetchUsers();
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to approve KYC' });
+            throw error;
+        }
+    },
+
+    rejectKyc: async (userId, reason) => {
+        try {
+            await adminApi.put(`/kyc/reject/${userId}`, { reason });
+            await get().fetchUsers();
+        } catch (error: any) {
+            set({ error: error.response?.data?.message || 'Failed to reject KYC' });
             throw error;
         }
     },

@@ -26,6 +26,7 @@ import { ActivateOthers } from "./views/ActivateOthers";
 import { SupportView } from "./views/SupportView";
 import { KycView } from "./views/KycView";
 import { AdminKycView } from "./views/AdminKycView";
+import { EpinPageView } from "./views/EpinPageView";
 import { BusinessPlanView } from "./views/BusinessPlanView";
 import { authApi } from "./lib/api";
 import { useAuthStore } from "./store/useAuthStore";
@@ -164,6 +165,7 @@ const App = () => {
               <Route path="/notifications" element={<DashboardView />} />
               <Route path="/payment" element={<PaymentView />} />
               <Route path="/kyc" element={<KycView />} />
+              <Route path="/epin" element={<EpinPageView />} />
             </Route>
           </Routes>
         </BrowserRouter>

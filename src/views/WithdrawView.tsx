@@ -30,6 +30,10 @@ export const WithdrawView = () => {
   });
 
   useEffect(() => {
+    // Refresh user profile to get latest bank details/status from admin updates
+    const { fetchProfile } = useAuthStore.getState();
+    fetchProfile();
+    
     fetchWalletData();
   }, [fetchWalletData]);
 
@@ -40,6 +44,7 @@ export const WithdrawView = () => {
 
   const today = new Date();
   const isSaturday = today.getDay() === 6;
+  const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
 
   const handleKycFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: 'aadharCard' | 'panCard') => {
     if (e.target.files && e.target.files[0]) {
@@ -96,11 +101,6 @@ export const WithdrawView = () => {
     const balance = isMatrix ? wallet.matrixWallet : wallet.balance;
     if (numAmount > balance) {
       showToast('Error', 'Insufficient wallet balance', 'error');
-      return;
-    }
-
-    if (!isSaturday) {
-      showToast('Error', 'Withdrawals are only allowed on Saturdays', 'error');
       return;
     }
 
@@ -349,14 +349,15 @@ export const WithdrawView = () => {
               </div>
             </div>
 
-            {!isSaturday && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 flex items-center gap-3 text-amber-800">
-                <Icon icon="solar:info-circle-bold" className="text-xl shrink-0" />
-                <p className="text-xs font-bold uppercase tracking-wide">
-                  Notice: Withdrawals are only active on <span className="text-amber-900 dark:text-amber-200 underline underline-offset-2">Saturdays</span>.
-                </p>
-              </div>
-            )}
+            <div className={`rounded-2xl p-4 flex items-center gap-3 ${isSaturday ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300' : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-300'}`}>
+              <Icon icon={isSaturday ? 'solar:check-circle-bold' : 'solar:calendar-mark-bold'} className="text-xl shrink-0" />
+              <p className="text-xs font-bold uppercase tracking-wide">
+                {isSaturday
+                  ? <>Today is <span className="underline underline-offset-2">Saturday</span> — Admin approvals are active today!</>
+                  : <>You can apply anytime. Admin processes approvals every <span className="underline underline-offset-2">Saturday</span> ({daysUntilSaturday} day{daysUntilSaturday !== 1 ? 's' : ''} away).</>
+                }
+              </p>
+            </div>
 
             {/* Withdraw Form */}
             <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 md:p-8 shadow-card">
@@ -425,8 +426,8 @@ export const WithdrawView = () => {
 
               <button
                 onClick={handleWithdraw}
-                disabled={loading || !isSaturday}
-                className={`w-full mt-8 ${!isSaturday ? 'bg-gray-400 cursor-not-allowed shadow-none' : 'bg-gray-900 dark:bg-white shadow-lg'} text-white dark:text-[#070b14] font-bold py-4 rounded-xl click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                disabled={loading}
+                className={`w-full mt-8 bg-gray-900 dark:bg-white shadow-lg text-white dark:text-[#070b14] font-bold py-4 rounded-xl click-scale transition-all flex items-center justify-center gap-2 text-sm md:text-base ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? (
                   <>

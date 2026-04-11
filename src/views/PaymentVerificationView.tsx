@@ -17,9 +17,11 @@ export const PaymentVerificationView = () => {
 
     useEffect(() => {
         if (user) {
+            const isFirstTime = (user?.matrix?.cycle || 1) === 1;
+            const amount = isFirstTime ? 1180 : 1357;
             const trId = `BFE-${user.username}-${Date.now()}`;
             const upiId = 'paytm.s21tpy8@pty';
-            const data = `upi://pay?pa=${upiId}&pn=BestForEveryone&am=1180&cu=INR&tr=${trId}`;
+            const data = `upi://pay?pa=${upiId}&pn=BestForEveryone&am=${amount}&cu=INR&tr=${trId}`;
             setQrData(data);
             setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`);
         }
@@ -151,7 +153,7 @@ export const PaymentVerificationView = () => {
         if (user?.matrix?.cycle > 5) {
             return {
                 title: 'Reactivation Required',
-                message: 'You have completed 5 matrix cycles. Please pay ₹1,180 to activate your account for the next set of cycles.',
+                message: 'You have completed 5 matrix cycles. Please pay ₹1,357 to activate your account for the next set of cycles.',
                 color: 'amber'
             };
         }
@@ -163,7 +165,7 @@ export const PaymentVerificationView = () => {
             case '':
                 return {
                     title: 'Complete Your Payment',
-                    message: 'Please scan the QR code and complete the payment to activate your account',
+                    message: `Please scan the QR code and complete the payment of ₹${(user?.matrix?.cycle || 1) === 1 ? '1,180' : '1,357'} to activate your account`,
                     color: 'amber'
                 };
             case 'submitted':
@@ -195,13 +197,19 @@ export const PaymentVerificationView = () => {
                 <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="h-10 w-10 bg-white dark:bg-gray-900/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                                <Icon icon="solar:shield-check-linear" className="text-2xl" />
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 bg-white dark:bg-gray-900/10 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                                    <Icon icon="solar:shield-check-linear" className="text-2xl" />
+                                </div>
+                                <div>
+                                    <h1 className="text-lg font-semibold">Payment Verification</h1>
+                                    <p className="text-xs text-slate-300">Secure Checkout</p>
+                                </div>
                             </div>
-                            <div>
-                                <h1 className="text-lg font-semibold">Payment Verification</h1>
-                                <p className="text-xs text-slate-300">Secure Checkout</p>
+                            <div className="text-right">
+                                <p className="text-xs font-bold text-white truncate max-w-[150px]">{user?.fullname}</p>
+                                <p className="text-[10px] text-slate-400 font-medium">@{user?.username}</p>
                             </div>
                         </div>
                     </div>
@@ -272,10 +280,14 @@ export const PaymentVerificationView = () => {
                                             <span className="text-slate-600">GST (18%)</span>
                                             <span className="font-mono">₹180.00</span>
                                         </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-600">Admin Charge (15%)</span>
+                                            <span className="font-mono">₹{(user?.matrix?.cycle || 1) === 1 ? '0.00' : '177.00'}</span>
+                                        </div>
                                         <div className="h-px bg-slate-200 my-2"></div>
                                         <div className="flex justify-between items-baseline">
                                             <span className="text-sm font-semibold">Total Amount</span>
-                                            <span className="text-2xl font-bold tracking-tight">₹1,180.00</span>
+                                            <span className="text-2xl font-bold tracking-tight">₹{(user?.matrix?.cycle || 1) === 1 ? '1,180.00' : '1,357.00'}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -315,7 +327,7 @@ export const PaymentVerificationView = () => {
                                     </h4>
                                     <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
                                         <li>Scan the QR code using any UPI app</li>
-                                        <li>Complete the payment of ₹1,180</li>
+                                        <li>Complete the payment of ₹{(user?.matrix?.cycle || 1) === 1 ? '1,180' : '1,357'}</li>
                                         <li>Click "Payment Done" button below</li>
                                         <li>Wait for admin approval</li>
                                     </ol>

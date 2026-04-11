@@ -23,6 +23,7 @@ interface AuthState {
     loginAsAdmin: (adminData: any, token: string) => void;
     logoutAdmin: () => void;
 
+    fetchProfile: () => Promise<void>;
     setHasSeenKycPrompt: (value: boolean) => void;
 }
 
@@ -83,6 +84,23 @@ export const useAuthStore = create<AuthState>()(
                     admin: null,
                     adminToken: null,
                 });
+            },
+
+            fetchProfile: async () => {
+                try {
+                    const { authApi } = await import('@/lib/api');
+                    const response = await authApi.getProfile();
+                    if (response?.user) {
+                        set((state) => ({
+                            user: {
+                                ...state.user,
+                                ...response.user,
+                            },
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch profile:', error);
+                }
             },
 
             setHasSeenKycPrompt: (value) => set({ hasSeenKycPrompt: value }),

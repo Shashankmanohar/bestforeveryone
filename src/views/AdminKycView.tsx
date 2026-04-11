@@ -1,36 +1,69 @@
 import { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { adminApi } from '@/lib/api';
 import { useToastStore } from '@/store/useToastStore';
 
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5005' : '');
+
+const getPhotoUrl = (path: string | undefined) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path; // Handle Cloudinary absolute URLs
+    // Normalize backslashes and prepend server base
+    return `${API_BASE}/${path.replace(/\\/g, '/')}`;
+};
+
+type KycStatus = 'all' | 'pending' | 'approved' | 'rejected';
+
+interface KycUser {
+    _id: string;
+    fullname: string;
+    username: string;
+    email: string;
+    kyc: {
+        status: string;
+        aadharCard?: string;
+        panCard?: string;
+        submittedAt?: string;
+        approvedAt?: string;
+        rejectionReason?: string;
+        bankDetails?: {
+            accountNumber?: string;
+            ifscCode?: string;
+            accountHolderName?: string;
+            bankName?: string;
+        };
+    };
+}
+
 export const AdminKycView = () => {
-    const [pendingUsers, setPendingUsers] = useState<any[]>([]);
+    const [allUsers, setAllUsers] = useState<KycUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState<KycStatus>('all');
+    const [lightbox, setLightbox] = useState<{ url: string; label: string } | null>(null);
     const { showToast } = useToastStore();
 
-    const fetchPendingKyc = async () => {
+    const fetchKyc = async () => {
+        setLoading(true);
         try {
             const response = await adminApi.getPendingKyc();
-            setPendingUsers(response.pendingKycUsers);
+            setAllUsers(response.pendingKycUsers || []);
         } catch (error: any) {
-            showToast('Error', error.message || 'Failed to fetch KYC requests', 'error');
+            showToast('Error', error.message || 'Failed to fetch KYC records', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchPendingKyc();
-    }, []);
+    useEffect(() => { fetchKyc(); }, []);
 
     const handleApprove = async (userId: string) => {
         setActionLoading(userId);
         try {
             await adminApi.approveKyc(userId);
             showToast('Success', 'KYC approved successfully', 'success');
-            setPendingUsers(pendingUsers.filter(u => u._id !== userId));
+            setAllUsers(prev => prev.map(u => u._id === userId ? { ...u, kyc: { ...u.kyc, status: 'approved' } } : u));
         } catch (error: any) {
             showToast('Error', error.message || 'Approval failed', 'error');
         } finally {
@@ -44,9 +77,9 @@ export const AdminKycView = () => {
 
         setActionLoading(userId);
         try {
-            await adminApi.rejectKyc(userId, reason);
+            await adminApi.rejectKyc(userId, reason || 'KYC verification failed');
             showToast('Success', 'KYC rejected', 'success');
-            setPendingUsers(pendingUsers.filter(u => u._id !== userId));
+            setAllUsers(prev => prev.map(u => u._id === userId ? { ...u, kyc: { ...u.kyc, status: 'rejected', rejectionReason: reason } } : u));
         } catch (error: any) {
             showToast('Error', error.message || 'Rejection failed', 'error');
         } finally {
@@ -54,99 +87,269 @@ export const AdminKycView = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <Icon icon="eos-icons:loading" className="text-4xl text-gray-400 dark:text-gray-500 animate-spin" />
-            </div>
-        );
-    }
+    const filtered = statusFilter === 'all' ? allUsers : allUsers.filter(u => u.kyc.status === statusFilter);
+
+    const counts = {
+        all: allUsers.length,
+        pending: allUsers.filter(u => u.kyc.status === 'pending').length,
+        approved: allUsers.filter(u => u.kyc.status === 'approved').length,
+        rejected: allUsers.filter(u => u.kyc.status === 'rejected').length,
+    };
+
+    const statusConfig: Record<string, { color: string; bg: string; border: string; icon: string }> = {
+        approved: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', icon: 'solar:check-circle-bold' },
+        pending:  { color: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/20',   icon: 'solar:clock-circle-bold' },
+        rejected: { color: 'text-rose-400',    bg: 'bg-rose-500/10',    border: 'border-rose-500/20',    icon: 'solar:close-circle-bold' },
+    };
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6 animate-in fade-in duration-700">
+            {/* Header */}
+            <div className="flex justify-between items-center px-1">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">KYC Requests</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage user document verifications</p>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">KYC Document Review</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">View and verify user identity & bank documents</p>
                 </div>
-                <div className="bg-amber-100 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-full text-xs font-bold">
-                    {pendingUsers.length} Pending
-                </div>
+                <button onClick={fetchKyc} className="h-9 w-9 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-indigo-500 transition-colors">
+                    <Icon icon="solar:restart-bold" className="text-base" />
+                </button>
             </div>
 
-            {pendingUsers.length === 0 ? (
-                <div className="bg-white dark:bg-gray-950/80 backdrop-blur-xl rounded-3xl border border-gray-200 dark:border-white/10 p-20 text-center shadow-xl">
-                    <Icon icon="solar:check-read-linear" className="mx-auto text-gray-300 dark:text-gray-600 mb-4" width={48} />
-                    <p className="text-gray-500 dark:text-gray-400 font-medium font-bold">All caught up! No pending KYC requests.</p>
+            {/* Status filter tabs */}
+            <div className="flex gap-2 flex-wrap">
+                {(['all', 'pending', 'approved', 'rejected'] as KycStatus[]).map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setStatusFilter(tab)}
+                        className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border transition-all ${
+                            statusFilter === tab
+                                ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 hover:text-white hover:bg-white/10'
+                        }`}
+                    >
+                        {tab} <span className="opacity-70">({counts[tab]})</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Content */}
+            {loading ? (
+                <div className="flex items-center justify-center py-24">
+                    <Icon icon="eos-icons:loading" className="text-4xl text-indigo-500 animate-spin" />
+                </div>
+            ) : filtered.length === 0 ? (
+                <div className="glass-card rounded-[2rem] p-20 text-center flex flex-col items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 text-3xl">
+                        <Icon icon="solar:document-bold-duotone" />
+                    </div>
+                    <p className="text-slate-500 font-bold text-sm">No KYC records found for this filter.</p>
                 </div>
             ) : (
-                <div className="grid gap-4">
-                    {pendingUsers.map((user) => (
-                        <motion.div
-                            key={user._id}
-                            initial={{ opacity: 0, scale: 0.98 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white dark:bg-gray-950/80 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/10 p-6 shadow-xl overflow-hidden glass-card-hover"
-                        >
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center font-bold text-gray-600 dark:text-gray-400 dark:text-gray-500 capitalize text-lg">
-                                        {user.fullname[0]}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    {filtered.map((user) => {
+                        const cfg = statusConfig[user.kyc.status] || statusConfig.pending;
+                        const aadharUrl = getPhotoUrl(user.kyc.aadharCard);
+                        const panUrl = getPhotoUrl(user.kyc.panCard);
+                        const isLoading = actionLoading === user._id;
+
+                        return (
+                            <motion.div
+                                key={user._id}
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="glass-card rounded-[2rem] p-6 border-none shadow-2xl bg-white/50 dark:bg-[#0f172a]/60 overflow-hidden"
+                            >
+                                {/* User header */}
+                                <div className="flex items-start justify-between mb-5">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-11 w-11 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold text-lg border border-indigo-500/20">
+                                            {user.fullname?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white">{user.fullname}</p>
+                                            <p className="text-[10px] text-slate-500 font-bold tracking-wider">@{user.username}</p>
+                                            <p className="text-[10px] text-indigo-400 lowercase">{user.email}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-900 dark:text-white">{user.fullname}</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 tracking-tight">@{user.username} • {user.email}</p>
-                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase mt-1">Submitted: {new Date(user.kyc.submittedAt).toLocaleDateString()}</p>
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border flex items-center gap-1 ${cfg.bg} ${cfg.color} ${cfg.border}`}>
+                                        <Icon icon={cfg.icon} className="text-sm" />
+                                        {user.kyc.status}
+                                    </span>
+                                </div>
+
+                                {/* Document Photo Cards */}
+                                <div className="grid grid-cols-2 gap-3 mb-4">
+                                    {/* Aadhar */}
+                                    <div
+                                        onClick={() => aadharUrl && setLightbox({ url: aadharUrl, label: `${user.fullname} — Aadhar Card` })}
+                                        className={`relative rounded-2xl overflow-hidden border-2 border-dashed transition-all group ${aadharUrl ? 'border-blue-500/30 cursor-pointer hover:border-blue-500/60' : 'border-slate-300 dark:border-white/10'}`}
+                                        style={{ aspectRatio: '4/3' }}
+                                    >
+                                        {aadharUrl ? (
+                                            <>
+                                                <img
+                                                    src={aadharUrl}
+                                                    alt="Aadhar Card"
+                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                                                    <span className="text-white text-[10px] font-bold flex items-center gap-1">
+                                                        <Icon icon="solar:eye-bold" /> View Full
+                                                    </span>
+                                                </div>
+                                                <div className="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-[9px] font-bold rounded-full uppercase tracking-wider">
+                                                    Aadhar
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full gap-1 p-4">
+                                                <Icon icon="solar:document-bold" className="text-2xl text-slate-300 dark:text-slate-600" />
+                                                <span className="text-[9px] text-slate-400 font-bold uppercase text-center">Aadhar<br/>Not Uploaded</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* PAN */}
+                                    <div
+                                        onClick={() => panUrl && setLightbox({ url: panUrl, label: `${user.fullname} — PAN Card` })}
+                                        className={`relative rounded-2xl overflow-hidden border-2 border-dashed transition-all group ${panUrl ? 'border-amber-500/30 cursor-pointer hover:border-amber-500/60' : 'border-slate-300 dark:border-white/10'}`}
+                                        style={{ aspectRatio: '4/3' }}
+                                    >
+                                        {panUrl ? (
+                                            <>
+                                                <img
+                                                    src={panUrl}
+                                                    alt="PAN Card"
+                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                                                    <span className="text-white text-[10px] font-bold flex items-center gap-1">
+                                                        <Icon icon="solar:eye-bold" /> View Full
+                                                    </span>
+                                                </div>
+                                                <div className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500 text-white text-[9px] font-bold rounded-full uppercase tracking-wider">
+                                                    PAN
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full gap-1 p-4">
+                                                <Icon icon="solar:card-bold" className="text-2xl text-slate-300 dark:text-slate-600" />
+                                                <span className="text-[9px] text-slate-400 font-bold uppercase text-center">PAN<br/>Not Uploaded</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
-                                    <a
-                                        href={`http://localhost:5005/${user.kyc.aadharCard.replace(/\\/g, '/')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-3 py-2 rounded-lg border border-blue-100 dark:border-blue-800 hover:bg-blue-100 transition-colors"
-                                    >
-                                        <Icon icon="solar:file-text-bold" /> Aadhar Card
-                                    </a>
-                                    <a
-                                        href={`http://localhost:5005/${user.kyc.panCard.replace(/\\/g, '/')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-lg border border-amber-100 dark:border-amber-800 hover:bg-amber-100 transition-colors"
-                                    >
-                                        <Icon icon="solar:bank-card-bold" /> PAN Card
-                                    </a>
-                                    <div className="col-span-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2 border border-gray-100 dark:border-gray-800 text-[10px]">
-                                        <p className="text-gray-400 dark:text-gray-500 uppercase font-bold mb-1">Bank Account</p>
-                                        <p className="font-bold text-gray-900 dark:text-white truncate">
-                                            {user.kyc.bankDetails.bankName} • {user.kyc.bankDetails.accountNumber} • {user.kyc.bankDetails.ifscCode}
+                                {/* Bank Details */}
+                                {user.kyc.bankDetails && (
+                                    <div className="bg-slate-100/60 dark:bg-white/5 rounded-2xl p-3 mb-4 space-y-1 border border-slate-200/50 dark:border-white/5">
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                                            <Icon icon="solar:bank-bold" className="text-indigo-400" /> Bank Details
                                         </p>
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                                            <div><span className="text-slate-500">Holder: </span><span className="font-bold text-slate-900 dark:text-white">{user.kyc.bankDetails.accountHolderName || '—'}</span></div>
+                                            <div><span className="text-slate-500">Bank: </span><span className="font-bold text-slate-900 dark:text-white">{user.kyc.bankDetails.bankName || '—'}</span></div>
+                                            <div><span className="text-slate-500">Account: </span><span className="font-bold text-slate-900 dark:text-white font-mono select-all">{user.kyc.bankDetails.accountNumber || '—'}</span></div>
+                                            <div><span className="text-slate-500">IFSC: </span><span className="font-bold text-slate-900 dark:text-white font-mono">{user.kyc.bankDetails.ifscCode || '—'}</span></div>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
-                                <div className="flex items-center gap-2 shrink-0">
-                                    <button
-                                        onClick={() => handleReject(user._id)}
-                                        disabled={actionLoading === user._id}
-                                        className="p-2.5 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 rounded-xl transition-colors border border-red-100 dark:border-red-800"
-                                        title="Reject KYC"
-                                    >
-                                        <Icon icon="solar:close-circle-bold" width={20} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleApprove(user._id)}
-                                        disabled={actionLoading === user._id}
-                                        className="flex items-center gap-2 bg-emerald-600 dark:bg-white text-white dark:text-[#070b14] px-6 py-3 rounded-xl font-bold text-sm shadow-lg transition-all click-scale"
-                                    >
-                                        {actionLoading === user._id ? <Icon icon="eos-icons:loading" className="animate-spin text-white dark:text-gray-900" /> : <Icon icon="solar:check-read-bold" />} Approve
-                                    </button>
+                                {/* Meta + Actions */}
+                                <div className="flex items-center justify-between">
+                                    <p className="text-[10px] text-slate-400">
+                                        Submitted: {user.kyc.submittedAt ? new Date(user.kyc.submittedAt).toLocaleDateString() : '—'}
+                                    </p>
+                                    {user.kyc.status === 'pending' && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleReject(user._id)}
+                                                disabled={isLoading}
+                                                className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all"
+                                            >
+                                                {isLoading ? <Icon icon="eos-icons:loading" className="animate-spin" /> : 'Reject'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleApprove(user._id)}
+                                                disabled={isLoading}
+                                                className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                                            >
+                                                {isLoading ? <Icon icon="eos-icons:loading" className="animate-spin" /> : <><Icon icon="solar:check-bold" /> Approve</>}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {user.kyc.status === 'rejected' && user.kyc.rejectionReason && (
+                                        <p className="text-[10px] text-rose-400 font-bold max-w-[200px] text-right truncate" title={user.kyc.rejectionReason}>
+                                            ✗ {user.kyc.rejectionReason}
+                                        </p>
+                                    )}
+                                    {user.kyc.status === 'approved' && (
+                                        <p className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                                            <Icon icon="solar:verified-check-bold" /> Verified
+                                        </p>
+                                    )}
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                            </motion.div>
+                        );
+                    })}
                 </div>
             )}
+
+            {/* Lightbox Modal */}
+            <AnimatePresence>
+                {lightbox && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+                        onClick={() => setLightbox(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.85, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.85, opacity: 0 }}
+                            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                            className="relative max-w-3xl w-full"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-3">
+                                <p className="text-white font-bold text-sm truncate">{lightbox.label}</p>
+                                <button
+                                    onClick={() => setLightbox(null)}
+                                    className="h-8 w-8 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all"
+                                >
+                                    <Icon icon="solar:close-bold" />
+                                </button>
+                            </div>
+                            <img
+                                src={lightbox.url}
+                                alt={lightbox.label}
+                                className="w-full rounded-2xl shadow-2xl max-h-[80vh] object-contain bg-slate-900"
+                            />
+                            <div className="flex gap-3 mt-3 justify-center">
+                                <a
+                                    href={lightbox.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-4 py-2 bg-white/10 text-white rounded-xl text-xs font-bold hover:bg-white/20 transition-all flex items-center gap-1.5"
+                                >
+                                    <Icon icon="solar:external-link-bold" /> Open in New Tab
+                                </a>
+                                <a
+                                    href={lightbox.url}
+                                    download
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-all flex items-center gap-1.5"
+                                >
+                                    <Icon icon="solar:download-bold" /> Download
+                                </a>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

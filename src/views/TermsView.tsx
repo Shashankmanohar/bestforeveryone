@@ -4,12 +4,13 @@ import { PageHeader } from '@/components/PageHeader';
 
 export const TermsView = () => {
   const planDetails = [
-    { label: 'Joining Fee', value: '₹1,000' },
+    { label: 'Joining Fee', value: '₹1,180 (Admin Charge Waived)' },
+    { label: 'Re-entry Fee', value: '₹1,357 (Inc. Admin Charge)' },
     { label: 'Matrix Type', value: '6x Matrix Auto Growth' },
     { label: 'Level 1 Matrix Income', value: '₹2,400 (One-Time)' },
-    { label: 'Direct Referral', value: '₹200 (20%)' },
-    { label: 'Weekly Bonanza', value: '₹200 (20%)' },
-    { label: 'Weekly Royalty Bonus', value: '₹200 (20% Pool)' },
+    { label: 'Direct Referral', value: '₹200 (Unlimited)' },
+    { label: 'Weekly Bonanza', value: '₹200 (Unlimited)' },
+    { label: 'Weekly Royalty Bonus', value: '₹200 (Pool Amount)' },
   ];
 
   return (
@@ -31,7 +32,7 @@ export const TermsView = () => {
             <h3 className="text-lg font-bold">Best For Everyone Plan Details</h3>
           </div>
           <p className="text-gray-400 text-sm leading-relaxed max-w-lg">
-            Our 5x5 forced matrix system ensures maximum earnings with automatic spillover and passive income opportunities.
+            Our 6x Matrix Auto Growth system ensures maximum earnings with automatic spillover and passive income opportunities.
           </p>
         </div>
         <div className="absolute -right-10 -bottom-10 text-white/5 rotate-12 pointer-events-none">
@@ -77,6 +78,10 @@ export const TermsView = () => {
           <li className="flex gap-2">
             <Icon icon="solar:check-circle-bold" className="text-emerald-500 shrink-0 mt-0.5" />
             <span>Leadership royalty is credited instantly on every re-topup.</span>
+          </li>
+          <li className="flex gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
+            <Icon icon="solar:info-circle-bold" className="text-emerald-500 shrink-0 mt-0.5" />
+            <span>Weekly Royalty is capped at: Star (₹10,000), Double Star (₹50,000), and Super Star (₹1,00,000). Total earnings capacity reset upon achievement.</span>
           </li>
           <li className="flex gap-2 text-emerald-600 dark:text-emerald-400 font-bold">
             <Icon icon="solar:info-circle-bold" className="text-emerald-500 shrink-0 mt-0.5" />
