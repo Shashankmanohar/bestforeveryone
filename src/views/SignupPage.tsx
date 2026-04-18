@@ -10,6 +10,7 @@ export const SignupPage = () => {
         fullname: '',
         username: '',
         email: '',
+        phone: '',
         password: '',
         referralCode: urlReferralCode || '',
     });
@@ -116,6 +117,21 @@ export const SignupPage = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
                             placeholder="Enter your email"
+                            required
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                            Mobile Number
+                        </label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-900 dark:focus:ring-white/20 focus:border-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all font-medium"
+                            placeholder="Enter your mobile number"
                             required
                         />
                     </div>

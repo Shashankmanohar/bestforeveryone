@@ -124,13 +124,6 @@ export const Sidebar = () => {
             isActive={isActive('/activate-others')}
             onClick={() => handleNavigate('/activate-others')}
           />
-          <NavItem
-            icon="solar:file-text-linear"
-            label="Business Plan"
-            route="/business-plan"
-            isActive={isActive('/business-plan')}
-            onClick={() => handleNavigate('/business-plan')}
-          />
 
           {/* Finance Section */}
           <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 px-3 mt-6">

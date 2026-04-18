@@ -21,8 +21,8 @@ export const EpinPageView = () => {
     const usedPins = myEpins.filter(p => p.status === 'used');
 
     const handleBuy = async () => {
-        if (wallet.balance < 1357) {
-            showToast('Insufficient Balance', 'You need at least ₹1,357 to purchase an E-pin.', 'error');
+        if (wallet.balance < 1380) {
+            showToast('Insufficient Balance', 'You need at least ₹1,380 to purchase an E-pin.', 'error');
             return;
         }
 
@@ -86,7 +86,7 @@ export const EpinPageView = () => {
                         className="bg-gray-900 dark:bg-white text-white dark:text-[#070b14] px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-gray-200 dark:shadow-none click-scale transition-all"
                     >
                         {loading ? <Icon icon="eos-icons:loading" className="animate-spin" /> : <Icon icon="solar:ticket-bold" />}
-                        Buy New E-Pin (₹1,357)
+                        Buy New E-Pin (₹1,380)
                     </button>
                 </div>
             </div>

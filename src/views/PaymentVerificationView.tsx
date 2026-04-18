@@ -18,7 +18,7 @@ export const PaymentVerificationView = () => {
     useEffect(() => {
         if (user) {
             const isFirstTime = (user?.matrix?.cycle || 1) === 1;
-            const amount = isFirstTime ? 1180 : 1357;
+            const amount = 1180;
             const trId = `BFE-${user.username}-${Date.now()}`;
             const upiId = 'paytm.s21tpy8@pty';
             const data = `upi://pay?pa=${upiId}&pn=BestForEveryone&am=${amount}&cu=INR&tr=${trId}`;
@@ -165,7 +165,7 @@ export const PaymentVerificationView = () => {
             case '':
                 return {
                     title: 'Complete Your Payment',
-                    message: `Please scan the QR code and complete the payment of ₹${(user?.matrix?.cycle || 1) === 1 ? '1,180' : '1,357'} to activate your account`,
+                    message: `Please scan the QR code and complete the payment of ₹1,180 to activate your account`,
                     color: 'amber'
                 };
             case 'submitted':
@@ -281,13 +281,13 @@ export const PaymentVerificationView = () => {
                                             <span className="font-mono">₹180.00</span>
                                         </div>
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-slate-600">Admin Charge (15%)</span>
-                                            <span className="font-mono">₹{(user?.matrix?.cycle || 1) === 1 ? '0.00' : '177.00'}</span>
+                                            <span className="text-slate-600">Admin Charge (Waived)</span>
+                                            <span className="font-mono">₹0.00</span>
                                         </div>
                                         <div className="h-px bg-slate-200 my-2"></div>
                                         <div className="flex justify-between items-baseline">
                                             <span className="text-sm font-semibold">Total Amount</span>
-                                            <span className="text-2xl font-bold tracking-tight">₹{(user?.matrix?.cycle || 1) === 1 ? '1,180.00' : '1,357.00'}</span>
+                                            <span className="text-2xl font-bold tracking-tight">₹1,180.00</span>
                                         </div>
                                     </div>
                                 </div>
@@ -327,7 +327,7 @@ export const PaymentVerificationView = () => {
                                     </h4>
                                     <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
                                         <li>Scan the QR code using any UPI app</li>
-                                        <li>Complete the payment of ₹{(user?.matrix?.cycle || 1) === 1 ? '1,180' : '1,357'}</li>
+                                        <li>Complete the payment of ₹1,180</li>
                                         <li>Click "Payment Done" button below</li>
                                         <li>Wait for admin approval</li>
                                     </ol>
@@ -341,7 +341,7 @@ export const PaymentVerificationView = () => {
 
                                     <div className="grid grid-cols-1 gap-2">
                                         <a
-                                            href="https://wa.me/916299347375"
+                                            href="https://wa.me/919693794089"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 transition-all click-scale"
@@ -351,13 +351,13 @@ export const PaymentVerificationView = () => {
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-emerald-900 leading-none mb-1">WhatsApp Support</p>
-                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+91 6299347375 / 9693794089</p>
+                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+91 9693794089</p>
                                             </div>
                                             <Icon icon="solar:round-alt-arrow-right-bold" className="ml-auto text-emerald-400" width={16} />
                                         </a>
 
                                         <a
-                                            href="mailto:ishuraj25122002@gmail.com"
+                                            href="mailto:hello.bestforeveryone@gmail.com"
                                             className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl hover:bg-blue-100 transition-all click-scale"
                                         >
                                             <div className="h-8 w-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
@@ -365,7 +365,7 @@ export const PaymentVerificationView = () => {
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-blue-900 leading-none mb-1">Email Support</p>
-                                                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">ishuraj25122002@gmail.com</p>
+                                                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">hello.bestforeveryone@gmail.com</p>
                                             </div>
                                             <Icon icon="solar:round-alt-arrow-right-bold" className="ml-auto text-blue-400" width={16} />
                                         </a>
@@ -410,7 +410,7 @@ export const PaymentVerificationView = () => {
                                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider text-center mb-3">Need help? Contact Support</p>
                                     <div className="grid grid-cols-1 gap-2">
                                         <a
-                                            href="https://wa.me/916299347375"
+                                            href="https://wa.me/919693794089"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-xl hover:bg-emerald-100 transition-all click-scale"
@@ -420,12 +420,12 @@ export const PaymentVerificationView = () => {
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-emerald-900 leading-none mb-1">WhatsApp Support</p>
-                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+91 6299347375 / 9693794089</p>
+                                                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">+91 9693794089</p>
                                             </div>
                                         </a>
 
                                         <a
-                                            href="mailto:ishuraj25122002@gmail.com"
+                                            href="mailto:hello.bestforeveryone@gmail.com"
                                             className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-xl hover:bg-blue-100 transition-all click-scale"
                                         >
                                             <div className="h-8 w-8 bg-white dark:bg-gray-900 rounded-lg flex items-center justify-center shadow-sm">
@@ -433,7 +433,7 @@ export const PaymentVerificationView = () => {
                                             </div>
                                             <div className="text-left">
                                                 <p className="text-[10px] font-bold text-blue-900 leading-none mb-1">Email Support</p>
-                                                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">ishuraj25122002@gmail.com</p>
+                                                <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium">hello.bestforeveryone@gmail.com</p>
                                             </div>
                                         </a>
                                     </div>

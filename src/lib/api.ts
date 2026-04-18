@@ -181,7 +181,7 @@ export const leadershipApi = {
 
 // E-pin API
 export const epinApi = {
-    buy: (amount: number = 1357) =>
+    buy: (amount: number = 1380) =>
         apiClient('/user/epin/buy', {
             method: 'POST',
             body: JSON.stringify({ amount }),

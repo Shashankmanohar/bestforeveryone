@@ -124,20 +124,20 @@ export const WalletView = () => {
           </div>
           <div>
             <h4 className="text-xl font-bold">Generate Activation E-pin</h4>
-            <p className="text-blue-100 text-sm opacity-90">Purchase a pin for ₹1,357 to activate other accounts.</p>
+            <p className="text-blue-100 text-sm opacity-90">Purchase a pin for ₹1,380 to activate other accounts.</p>
           </div>
         </div>
         <button 
           onClick={async () => {
-            if (wallet.balance < 1357) {
+            if (wallet.balance < 1380) {
               toast({
                 title: "Insufficient Balance",
-                description: "You need at least ₹1,357 to purchase an E-pin.",
+                description: "You need at least ₹1,380 to purchase an E-pin.",
                 variant: "destructive"
               });
               return;
             }
-            if (confirm("Are you sure you want to purchase an E-pin for ₹1,357?")) {
+            if (confirm("Are you sure you want to purchase an E-pin for ₹1,380?")) {
               setBuying(true);
               try {
                 await epinApi.buy();

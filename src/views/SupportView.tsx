@@ -5,9 +5,9 @@ export const SupportView = () => {
     const supportOptions = [
         {
             title: 'WhatsApp Support',
-            description: 'Chat with us on WhatsApp: +91 6299347375 or +91 9693794089',
+            description: 'Chat with us on WhatsApp: +91 9693794089',
             icon: 'logos:whatsapp-icon',
-            link: 'https://wa.me/916299347375',
+            link: 'https://wa.me/919693794089',
             color: 'bg-emerald-50 dark:bg-emerald-900/30',
             textColor: 'text-emerald-600 dark:text-emerald-400',
             borderColor: 'border-emerald-100 dark:border-emerald-800',
@@ -15,9 +15,9 @@ export const SupportView = () => {
         },
         {
             title: 'Email Support',
-            description: 'Send us an email for detailed inquiries or issues.',
+            description: 'Send us an email: hello.bestforeveryone@gmail.com',
             icon: 'solar:letter-bold-duotone',
-            link: 'mailto:ishuraj25122002@gmail.com',
+            link: 'mailto:hello.bestforeveryone@gmail.com',
             color: 'bg-blue-50 dark:bg-blue-900/30',
             textColor: 'text-blue-600 dark:text-blue-400',
             borderColor: 'border-blue-100 dark:border-blue-800',

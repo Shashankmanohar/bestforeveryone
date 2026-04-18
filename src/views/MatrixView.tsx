@@ -103,7 +103,7 @@ export const MatrixView = () => {
 
     const trId = `BFE-RE-${user?.username}-${Date.now()}`;
     const receiverUpi = 'paytm.s21tpy8@pty';
-    const amount = 1357;
+    const amount = 1180;
     const data = `upi://pay?pa=${receiverUpi}&pn=BestForEveryone&am=${amount}&cu=INR&tr=${trId}`;
 
     setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`);
@@ -450,7 +450,7 @@ export const MatrixView = () => {
                     <div className="h-px bg-gray-200 dark:bg-gray-800 w-full" />
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-500 dark:text-gray-400 font-medium">Re-entry Fee</span>
-                      <span className="text-gray-900 dark:text-white font-bold">₹1,357</span>
+                      <span className="text-gray-900 dark:text-white font-bold">₹1,180</span>
                     </div>
                   </div>
 
@@ -464,7 +464,7 @@ export const MatrixView = () => {
                       {isProcessingPayment ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        user?.paymentStatus === 'submitted' ? 'Waiting for Approval...' : 'Generate QR & Pay ₹1,357'
+                        user?.paymentStatus === 'submitted' ? 'Waiting for Approval...' : 'Generate QR & Pay ₹1,180'
                       )}
                     </button>
                     {user?.paymentStatus === 'submitted' && (
@@ -497,7 +497,7 @@ export const MatrixView = () => {
                     <>
                       <div className="mb-6">
                         <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-1">Step 2: Complete Payment</p>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Pay ₹1,357</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scan to Pay ₹1,180</h3>
                       </div>
 
                       <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm inline-block mb-6 mx-auto">

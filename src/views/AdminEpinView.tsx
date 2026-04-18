@@ -14,7 +14,7 @@ export const AdminEpinView = () => {
     } = useAdminStore();
 
     const [quantity, setQuantity] = useState(1);
-    const [amount, setAmount] = useState(1357);
+    const [amount, setAmount] = useState(1380);
     const [selectedPins, setSelectedPins] = useState<string[]>([]);
     const [isAssigningBulk, setIsAssigningBulk] = useState(false);
     const [targetUsername, setTargetUsername] = useState('');
@@ -189,7 +189,7 @@ export const AdminEpinView = () => {
                                     epins.map((pin) => (
                                         <tr key={pin._id} className={`hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all group ${selectedPins.includes(pin._id) ? 'bg-indigo-500/5' : ''}`}>
                                             <td className="px-6 py-4">
-                                                {pin.status === 'active' && (
+                                                {pin.status === 'active' && !pin.owner?.username && (
                                                     <input 
                                                         type="checkbox" 
                                                         className="rounded border-slate-300 dark:border-white/10"

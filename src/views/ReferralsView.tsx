@@ -449,27 +449,43 @@ export const ReferralsView = () => {
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white truncate">{member.name}</p>
-                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5 truncate">Joined {member.joined}</p>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
+                      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium truncate">Joined {member.joined}</p>
+                      {member.email && (
+                        <div className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">
+                          <Icon icon="solar:letter-linear" width={12} />
+                          <span className="truncate">{member.email}</span>
+                        </div>
+                      )}
+                      {member.phone && (
+                        <div className="flex items-center gap-1 text-[10px] sm:text-xs text-blue-500 dark:text-blue-400 font-bold">
+                          <Icon icon="solar:phone-bold" width={12} />
+                          <span>{member.phone}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Reward & Status */}
-                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                  {member.rewardCredited ? (
-                    <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
-                      +₹{weeklyStats.bonusUnlocked ? 400 : 200}
+                {/* Contact & Status */}
+                <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                  <div className="flex flex-col items-end gap-1">
+                    {member.rewardCredited ? (
+                      <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                        +₹{weeklyStats.bonusUnlocked ? 400 : 200}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] sm:text-xs font-medium text-gray-400 dark:text-gray-500 whitespace-nowrap">Pending</span>
+                    )}
+                    <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap ${member.status === 'active'
+                      ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800'
+                      : member.status === 'pending'
+                        ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800'
+                        : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800'
+                      }`}>
+                      {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
                     </span>
-                  ) : (
-                    <span className="text-[10px] sm:text-xs font-medium text-gray-400 dark:text-gray-500 whitespace-nowrap">Pending</span>
-                  )}
-                  <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap ${member.status === 'active'
-                    ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800'
-                    : member.status === 'pending'
-                      ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800'
-                      : 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800'
-                    }`}>
-                    {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
-                  </span>
+                  </div>
                 </div>
               </div>
             ))}

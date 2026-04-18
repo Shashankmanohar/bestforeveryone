@@ -28,6 +28,7 @@ import { KycView } from "./views/KycView";
 import { AdminKycView } from "./views/AdminKycView";
 import { EpinPageView } from "./views/EpinPageView";
 import { BusinessPlanView } from "./views/BusinessPlanView";
+import { IdCardView } from "./views/IdCardView";
 import { authApi } from "./lib/api";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore, resolveTheme } from "./store/useThemeStore";
@@ -161,11 +162,13 @@ const App = () => {
               <Route path="/activate-others" element={<ActivateOthers />} />
               <Route path="/support" element={<SupportView />} />
               <Route path="/terms" element={<TermsView />} />
-              <Route path="/business-plan" element={<BusinessPlanView />} />
+              <Route path="/business-plan" element={<TermsView />} />
+              <Route path="/business_plan" element={<TermsView />} />
               <Route path="/notifications" element={<DashboardView />} />
               <Route path="/payment" element={<PaymentView />} />
               <Route path="/kyc" element={<KycView />} />
               <Route path="/epin" element={<EpinPageView />} />
+              <Route path="/id-card" element={<IdCardView />} />
             </Route>
           </Routes>
         </BrowserRouter>

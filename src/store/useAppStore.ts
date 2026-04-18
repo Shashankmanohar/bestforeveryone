@@ -231,7 +231,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   })),
 
-  buyEpin: async (amount: number = 1357) => {
+  buyEpin: async (amount: number = 1380) => {
     try {
       const response = await epinApi.buy(amount);
       if (response.newBalance !== undefined) {

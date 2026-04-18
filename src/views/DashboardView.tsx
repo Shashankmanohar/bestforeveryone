@@ -205,6 +205,12 @@ export const DashboardView = () => {
               Change Password <Icon icon="solar:lock-password-linear" />
             </button>
             <button
+              onClick={() => navigate('/id-card')}
+              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3.5 px-6 rounded-xl text-sm font-bold click-scale shadow-lg hover:shadow-indigo-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              <Icon icon="solar:user-id-bold" /> Digital ID Card
+            </button>
+            <button
               onClick={() => navigate('/activate-others')}
               className="flex-1 bg-emerald-500 text-white py-3.5 px-6 rounded-xl text-sm font-bold click-scale shadow-lg hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
             >
@@ -250,7 +256,7 @@ export const DashboardView = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Buy E-pin</h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 px-2">
-                Buy a ₹1,357 E-pin (₹1,180 + ₹177 admin charge) to activate any user account. The amount will be deducted from your wallet balance.
+                Buy a ₹1,380 E-pin (₹1,180 + ₹200 admin charge) to activate any user account. The amount will be deducted from your wallet balance.
               </p>
               {epinSuccess ? (
                 <div className="space-y-4">
@@ -290,9 +296,9 @@ export const DashboardView = () => {
                     Cancel
                   </button>
                   <button
-                    disabled={loading || wallet.balance < 1357}
+                    disabled={loading || wallet.balance < 1380}
                     onClick={handleBuyEpin}
-                    className={`flex-1 py-4 px-4 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center ${loading || wallet.balance < 1357 ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                    className={`flex-1 py-4 px-4 rounded-2xl text-xs font-bold shadow-lg transition-all flex items-center justify-center ${loading || wallet.balance < 1380 ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                   >
                     {loading ? (
                       <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -358,7 +364,7 @@ export const DashboardView = () => {
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex items-center gap-3">
           <Icon icon="solar:info-circle-bold" className="text-amber-600 dark:text-amber-400 text-xl" />
           <p className="text-sm text-amber-900 dark:text-amber-200 font-medium">
-            This is your <strong>5th (final) cycle</strong>. After completing this cycle, account reactivation (₹1,357) will be required to continue.
+            This is your <strong>5th (final) cycle</strong>. After completing this cycle, account reactivation (₹1,180) will be required to continue.
           </p>
         </div>
       )}
