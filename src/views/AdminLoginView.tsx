@@ -5,8 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import adminApi from '@/lib/adminApi';
 
 export const AdminLoginView = () => {
-    const [email, setEmail] = useState('admin@bestforeveryone.in');
-    const [password, setPassword] = useState('admin@123');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 

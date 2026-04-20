@@ -13,8 +13,8 @@ export const AdminEpinView = () => {
         assignEpin 
     } = useAdminStore();
 
-    const [quantity, setQuantity] = useState(1);
-    const [amount, setAmount] = useState(1380);
+    const [quantity, setQuantity] = useState<number | string>('');
+    const [amount, setAmount] = useState<number | string>('');
     const [selectedPins, setSelectedPins] = useState<string[]>([]);
     const [isAssigningBulk, setIsAssigningBulk] = useState(false);
     const [targetUsername, setTargetUsername] = useState('');
@@ -28,10 +28,12 @@ export const AdminEpinView = () => {
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!quantity || !amount) return;
         setIsGenerating(true);
         try {
-            await generateEpins(quantity, amount);
-            setQuantity(1);
+            await generateEpins(Number(quantity), Number(amount));
+            setQuantity('');
+            setAmount('');
         } catch (error) {
             console.error(error);
         } finally {
@@ -127,7 +129,7 @@ export const AdminEpinView = () => {
                                 min="1" 
                                 max="100"
                                 value={quantity}
-                                onChange={(e) => setQuantity(parseInt(e.target.value))}
+                                onChange={(e) => setQuantity(e.target.value === '' ? '' : parseInt(e.target.value))}
                                 className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
                             />
                         </div>
@@ -136,7 +138,7 @@ export const AdminEpinView = () => {
                             <input 
                                 type="number" 
                                 value={amount}
-                                onChange={(e) => setAmount(parseFloat(e.target.value))}
+                                onChange={(e) => setAmount(e.target.value === '' ? '' : parseFloat(e.target.value))}
                                 className="w-full bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium"
                             />
                         </div>

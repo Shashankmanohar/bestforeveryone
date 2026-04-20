@@ -2,6 +2,7 @@ import { Icon } from '@iconify/react';
 import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/PageHeader';
 import { useAuthStore } from '@/store/useAuthStore';
+import { BioEnergyCard } from '@/components/BioEnergyCard';
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -326,33 +327,15 @@ export const TermsView = () => {
             )}
           </div>
 
-          <div className={`relative ${!isEligibleForHealthCard ? 'opacity-30 grayscale blur-[2px]' : ''} transition-all duration-700`}>
-            <div className="relative aspect-[1.586/1] rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/20">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-emerald-600 to-cyan-700" />
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
-              <div className="relative h-full w-full p-8 flex flex-col justify-between text-white border border-white/10">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Icon icon="solar:bolt-circle-bold" width={24} className="text-amber-400" />
-                    <span className="text-xs font-black tracking-tight uppercase">BIO-ENERGY</span>
-                  </div>
-                  <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-wider border border-white/30">Official Member Card</span>
-                </div>
-                <div className="text-center py-4">
-                  <h4 className="text-3xl font-black tracking-tight uppercase leading-none text-shadow-lg">HEALTH CARD</h4>
-                  <p className="text-[10px] opacity-70 mt-2 uppercase font-bold tracking-[0.2em]">Premium Wellness Shield</p>
-                </div>
-                <div className="flex justify-between items-end border-t border-white/20 pt-4">
-                  <div className="space-y-1">
-                    <p className="text-[8px] opacity-60 font-black uppercase tracking-tighter">Verified Holder</p>
-                    <p className="text-sm font-black uppercase truncate max-w-[150px]">{user?.fullname || 'Member Name'}</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <Icon icon="solar:verified-check-bold" width={32} className="text-white opacity-80" />
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-col items-center justify-center">
+            <BioEnergyCard 
+              userName={user?.fullname} 
+              isLocked={!isEligibleForHealthCard} 
+              unlockDays={30 - daysSinceJoined}
+            />
+            <p className="text-[10px] text-gray-500 mt-6 font-medium italic animate-pulse">
+              Click or tap the card to see both sides
+            </p>
           </div>
         </div>
 
