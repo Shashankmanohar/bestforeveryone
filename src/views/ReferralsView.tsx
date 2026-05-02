@@ -327,16 +327,16 @@ export const ReferralsView = () => {
               <div className="flex justify-between items-end mb-1">
                 <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Remaining capacity</span>
                 <span className="text-sm font-black text-blue-600 dark:text-blue-400 font-mono">
-                  <AnimatedNumber value={Math.max(0, 50000 - (user?.wallet?.royalty || 0))} prefix="₹" />
+                  <AnimatedNumber value={Math.max(0, 25000 - (user?.wallet?.royalty || 0))} prefix="₹" />
                 </span>
               </div>
               <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-blue-400/50 transition-all duration-700" 
-                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 50000) * 100, 100)}%` }} 
+                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 25000) * 100, 100)}%` }} 
                 />
               </div>
-              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹50,000 total royalty</p>
+              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹25,000 total royalty</p>
             </div>
 
             {/* Visualization */}
@@ -387,16 +387,16 @@ export const ReferralsView = () => {
               <div className="flex justify-between items-end mb-1">
                 <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Remaining capacity</span>
                 <span className="text-sm font-black text-amber-600 dark:text-amber-400 font-mono">
-                  <AnimatedNumber value={Math.max(0, 100000 - (user?.wallet?.royalty || 0))} prefix="₹" />
+                  <AnimatedNumber value={Math.max(0, 50000 - (user?.wallet?.royalty || 0))} prefix="₹" />
                 </span>
               </div>
               <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-amber-400/50 transition-all duration-700" 
-                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 100000) * 100, 100)}%` }} 
+                  style={{ width: `${Math.min(((user?.wallet?.royalty || 0) / 50000) * 100, 100)}%` }} 
                 />
               </div>
-              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹1,00,000 total royalty</p>
+              <p className="text-[8px] text-gray-400 mt-1 font-medium">Cap: ₹50,000 total royalty</p>
             </div>
 
             {/* Visualization */}

@@ -28,8 +28,8 @@ export const LeadershipView = () => {
 
   const tiers = [
     { label: 'Star Pool', req: 6, percent: '3%', color: 'emerald', icon: 'solar:star-bold', cap: 10000 },
-    { label: 'Double Star', req: 18, percent: '6%', color: 'blue', icon: 'solar:stars-bold', cap: 50000 },
-    { label: 'Super Star', req: 36, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold', cap: 100000 }
+    { label: 'Double Star', req: 18, percent: '6%', color: 'blue', icon: 'solar:stars-bold', cap: 25000 },
+    { label: 'Super Star', req: 36, percent: '11%', color: 'amber', icon: 'solar:crown-star-bold', cap: 50000 }
   ];
 
   return (

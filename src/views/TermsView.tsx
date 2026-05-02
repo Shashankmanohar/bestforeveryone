@@ -363,10 +363,11 @@ export const TermsView = () => {
              'Minimum withdrawal amount is ₹200 for all wallets.',
              'Weekly withdrawal limit is capped at ₹50,000 per user.',
              'Matrix positions are filled on First-Come, First-Serve basis.',
-             'Weekly Royalty is capped at Star (₹10k), D.Star (₹50k), S.Star (₹100k).',
+             'Weekly Royalty is capped at Star (₹10k), D.Star (₹25k), S.Star (₹50k).',
              'System works on community based auto growth (Top to Bottom, Left to Right).',
              'Direct sponsoring is not mandatory for Matrix income.',
-             'Identity verification (KYC) is required for large withdrawals.'
+             'Identity verification (KYC) is required for large withdrawals.',
+             'Users should submit their TDS directly to the government; the platform does not deduct any TDS charges.'
            ].map((item, i) => (
             <li key={i} className="flex gap-4 text-xs font-medium text-gray-600 dark:text-gray-400 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/30 border border-gray-100 dark:border-white/5 hover:border-gray-200 transition-colors group">
               <Icon icon="solar:check-circle-bold" className="text-emerald-500 shrink-0 mt-0.5 text-lg group-hover:scale-110 transition-transform" />
